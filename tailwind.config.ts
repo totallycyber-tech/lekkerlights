@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Nunito', 'sans-serif'],
         display: ['Outfit', 'sans-serif'],
       },
       colors: {
@@ -51,9 +51,13 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        glow: {
-          DEFAULT: "hsl(var(--glow))",
-          soft: "hsl(var(--glow-soft))",
+        festive: {
+          gold: "hsl(var(--festive-gold))",
+          pink: "hsl(var(--festive-pink))",
+          purple: "hsl(var(--festive-purple))",
+          cyan: "hsl(var(--festive-cyan))",
+          green: "hsl(var(--festive-green))",
+          orange: "hsl(var(--festive-orange))",
         },
         christmas: {
           DEFAULT: "hsl(var(--christmas))",
@@ -100,12 +104,14 @@ export default {
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-glow": "var(--gradient-glow)",
+        "gradient-festive": "var(--gradient-festive)",
+        "gradient-warm": "var(--gradient-warm)",
         "gradient-night": "var(--gradient-night)",
         "gradient-card": "var(--gradient-card)",
       },
       boxShadow: {
         glow: "var(--shadow-glow)",
+        festive: "var(--shadow-festive)",
         "card-hover": "var(--shadow-card-hover)",
       },
     },

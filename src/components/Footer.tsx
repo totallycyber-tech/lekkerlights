@@ -12,7 +12,7 @@ export function Footer() {
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
               <Sparkles className="h-6 w-6 text-primary" />
-              <span className="font-display font-bold text-xl">SA Lights</span>
+              <span className="font-display font-bold text-xl glow-text">Lekker Lights</span>
             </Link>
             <p className="text-sm text-muted-foreground">
               Discover and share beautiful light displays across South Africa. 
@@ -88,7 +88,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} SA Lights. Made with ❤️ in South Africa.
+            © {new Date().getFullYear()} Lekker Lights. Made with ❤️ in South Africa.
           </p>
           <nav className="flex gap-6">
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
