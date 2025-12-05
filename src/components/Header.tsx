@@ -17,7 +17,7 @@ export function Header() {
               <div className="absolute inset-0 bg-primary/20 blur-lg rounded-full" />
             </div>
             <span className="font-display font-bold text-xl glow-text">
-              SA Lights
+              Lekker Lights
             </span>
           </Link>
 

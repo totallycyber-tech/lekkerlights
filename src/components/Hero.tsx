@@ -28,7 +28,7 @@ export function Hero() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/50 backdrop-blur-sm rounded-full border border-border">
             <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-            <span className="text-sm font-medium">Discover South Africa's brightest displays</span>
+            <span className="text-sm font-medium">Discover South Africa's lekker lights</span>
           </div>
 
           {/* Main Heading */}

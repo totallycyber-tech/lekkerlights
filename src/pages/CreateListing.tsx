@@ -14,12 +14,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { themes, provinces } from "@/data/mockListings";
-import { Sparkles, Upload, ArrowLeft, Check } from "lucide-react";
+import { Sparkles, Upload, ArrowLeft, Check, Youtube, Image, Plus, X, Link as LinkIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 export default function CreateListing() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [youtubeUrls, setYoutubeUrls] = useState<string[]>(['']);
+  const [googleDriveUrls, setGoogleDriveUrls] = useState<string[]>(['']);
   const [formData, setFormData] = useState({
     theme: '',
     title: '',
@@ -38,6 +40,38 @@ export default function CreateListing() {
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const addYoutubeUrl = () => {
+    if (youtubeUrls.length < 3) {
+      setYoutubeUrls([...youtubeUrls, '']);
+    }
+  };
+
+  const removeYoutubeUrl = (index: number) => {
+    setYoutubeUrls(youtubeUrls.filter((_, i) => i !== index));
+  };
+
+  const updateYoutubeUrl = (index: number, value: string) => {
+    const updated = [...youtubeUrls];
+    updated[index] = value;
+    setYoutubeUrls(updated);
+  };
+
+  const addGoogleDriveUrl = () => {
+    if (googleDriveUrls.length < 10) {
+      setGoogleDriveUrls([...googleDriveUrls, '']);
+    }
+  };
+
+  const removeGoogleDriveUrl = (index: number) => {
+    setGoogleDriveUrls(googleDriveUrls.filter((_, i) => i !== index));
+  };
+
+  const updateGoogleDriveUrl = (index: number, value: string) => {
+    const updated = [...googleDriveUrls];
+    updated[index] = value;
+    setGoogleDriveUrls(updated);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -232,23 +266,111 @@ export default function CreateListing() {
               <div className="bg-card rounded-xl border border-border p-6 space-y-6">
                 <h2 className="font-display text-lg font-semibold">Photos & Videos</h2>
                 
-                <div className="space-y-4">
-                  <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer">
-                    <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
-                    <p className="font-medium mb-1">Upload Photos</p>
-                    <p className="text-sm text-muted-foreground">
-                      Drag and drop or click to upload (up to 10 photos)
-                    </p>
-                    <input type="file" className="hidden" accept="image/*" multiple />
+                <div className="space-y-6">
+                  {/* Photo Upload */}
+                  <div className="space-y-4">
+                    <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer">
+                      <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
+                      <p className="font-medium mb-1">Upload Photos</p>
+                      <p className="text-sm text-muted-foreground">
+                        Drag and drop or click to upload (up to 10 photos)
+                      </p>
+                      <input type="file" className="hidden" accept="image/*" multiple />
+                    </div>
                   </div>
 
-                  <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer">
-                    <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
-                    <p className="font-medium mb-1">Upload Videos</p>
-                    <p className="text-sm text-muted-foreground">
-                      Drag and drop or click to upload (up to 3 videos)
+                  {/* Google Drive Import */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Image className="h-5 w-5 text-festive-cyan" />
+                        <Label className="text-sm font-medium">Import from Google Drive</Label>
+                      </div>
+                      {googleDriveUrls.length < 10 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={addGoogleDriveUrl}
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Add More
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Paste shareable Google Drive image links (up to 10)
                     </p>
-                    <input type="file" className="hidden" accept="video/*" multiple />
+                    {googleDriveUrls.map((url, index) => (
+                      <div key={index} className="flex gap-2">
+                        <div className="relative flex-1">
+                          <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            placeholder="https://drive.google.com/file/d/..."
+                            value={url}
+                            onChange={(e) => updateGoogleDriveUrl(index, e.target.value)}
+                            className="bg-secondary pl-10"
+                          />
+                        </div>
+                        {googleDriveUrls.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeGoogleDriveUrl(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* YouTube URLs */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Youtube className="h-5 w-5 text-destructive" />
+                        <Label className="text-sm font-medium">YouTube Videos</Label>
+                      </div>
+                      {youtubeUrls.length < 3 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={addYoutubeUrl}
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Add More
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Add YouTube video URLs to showcase your display (up to 3)
+                    </p>
+                    {youtubeUrls.map((url, index) => (
+                      <div key={index} className="flex gap-2">
+                        <div className="relative flex-1">
+                          <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            value={url}
+                            onChange={(e) => updateYoutubeUrl(index, e.target.value)}
+                            className="bg-secondary pl-10"
+                          />
+                        </div>
+                        {youtubeUrls.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeYoutubeUrl(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>

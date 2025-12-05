@@ -16,7 +16,8 @@ export interface Listing {
     lng: number;
   };
   photos: string[];
-  videos: string[];
+  youtubeUrls: string[];
+  googleDrivePhotos?: string[];
   operatingHours: {
     days: string;
     times: string;
@@ -71,7 +72,7 @@ export const mockListings: Listing[] = [
       'https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=800',
       'https://images.unsplash.com/photo-1512389142860-9c449e58a814?w=800',
     ],
-    videos: [],
+    youtubeUrls: ['https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
     operatingHours: {
       days: 'Daily from 1 Dec - 6 Jan',
       times: '7:00 PM - 11:00 PM',
@@ -101,7 +102,7 @@ export const mockListings: Listing[] = [
       'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800',
       'https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=800',
     ],
-    videos: [],
+    youtubeUrls: [],
     operatingHours: {
       days: 'Diwali Week',
       times: '6:30 PM - 10:00 PM',
@@ -128,7 +129,7 @@ export const mockListings: Listing[] = [
       'https://images.unsplash.com/photo-1509557965875-b88c97052f0e?w=800',
       'https://images.unsplash.com/photo-1508361001413-7a9dca21d08a?w=800',
     ],
-    videos: [],
+    youtubeUrls: [],
     operatingHours: {
       days: '25-31 October',
       times: '6:00 PM - 9:00 PM',
@@ -157,7 +158,7 @@ export const mockListings: Listing[] = [
       'https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=800',
       'https://images.unsplash.com/photo-1545048702-79362596cdc9?w=800',
     ],
-    videos: [],
+    youtubeUrls: [],
     operatingHours: {
       days: 'Fri-Sun, Dec 1-25',
       times: '7:00 PM - 10:00 PM',
@@ -182,7 +183,7 @@ export const mockListings: Listing[] = [
     photos: [
       'https://images.unsplash.com/photo-1532635241-17e820acc59f?w=800',
     ],
-    videos: [],
+    youtubeUrls: [],
     operatingHours: {
       days: 'Eid Week',
       times: '7:00 PM - 11:00 PM',
@@ -208,7 +209,7 @@ export const mockListings: Listing[] = [
       'https://images.unsplash.com/photo-1513297887119-d46091b24bfa?w=800',
       'https://images.unsplash.com/photo-1544143481-18a7c2b49242?w=800',
     ],
-    videos: [],
+    youtubeUrls: ['https://www.youtube.com/watch?v=example123'],
     operatingHours: {
       days: 'Nightly, Dec 1-31',
       times: '8:00 PM - 10:30 PM',
