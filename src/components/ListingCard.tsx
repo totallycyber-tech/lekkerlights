@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -12,7 +12,8 @@ interface ListingCardProps {
   onToggleFavorite?: (listingId: string) => void;
   isPopular?: boolean;
   onDirectionsClick?: (listingId: string) => void;
-  distance?: number | null; // Distance in kilometers
+  distance?: number | null;
+  reviewStats?: { average_rating: number; review_count: number } | null;
 }
 
 export function ListingCard({ 
@@ -23,6 +24,7 @@ export function ListingCard({
   isPopular = false,
   onDirectionsClick,
   distance,
+  reviewStats,
 }: ListingCardProps) {
   const getDirectionsUrl = () => {
     const address = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}, ${listing.location.postalCode}`;
@@ -115,9 +117,18 @@ export function ListingCard({
 
       {/* Content */}
       <div className="p-4 space-y-3">
-        <h3 className="font-display font-semibold text-lg group-hover:text-christmas transition-colors line-clamp-1">
-          {listing.title}
-        </h3>
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-display font-semibold text-lg group-hover:text-christmas transition-colors line-clamp-1">
+            {listing.title}
+          </h3>
+          {reviewStats && reviewStats.review_count > 0 && (
+            <div className="flex items-center gap-1 shrink-0">
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              <span className="text-sm font-medium">{reviewStats.average_rating}</span>
+              <span className="text-xs text-muted-foreground">({reviewStats.review_count})</span>
+            </div>
+          )}
+        </div>
         
         <p className="text-sm text-muted-foreground line-clamp-2">
           {listing.description}

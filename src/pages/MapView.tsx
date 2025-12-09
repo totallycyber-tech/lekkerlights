@@ -13,10 +13,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { mockListings, provinces, transformDbListing, Listing } from "@/data/mockListings";
-import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation, Crosshair, X, Tags } from "lucide-react";
+import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation, Crosshair, X, Tags, Star } from "lucide-react";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
 import { useListings } from "@/hooks/use-listings";
+import { useReviewStats } from "@/hooks/use-reviews";
 import { calculateDistance } from "@/lib/geo-utils";
 import { toast } from "@/hooks/use-toast";
 import { TagFilter } from "@/components/TagFilter";
@@ -87,6 +88,10 @@ export default function MapView() {
     const transformed = (dbListings || []).map(transformDbListing);
     return transformed.length > 0 ? transformed : mockListings;
   }, [dbListings]);
+
+  // Fetch review stats for all listings
+  const listingIds = useMemo(() => allListings.map(l => l.id), [allListings]);
+  const { data: reviewStats } = useReviewStats(listingIds);
 
   // Calculate distance for each listing
   const getListingDistance = (listing: Listing): number | null => {
@@ -687,6 +692,7 @@ export default function MapView() {
               ) : (
                 filteredListings.map((listing) => {
                   const distance = getListingDistance(listing);
+                  const stats = reviewStats?.[listing.id];
                   const formatDistance = (km: number) => {
                     if (km < 1) return `${Math.round(km * 1000)} m`;
                     return `${km.toFixed(1)} km`;
@@ -710,7 +716,15 @@ export default function MapView() {
                           className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm truncate">{listing.title}</h3>
+                          <div className="flex items-start justify-between gap-1">
+                            <h3 className="font-semibold text-sm truncate">{listing.title}</h3>
+                            {stats && stats.review_count > 0 && (
+                              <div className="flex items-center gap-0.5 shrink-0">
+                                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                <span className="text-xs font-medium">{stats.average_rating}</span>
+                              </div>
+                            )}
+                          </div>
                           <p className="text-xs text-muted-foreground mt-1">
                             {listing.location.suburb}, {listing.location.city}
                           </p>
