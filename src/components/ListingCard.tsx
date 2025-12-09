@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -12,6 +12,7 @@ interface ListingCardProps {
   onToggleFavorite?: (listingId: string) => void;
   isPopular?: boolean;
   onDirectionsClick?: (listingId: string) => void;
+  distance?: number | null; // Distance in kilometers
 }
 
 export function ListingCard({ 
@@ -21,6 +22,7 @@ export function ListingCard({
   onToggleFavorite,
   isPopular = false,
   onDirectionsClick,
+  distance,
 }: ListingCardProps) {
   const getDirectionsUrl = () => {
     const address = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}, ${listing.location.postalCode}`;
@@ -39,6 +41,13 @@ export function ListingCard({
           : `${listing.title} has been added to your favourites.`,
       });
     }
+  };
+
+  const formatDistance = (km: number) => {
+    if (km < 1) {
+      return `${Math.round(km * 1000)} m`;
+    }
+    return `${km.toFixed(1)} km`;
   };
 
   return (
@@ -75,6 +84,17 @@ export function ListingCard({
           >
             <TrendingUp className="h-3 w-3 mr-1" />
             Popular
+          </Badge>
+        )}
+
+        {/* Distance Badge - show when location is provided */}
+        {distance !== undefined && distance !== null && (
+          <Badge 
+            variant="secondary"
+            className="absolute bottom-3 left-3 bg-background/80 backdrop-blur-sm"
+          >
+            <Navigation className="h-3 w-3 mr-1" />
+            {formatDistance(distance)}
           </Badge>
         )}
 
