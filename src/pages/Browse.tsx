@@ -4,11 +4,12 @@ import { Footer } from "@/components/Footer";
 import { SearchFilters } from "@/components/SearchFilters";
 import { ListingCard } from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
-import { mockListings } from "@/data/mockListings";
-import { LayoutGrid, Map, Sparkles, Heart } from "lucide-react";
+import { mockListings, transformDbListing, Listing } from "@/data/mockListings";
+import { LayoutGrid, Map, Sparkles, Heart, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useFavorites } from "@/hooks/use-favorites";
 import { usePopularity } from "@/hooks/use-popularity";
+import { useListings } from "@/hooks/use-listings";
 
 export default function Browse() {
   const [filters, setFilters] = useState({
@@ -20,14 +21,22 @@ export default function Browse() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
   const { isPopular, trackDirectionsClick, refreshFavoritesCount } = usePopularity();
+  const { data: dbListings, isLoading, error } = useListings();
 
   // Refresh popularity counts when favorites change
   useEffect(() => {
     refreshFavoritesCount();
   }, [favorites, refreshFavoritesCount]);
 
+  // Combine database listings with mock listings for display
+  const allListings: Listing[] = useMemo(() => {
+    const transformed = (dbListings || []).map(transformDbListing);
+    // If we have database listings, use them; otherwise fall back to mock
+    return transformed.length > 0 ? transformed : mockListings;
+  }, [dbListings]);
+
   const filteredListings = useMemo(() => {
-    return mockListings.filter((listing) => {
+    return allListings.filter((listing) => {
       // Favorites filter
       if (showFavoritesOnly && !favorites.includes(listing.id)) {
         return false;
@@ -59,7 +68,7 @@ export default function Browse() {
 
       return true;
     });
-  }, [filters, showFavoritesOnly, favorites]);
+  }, [filters, showFavoritesOnly, favorites, allListings]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -116,8 +125,17 @@ export default function Browse() {
           {/* Results Header */}
           <div className="mb-4 flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing {filteredListings.length} display{filteredListings.length !== 1 ? 's' : ''}
-              {showFavoritesOnly && ' (favourites only)'}
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading displays...
+                </span>
+              ) : (
+                <>
+                  Showing {filteredListings.length} display{filteredListings.length !== 1 ? 's' : ''}
+                  {showFavoritesOnly && ' (favourites only)'}
+                </>
+              )}
             </p>
             <Button
               variant={showFavoritesOnly ? 'default' : 'outline'}
@@ -130,7 +148,11 @@ export default function Browse() {
             </Button>
           </div>
 
-          {filteredListings.length > 0 ? (
+          {isLoading ? (
+            <div className="flex justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-christmas" />
+            </div>
+          ) : filteredListings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredListings.map((listing) => (
                 <ListingCard 

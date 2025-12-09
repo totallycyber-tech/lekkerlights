@@ -27,6 +27,82 @@ export interface Listing {
   featured?: boolean;
 }
 
+// Transform database listing to UI format
+export function transformDbListing(dbListing: {
+  id: string;
+  title: string;
+  description: string;
+  street_number: string;
+  street_name: string;
+  suburb: string;
+  city: string;
+  province: string;
+  postal_code: string;
+  lat: number | null;
+  lng: number | null;
+  google_drive_urls: string[];
+  youtube_urls: string[];
+  operating_hours: Record<string, { enabled: boolean; startTime: string; endTime: string }> | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  created_at: string;
+  directions_clicks: number;
+  favorites_count: number;
+}): Listing {
+  // Build operating hours display string
+  const hours = dbListing.operating_hours || {};
+  const enabledDays = Object.entries(hours)
+    .filter(([_, schedule]) => schedule?.enabled)
+    .map(([day, schedule]) => ({ day, ...schedule }));
+  
+  let daysStr = 'Contact for hours';
+  let timesStr = '';
+  
+  if (enabledDays.length > 0) {
+    if (enabledDays.length === 7) {
+      daysStr = 'Daily';
+    } else {
+      daysStr = enabledDays.map(d => d.day.substring(0, 3)).join(', ');
+    }
+    // Get unique time ranges
+    const timeRanges = [...new Set(enabledDays.map(d => `${d.startTime} - ${d.endTime}`))];
+    timesStr = timeRanges[0] || '';
+  }
+
+  // Use Google Drive URLs as photos, or placeholder if none
+  const photos = dbListing.google_drive_urls?.length > 0 
+    ? dbListing.google_drive_urls 
+    : ['https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=800'];
+
+  return {
+    id: dbListing.id,
+    title: dbListing.title,
+    description: dbListing.description,
+    location: {
+      streetNumber: dbListing.street_number,
+      streetName: dbListing.street_name,
+      suburb: dbListing.suburb,
+      city: dbListing.city,
+      province: dbListing.province,
+      postalCode: dbListing.postal_code,
+      lat: dbListing.lat || 0,
+      lng: dbListing.lng || 0,
+    },
+    photos,
+    youtubeUrls: dbListing.youtube_urls || [],
+    googleDrivePhotos: dbListing.google_drive_urls || [],
+    operatingHours: {
+      days: daysStr,
+      times: timesStr,
+    },
+    contact: {
+      email: dbListing.contact_email || undefined,
+      phone: dbListing.contact_phone || undefined,
+    },
+    createdAt: dbListing.created_at,
+  };
+}
+
 export const provinces = [
   'Gauteng',
   'Western Cape',
