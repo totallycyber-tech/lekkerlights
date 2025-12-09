@@ -74,9 +74,9 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
             <div className="space-y-2">
               <label className="text-sm font-medium">Province</label>
               <Select 
-                value={province} 
+                value={province || "all"} 
                 onValueChange={(value) => {
-                  setProvince(value);
+                  setProvince(value === "all" ? "" : value);
                   setTimeout(handleFilterChange, 0);
                 }}
               >
@@ -84,7 +84,7 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
                   <SelectValue placeholder="All Provinces" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Provinces</SelectItem>
+                  <SelectItem value="all">All Provinces</SelectItem>
                   {provinces.map((p) => (
                     <SelectItem key={p} value={p}>
                       {p}
