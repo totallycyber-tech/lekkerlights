@@ -11,6 +11,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { useListing } from "@/hooks/use-listings";
 import { ListingReviews } from "@/components/ListingReviews";
+import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -94,7 +95,7 @@ export default function ListingDetail() {
         {/* Hero Image Gallery */}
         <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
           <img 
-            src={listing.photos[0]} 
+            src={listing.photos[0] || defaultCoverPhoto} 
             alt={listing.title}
             className="w-full h-full object-cover"
           />

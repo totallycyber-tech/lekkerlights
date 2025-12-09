@@ -4,6 +4,7 @@ import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 interface ListingCardProps {
   listing: Listing;
@@ -75,7 +76,7 @@ export function ListingCard({
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden">
         <img 
-          src={listing.photos[0]} 
+          src={listing.photos[0] || defaultCoverPhoto} 
           alt={listing.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />

@@ -401,9 +401,9 @@ export default function CreateListing() {
                   {/* Cover Photo Upload */}
                   <div className="space-y-3">
                     <div>
-                      <Label className="text-sm font-medium">Cover Photo *</Label>
+                      <Label className="text-sm font-medium">Cover Photo</Label>
                       <p className="text-xs text-muted-foreground mt-1">
-                        This image will be displayed on listing cards in the Browse page
+                        This image will be displayed on listing cards in the Browse page. If not provided, a default festive image will be used.
                       </p>
                       <p className="text-xs text-christmas mt-1">
                         Recommended size: 1200 × 800 pixels (3:2 aspect ratio) for best display quality

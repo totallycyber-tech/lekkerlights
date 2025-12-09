@@ -21,6 +21,7 @@ import { useReviewStats } from "@/hooks/use-reviews";
 import { calculateDistance } from "@/lib/geo-utils";
 import { toast } from "@/hooks/use-toast";
 import { TagFilter } from "@/components/TagFilter";
+import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 const libraries: ("places")[] = ["places"];
 
@@ -647,7 +648,7 @@ export default function MapView() {
                   >
                     <div className="p-2 max-w-[200px]">
                       <img 
-                        src={selected.photos[0]} 
+                        src={selected.photos[0] || defaultCoverPhoto} 
                         alt={selected.title}
                         className="w-full h-20 object-cover rounded mb-2"
                       />
@@ -711,7 +712,7 @@ export default function MapView() {
                     >
                       <div className="flex gap-3">
                         <img
-                          src={listing.photos[0]}
+                          src={listing.photos[0] || defaultCoverPhoto}
                           alt={listing.title}
                           className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                         />
