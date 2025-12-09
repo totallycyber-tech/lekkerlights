@@ -19,7 +19,7 @@ export default function PrivacyPolicy() {
                 Lekker Lights ("Lekker Lights", "we", "us", or "our") provides an online platform at https://lekkerlights.co.za ("Website") that allows people to list and discover festive light displays at homes and properties ("Service"). This Privacy Policy explains how we collect, use, store, and protect your personal information when you use our Website and related services.
               </p>
               <p className="text-muted-foreground leading-relaxed mt-4">
-                By using the Service and submitting a listing or contact form, you agree to the collection and use of information in accordance with this Privacy Policy.
+                By using the Service and submitting a listing, review, report, or contact form, you agree to the collection and use of information in accordance with this Privacy Policy.
               </p>
             </div>
 
@@ -37,31 +37,69 @@ export default function PrivacyPolicy() {
             <div>
               <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">3. Information We Collect</h2>
               <p className="text-muted-foreground leading-relaxed">
-                We do not require users to create accounts or passwords. However, we do collect certain information when you submit a listing or contact us.
+                We do not require users to create accounts or passwords. However, we do collect certain information when you submit a listing, leave a review, report a listing, or contact us.
               </p>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.1 Information You Provide Directly</h3>
               
               <h4 className="font-display text-lg font-medium text-foreground mt-4 mb-2">a) Listing and Contact Information</h4>
-              <p className="text-muted-foreground leading-relaxed">When you submit a listing for your light display or contact us, we may collect:</p>
+              <p className="text-muted-foreground leading-relaxed">When you submit a listing for your light display, we may collect:</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
-                <li>Property address (street number, street name, suburb, city, province, postal code)</li>
-                <li>Contact email address</li>
+                <li>Full name</li>
+                <li>Contact email address (required so we can send you a secure edit link for your listing)</li>
                 <li>Contact phone number</li>
+                <li>Whether your name and/or contact details should be visible to the public or kept private</li>
+                <li>Property address (street number, street name, suburb, city, province, postal code)</li>
                 <li>Listing title and description</li>
-                <li>Display theme (e.g. Christmas)</li>
                 <li>Dates and hours during which the display is available for public viewing</li>
-                <li>Photos and/or videos you upload</li>
+                <li>Parking information (for example, where visitors may park, restrictions on street parking, etc.)</li>
+                <li>Visitor limits or guidance (such as maximum visitors at a time, "no buses", or group-size preferences)</li>
+                <li>Access instructions and gate/complex rules (for example, security gate procedures, ID or driver's licence requirements, dial-in or intercom codes, calling ahead for access, or estate rules)</li>
+                <li>Tags that describe the display (such as KidFriendly, Walkthrough, Synced, etc.); these are optional but help visitors find relevant listings</li>
+                <li>Photos and other images you upload directly to the Website</li>
+                <li>Links to external media such as YouTube videos</li>
                 <li>Any additional information you voluntarily include in your submission</li>
               </ul>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                We will always store your full name and contact details for administrative and safety purposes, even if you choose not to display them publicly. Where you select a visibility option, we will honour that preference on the public listing where technically and legally possible.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                We use your email address to send you a secure, unique edit link so that you can edit or delete your listing without creating an account or password. You are responsible for keeping this email and link safe and not sharing it with others you do not trust.
+              </p>
               <p className="text-muted-foreground leading-relaxed mt-4 italic">
                 Please note that photos and videos may include personal information (for example, images of people, vehicles, or neighbouring properties). You are responsible for ensuring you have the necessary consent before uploading such content.
               </p>
 
-              <h4 className="font-display text-lg font-medium text-foreground mt-4 mb-2">b) Notification and Communication Data</h4>
+              <h4 className="font-display text-lg font-medium text-foreground mt-4 mb-2">b) Reviews and Ratings</h4>
+              <p className="text-muted-foreground leading-relaxed">When Visitors submit reviews or ratings about a display, we may collect:</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
-                <li>Your email address and preferences when you subscribe to notifications or newsletters (if enabled)</li>
+                <li>Rating score</li>
+                <li>Review text and any captions or titles</li>
+                <li>The approximate date and time of your visit (if you provide it)</li>
+                <li>The suburb or general area you visited from (if you provide it)</li>
+                <li>Any display tags or options selected as part of the review (for example, whether you found it kid-friendly or accessible)</li>
+              </ul>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                Reviews and ratings are generally displayed publicly along with an anonymised or display name where appropriate. Reviews may be processed by automated tools (including AI systems) and/or human moderators to detect spam, offensive content, or other policy violations.
+              </p>
+
+              <h4 className="font-display text-lg font-medium text-foreground mt-4 mb-2">c) Reports and Flags</h4>
+              <p className="text-muted-foreground leading-relaxed">If you report a listing, we may collect:</p>
+              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
+                <li>The reason for the report (for example, "Inaccurate info", "Privacy concern", "Offensive content", "Safety issue", or other options made available)</li>
+                <li>Additional free-text details that you choose to provide about your concern</li>
+                <li>Your full name</li>
+                <li>Your contact email address and/or phone number</li>
+                <li>The date and time of the report</li>
+              </ul>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                Report information (including your contact details and the content of your report) may be emailed to totallycyber.tech@gmail.com and stored in our systems so that we can investigate and respond to your concern. We may contact you if we need more information about the report.
+              </p>
+
+              <h4 className="font-display text-lg font-medium text-foreground mt-4 mb-2">d) Communication Data</h4>
+              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Information you provide when contacting us for support or inquiries</li>
+                <li>Your email address and preferences when you subscribe to notifications or newsletters (if enabled)</li>
               </ul>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.2 Information Collected Automatically</h3>
@@ -96,8 +134,11 @@ export default function PrivacyPolicy() {
                 <li>Google may collect information such as your IP address, device details, and search queries.</li>
                 <li>Google processes this information according to its own Privacy Policy and Terms of Service.</li>
               </ul>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                We may also use third-party services (including AI-based tools) to help moderate reviews, images, tags, and other user-generated content for spam, harmful content, or policy violations.
+              </p>
               <p className="text-muted-foreground leading-relaxed mt-2">
-                We encourage you to review Google's privacy policy and terms to understand how they handle your information.
+                We encourage you to review relevant third-party privacy policies to understand how they handle your information.
               </p>
             </div>
 
@@ -106,13 +147,22 @@ export default function PrivacyPolicy() {
               <p className="text-muted-foreground leading-relaxed">We use the information we collect for the following purposes:</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>To receive, process, and display your listings on the Website and on maps so that visitors can find them</li>
-                <li>To contact you about your listing (for example, to clarify details or address issues)</li>
+                <li>To send you a secure edit link for your listing and allow you to edit or delete your listing without creating an account</li>
+                <li>To display optional details such as parking information, visitor limits, and access instructions so visitors can plan their trips safely and respectfully</li>
+                <li>To help visitors discover displays that match their interests by using tags and filters</li>
+                <li>To enable visitors to submit reviews and ratings and to display those reviews and ratings publicly</li>
+                <li>To moderate user-generated content (including reviews, tags, reports, and images) using a combination of automated tools (including AI models) and human review, with the goal of detecting spam, harmful content, and policy violations</li>
+                <li>To receive, investigate, and respond to reports about listings, including by contacting the reporter or the Host where necessary</li>
+                <li>To contact you about your listing, review, or report (for example, to clarify details, address complaints, or respond to concerns)</li>
                 <li>To send you notifications you have opted into (e.g. alerts about new displays in certain areas, if enabled)</li>
                 <li>To respond to your inquiries and support requests</li>
                 <li>To monitor, maintain, and improve the performance and security of the Service</li>
                 <li>To prevent fraud, abuse, and misuse (including enforcing our Terms of Service)</li>
                 <li>To comply with legal obligations</li>
               </ul>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                We do not use your personal information to make automated decisions that produce legal or similarly significant effects for you. However, we may use automated systems (including AI models) to decide whether to temporarily hide or flag certain reviews or content for further moderation.
+              </p>
             </div>
 
             <div>
@@ -121,9 +171,9 @@ export default function PrivacyPolicy() {
                 Where data protection laws such as the EU/UK GDPR or the South African Protection of Personal Information Act, 2013 ("POPIA") apply, we rely on the following legal bases:
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
-                <li><strong>Performance of a contract:</strong> Operating the Service you request, such as publishing your listing.</li>
+                <li><strong>Performance of a contract:</strong> Operating the Service you request, such as publishing your listing and enabling you to edit or remove it using a secure link.</li>
                 <li><strong>Consent:</strong> Sending you optional email notifications or marketing messages, and using certain cookies.</li>
-                <li><strong>Legitimate interests:</strong> Improving the Service, ensuring security, preventing abuse, and analysing usage.</li>
+                <li><strong>Legitimate interests:</strong> Improving the Service, ensuring security, preventing abuse, moderating user-generated content (including via AI tools), investigating and responding to reports, and analysing usage.</li>
                 <li><strong>Legal obligations:</strong> Complying with applicable laws and regulations.</li>
               </ul>
             </div>
@@ -133,12 +183,12 @@ export default function PrivacyPolicy() {
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">6.1 Responsible Party</h3>
               <p className="text-muted-foreground leading-relaxed">
-                For purposes of POPIA, Lekker Lights acts as the "responsible party" for personal information we collect and process via the Website and Service, except where you, as a Host, submit personal information about third parties (such as images of identifiable individuals). In those cases, you may also act as a responsible party or "responsible person" and are required to ensure that such processing is lawful.
+                For purposes of POPIA, Lekker Lights acts as the "responsible party" for personal information we collect and process via the Website and Service, except where you, as a Host, reviewer, or reporter, submit personal information about third parties (such as images of identifiable individuals or information about neighbours). In those cases, you may also act as a responsible party or "responsible person" and are required to ensure that such processing is lawful.
               </p>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">6.2 Lawfulness and Minimality</h3>
               <p className="text-muted-foreground leading-relaxed">
-                We process personal information in a manner that is lawful, reasonable, and not intrusive to your privacy, and we only process information that is adequate, relevant, and not excessive for the purposes described in this Privacy Policy.
+                We process personal information in a manner that is lawful, reasonable, and not intrusive to your privacy, and we only process information that is adequate, relevant, and not excessive for the purposes described in this Privacy Policy. We aim to collect only what is necessary to operate the Service (for example, your name and contact details for managing your listing, and tags and guidance information to help visitors plan their visit, and sufficient information in reports to investigate concerns).
               </p>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">6.3 Data Subject Rights under POPIA</h3>
@@ -155,12 +205,13 @@ export default function PrivacyPolicy() {
                 To exercise your rights, please contact us at <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a>.
               </p>
 
-              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">6.4 Hosts' Responsibilities under POPIA</h3>
-              <p className="text-muted-foreground leading-relaxed">If you submit a listing on Lekker Lights, you are responsible for ensuring that:</p>
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">6.4 Hosts', Reviewers', and Reporters' Responsibilities under POPIA</h3>
+              <p className="text-muted-foreground leading-relaxed">If you submit a listing, review, or report on Lekker Lights, you are responsible for ensuring that:</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
-                <li>You have a lawful basis under POPIA to upload and publish any personal information in your listing (including photos and videos showing identifiable individuals or neighbouring properties).</li>
+                <li>You have a lawful basis under POPIA to upload and publish any personal information in your listing, images, review, or report (including photos and videos showing identifiable individuals or neighbouring properties).</li>
                 <li>You obtain appropriate consent from any identifiable individuals appearing in your photos or videos, especially children.</li>
                 <li>You do not upload unnecessary or excessive personal information, such as detailed images of neighbours' homes or licence plates, unless you have a clear lawful justification and consent where required.</li>
+                <li>Any information you include about security procedures (such as gate access processes) does not unlawfully disclose sensitive information about others.</li>
               </ul>
             </div>
 
@@ -168,17 +219,26 @@ export default function PrivacyPolicy() {
               <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">7. How We Share Your Information</h2>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">7.1 Information Shared Publicly</h3>
-              <p className="text-muted-foreground leading-relaxed">The following data is made publicly visible as part of a listing:</p>
+              <p className="text-muted-foreground leading-relaxed">The following data is generally made publicly visible as part of a listing:</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Listing title</li>
                 <li>Listing description</li>
-                <li>Display theme</li>
-                <li>Photos and/or videos</li>
+                <li>Tags selected for the display</li>
+                <li>Photos and other images you upload</li>
+                <li>Links to videos (e.g. YouTube)</li>
                 <li>The location of the display (address and/or map marker, which may be shown at approximate or full accuracy, depending on implementation)</li>
                 <li>Available dates and hours for viewing</li>
+                <li>Parking information, visitor limits, and access instructions (to the extent you choose to provide them)</li>
+                <li>Whether the display is kid-friendly or has other attributes you choose to share</li>
               </ul>
-              <p className="text-muted-foreground leading-relaxed mt-2">
-                Anyone who visits the Website can view this information.
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                In some cases, your full name and/or contact details may also be visible to the public where you have chosen that option. Where you choose not to display certain details publicly, we will use them only for internal purposes such as contacting you about your listing.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                Reviews and ratings submitted by Visitors may also be displayed publicly, including rating score, review text, and a display name or anonymised identifier, as well as any tags or options selected as part of the review.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                Reports you submit are not displayed publicly but may be shared internally within Lekker Lights and with service providers or legal authorities where necessary to investigate and respond to the issue raised.
               </p>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">7.2 Service Providers</h3>
@@ -191,6 +251,7 @@ export default function PrivacyPolicy() {
                 <li>Analytics providers</li>
                 <li>Content delivery networks</li>
                 <li>Google Maps Platform</li>
+                <li>Content moderation or AI service providers</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-2">
                 These providers only have access to the information necessary to perform specific tasks on our behalf and are obligated to protect your information.
@@ -219,8 +280,10 @@ export default function PrivacyPolicy() {
                 We retain your information for as long as necessary to provide the Service, comply with our legal obligations, resolve disputes, and enforce our agreements.
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
-                <li>Listing and contact data are retained while the listing is active or as long as reasonably necessary for the purposes described in this Privacy Policy.</li>
-                <li>If you request that we remove a listing or your personal information, we will take reasonable steps to delete or anonymise the data, subject to any legal or legitimate business requirements (such as security or fraud prevention, or backup retention).</li>
+                <li>Listing, tag, image, and contact data are retained while the listing is active or as long as reasonably necessary for the purposes described in this Privacy Policy.</li>
+                <li>Review and rating data may be retained as part of the historical record of the Service, even if a listing is later removed, subject to applicable laws and our moderation policies.</li>
+                <li>Report data (including reporter details and the content of reports) may be retained for a reasonable period to investigate issues, maintain security, and demonstrate compliance with legal or regulatory obligations.</li>
+                <li>If you request that we remove a listing, review, report, or your personal information, we will take reasonable steps to delete or anonymise the data, subject to any legal or legitimate business requirements (such as security or fraud prevention, or backup retention).</li>
               </ul>
             </div>
 
@@ -253,7 +316,7 @@ export default function PrivacyPolicy() {
               <p className="text-muted-foreground leading-relaxed">
                 The Service is intended for use by adults. You must be at least 18 years old to submit a listing. Children may browse the site with the supervision and consent of a parent or guardian.
               </p>
-              <p className="text-muted-foreground leading-relaxed mt-2">
+              <p className="text-muted-foreground leading-relaxed mt-4">
                 We do not knowingly collect personal information from children under 13. If you believe that a child under 13 has provided us with personal information, please contact us so we can take appropriate action.
               </p>
             </div>
@@ -270,7 +333,7 @@ export default function PrivacyPolicy() {
               <p className="text-muted-foreground leading-relaxed">
                 We may update this Privacy Policy from time to time. When we do, we will revise the "Last updated" date at the top of this page. If changes are material, we may provide additional notice, such as by email or through the Service.
               </p>
-              <p className="text-muted-foreground leading-relaxed mt-2">
+              <p className="text-muted-foreground leading-relaxed mt-4">
                 Your continued use of the Service after any changes to this Privacy Policy constitutes your acceptance of the updated policy.
               </p>
             </div>
