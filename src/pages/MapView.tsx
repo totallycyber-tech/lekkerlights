@@ -15,8 +15,8 @@ import {
 import { mockListings, provinces } from "@/data/mockListings";
 import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation } from "lucide-react";
 import { usePopularity } from "@/hooks/use-popularity";
+import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
 
-const GOOGLE_MAPS_API_KEY = "AIzaSyAH-g4xwt6nXkCVlRC0eSYkM7-Q19_4gAo";
 const libraries: ("places")[] = ["places"];
 
 const mapContainerStyle = {
@@ -59,9 +59,10 @@ export default function MapView() {
   const addressAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const suburbAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const { trackDirectionsClick } = usePopularity();
+  const { apiKey, isLoading: isLoadingKey, error: keyError } = useGoogleMapsKey();
 
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: apiKey || '',
     libraries,
   });
 
@@ -209,6 +210,43 @@ export default function MapView() {
     }
   };
 
+  // Show loading state while fetching API key
+  if (isLoadingKey) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="pt-16 h-screen flex items-center justify-center">
+          <div className="text-center p-8">
+            <Loader2 className="h-12 w-12 text-christmas mx-auto mb-4 animate-spin" />
+            <p className="text-muted-foreground">Loading map configuration...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Show error state if API key failed to load
+  if (keyError) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="pt-16 h-screen flex items-center justify-center">
+          <div className="text-center p-8">
+            <MapPin className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <p className="text-destructive mb-2">Map configuration error</p>
+            <p className="text-muted-foreground text-sm">{keyError}</p>
+            <Link to="/browse">
+              <Button variant="outline" className="mt-4">
+                <LayoutGrid className="h-4 w-4 mr-1" />
+                View Grid Instead
+              </Button>
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -297,7 +335,7 @@ export default function MapView() {
               </div>
             )}
 
-            {!isLoaded && !loadError && (
+            {!isLoaded && !loadError && apiKey && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center p-8">
                   <Loader2 className="h-12 w-12 text-christmas mx-auto mb-4 animate-spin" />
@@ -306,7 +344,7 @@ export default function MapView() {
               </div>
             )}
 
-            {isLoaded && !loadError && (
+            {isLoaded && !loadError && apiKey && (
               <GoogleMap
                 mapContainerStyle={mapContainerStyle}
                 center={mapCenter}
@@ -413,86 +451,67 @@ export default function MapView() {
             <div className="p-4 border-b border-border sticky top-0 bg-card z-10">
               <div className="flex items-center justify-between">
                 <h2 className="font-display font-semibold">
-                  {filteredListings.length} Display{filteredListings.length !== 1 ? 's' : ''}
+                  <List className="h-4 w-4 inline mr-2" />
+                  Nearby Displays
                 </h2>
-                <List className="h-4 w-4 text-muted-foreground" />
               </div>
             </div>
 
-            {filteredListings.length === 0 ? (
-              <div className="p-8 text-center">
-                <p className="text-muted-foreground">No displays found matching your filters.</p>
-                <Button variant="ghost" size="sm" onClick={clearFilters} className="mt-4">
-                  Clear Filters
-                </Button>
-              </div>
-            ) : (
-              <div className="divide-y divide-border">
-                {filteredListings.map((listing) => (
-                  <div 
+            <div className="divide-y divide-border">
+              {filteredListings.length === 0 ? (
+                <div className="p-8 text-center text-muted-foreground">
+                  <MapPin className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No displays found in this area</p>
+                  <p className="text-sm">Try adjusting your filters</p>
+                </div>
+              ) : (
+                filteredListings.map((listing) => (
+                  <div
                     key={listing.id}
-                    ref={(el) => { listingRefs.current[listing.id] = el; }}
-                    className={`
-                      p-4 cursor-pointer transition-colors
-                      ${selectedListing === listing.id 
-                        ? 'bg-christmas/10 border-l-2 border-l-christmas' 
-                        : 'hover:bg-secondary'
-                      }
-                    `}
+                    ref={(el) => (listingRefs.current[listing.id] = el)}
+                    className={`p-4 cursor-pointer transition-colors hover:bg-secondary/50 ${
+                      selectedListing === listing.id ? "bg-christmas/10 border-l-2 border-christmas" : ""
+                    }`}
                     onClick={() => handleListingClick(listing.id)}
                     onMouseEnter={() => setHoveredListing(listing.id)}
                     onMouseLeave={() => setHoveredListing(null)}
                   >
                     <div className="flex gap-3">
-                      <img 
-                        src={listing.photos[0]} 
+                      <img
+                        src={listing.photos[0]}
                         alt={listing.title}
-                        className="w-16 h-16 rounded-lg object-cover shrink-0"
+                        className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
-                        <Badge variant="christmas" className="mb-1 text-xs">
-                          🎄 Christmas
-                        </Badge>
-                        <h3 className="font-medium text-sm truncate">
-                          {listing.title}
-                        </h3>
-                        <p className="text-xs text-muted-foreground truncate">
+                        <h3 className="font-semibold text-sm truncate">{listing.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">
                           {listing.location.suburb}, {listing.location.city}
                         </p>
-                        <p className="text-xs text-muted-foreground/70 truncate">
-                          {listing.location.province}
-                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {listing.location.province}
+                          </Badge>
+                        </div>
+                        <a
+                          href={getDirectionsUrl(listing)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            trackDirectionsClick(listing.id);
+                          }}
+                          className="inline-flex items-center text-xs text-christmas hover:underline mt-2"
+                        >
+                          <Navigation className="h-3 w-3 mr-1" />
+                          Get Directions
+                          <ExternalLink className="h-3 w-3 ml-1" />
+                        </a>
                       </div>
                     </div>
-
-                    {selectedListing === listing.id && (
-                      <div className="mt-3 pt-3 border-t border-border space-y-2">
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {listing.description}
-                        </p>
-                        <div className="flex gap-2">
-                          <Link to={`/listing/${listing.id}`} className="flex-1">
-                            <Button variant="default" size="sm" className="w-full">
-                              View Details
-                            </Button>
-                          </Link>
-                          <a 
-                            href={getDirectionsUrl(listing)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={() => trackDirectionsClick(listing.id)}
-                          >
-                            <Button variant="outline" size="sm">
-                              <ExternalLink className="h-4 w-4" />
-                            </Button>
-                          </a>
-                        </div>
-                      </div>
-                    )}
                   </div>
-                ))}
-              </div>
-            )}
+                ))
+              )}
+            </div>
           </div>
         </div>
       </main>
