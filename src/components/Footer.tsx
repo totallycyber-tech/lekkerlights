@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { Sparkles, MessageCircle } from "lucide-react";
+import { Sparkles, MessageCircle, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ContactUsDialog } from "@/components/ContactUsDialog";
 
 export function Footer() {
   return (
@@ -35,6 +36,14 @@ export function Footer() {
               <Link to="/resend-edit-link" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Lost Edit Link?
               </Link>
+              <ContactUsDialog
+                trigger={
+                  <button className="text-sm text-muted-foreground hover:text-foreground transition-colors text-left flex items-center gap-1">
+                    <Mail className="h-3 w-3" />
+                    Contact Us
+                  </button>
+                }
+              />
             </nav>
           </div>
 
