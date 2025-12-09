@@ -13,14 +13,23 @@ interface AddressComponents {
   postalCode: string;
 }
 
+interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
 interface AddressAutocompleteProps {
   onAddressSelect: (components: AddressComponents) => void;
 }
 
 export function AddressAutocomplete({ onAddressSelect }: AddressAutocompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
 
   useEffect(() => {
     // Load Google Maps script if not already loaded
@@ -36,18 +45,55 @@ export function AddressAutocomplete({ onAddressSelect }: AddressAutocompleteProp
     }
   }, []);
 
+  // Initialize map when coordinates are set
+  useEffect(() => {
+    if (!isLoaded || !coordinates || !mapContainerRef.current) return;
+
+    if (!mapRef.current) {
+      mapRef.current = new google.maps.Map(mapContainerRef.current, {
+        center: coordinates,
+        zoom: 16,
+        disableDefaultUI: true,
+        zoomControl: true,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+      });
+    } else {
+      mapRef.current.setCenter(coordinates);
+    }
+
+    if (markerRef.current) {
+      markerRef.current.setPosition(coordinates);
+    } else {
+      markerRef.current = new google.maps.Marker({
+        position: coordinates,
+        map: mapRef.current,
+        animation: google.maps.Animation.DROP,
+      });
+    }
+  }, [isLoaded, coordinates]);
+
   useEffect(() => {
     if (!isLoaded || !inputRef.current || autocompleteRef.current) return;
 
     autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
       componentRestrictions: { country: "za" },
       types: ["address"],
-      fields: ["address_components", "formatted_address"],
+      fields: ["address_components", "formatted_address", "geometry"],
     });
 
     autocompleteRef.current.addListener("place_changed", () => {
       const place = autocompleteRef.current?.getPlace();
       if (!place?.address_components) return;
+
+      // Get coordinates for map
+      if (place.geometry?.location) {
+        setCoordinates({
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        });
+      }
 
       const components: AddressComponents = {
         streetNumber: "",
@@ -96,13 +142,23 @@ export function AddressAutocomplete({ onAddressSelect }: AddressAutocompleteProp
   }, [isLoaded, onAddressSelect]);
 
   return (
-    <div className="relative">
-      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-      <Input
-        ref={inputRef}
-        placeholder="Start typing your address..."
-        className="bg-secondary pl-10"
-      />
+    <div className="space-y-3">
+      <div className="relative">
+        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          ref={inputRef}
+          placeholder="Start typing your address..."
+          className="bg-secondary pl-10"
+        />
+      </div>
+      
+      {/* Map Preview */}
+      {coordinates && (
+        <div 
+          ref={mapContainerRef}
+          className="w-full h-48 rounded-lg border border-border overflow-hidden"
+        />
+      )}
     </div>
   );
 }
