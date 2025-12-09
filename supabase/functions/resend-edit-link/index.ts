@@ -11,6 +11,47 @@ interface ResendEditLinkRequest {
   email: string;
 }
 
+// Rate limiting
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_MAX = 3;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+         req.headers.get("x-real-ip") || 
+         "unknown";
+}
+
+function checkRateLimit(identifier: string): { allowed: boolean; remainingTime?: number } {
+  const now = Date.now();
+  const record = rateLimitStore.get(identifier);
+
+  if (!record || now > record.resetTime) {
+    rateLimitStore.set(identifier, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true };
+  }
+
+  if (record.count >= RATE_LIMIT_MAX) {
+    const remainingTime = Math.ceil((record.resetTime - now) / 1000 / 60);
+    return { allowed: false, remainingTime };
+  }
+
+  record.count++;
+  return { allowed: true };
+}
+
+// HTML escape function to prevent injection
+function escapeHtml(text: string): string {
+  const entities: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return text.replace(/[&<>"']/g, char => entities[char]);
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -18,6 +59,22 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { email }: ResendEditLinkRequest = await req.json();
+    
+    // Rate limiting
+    const clientIP = getClientIP(req);
+    const rateLimitKey = `${clientIP}:${email || 'unknown'}`;
+    const rateCheck = checkRateLimit(rateLimitKey);
+    
+    if (!rateCheck.allowed) {
+      console.log(`Rate limit exceeded for ${rateLimitKey}`);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `Too many requests. Please try again in ${rateCheck.remainingTime} minutes.` 
+        }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
     
     if (!email || !email.trim()) {
       return new Response(
@@ -58,12 +115,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     const siteUrl = Deno.env.get("SITE_URL") || "https://lekkerlights.co.za";
 
-    // Build HTML for all listings
+    // Build HTML for all listings with escaped content
     const listingsHtml = listings.map(listing => {
       const editLink = `${siteUrl}/edit-listing/${listing.id}?token=${listing.edit_token}`;
+      const safeTitle = escapeHtml(listing.title);
       return `
         <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0;">
-          <h3 style="margin: 0 0 8px; color: #111827;">${listing.title}</h3>
+          <h3 style="margin: 0 0 8px; color: #111827;">${safeTitle}</h3>
           <a href="${editLink}" style="display: inline-block; background: #dc2626; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-size: 14px;">Edit This Listing</a>
           <p style="color: #666; font-size: 11px; margin: 12px 0 0; word-break: break-all;">Link: ${editLink}</p>
         </div>
