@@ -13,8 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { mockListings, provinces, transformDbListing, Listing } from "@/data/mockListings";
-import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation, Crosshair, X, Tags, Star, Flag, CheckSquare } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation, Crosshair, X, Tags, Star, Flag } from "lucide-react";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
 import { useListings } from "@/hooks/use-listings";
@@ -71,7 +70,6 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
   const [radiusFilter, setRadiusFilter] = useState<number | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isLocating, setIsLocating] = useState(false);
-  const [checkedListings, setCheckedListings] = useState<Set<string> | null>(null);
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const mapRef = useRef<google.maps.Map | null>(null);
   const listingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -151,53 +149,6 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
   };
 
   const hasActiveFilters = selectedProvince !== 'all' || suburbSearch || searchMarker || userLocation || selectedTags.length > 0;
-
-  // Auto-select all listings when they first load
-  useEffect(() => {
-    if (checkedListings === null && filteredListings.length > 0) {
-      setCheckedListings(new Set(filteredListings.map((l) => l.id)));
-    }
-  }, [filteredListings, checkedListings]);
-
-  // Ensure checkedListings is always a Set for operations
-  const activeCheckedListings = checkedListings ?? new Set<string>();
-
-  // Handle checkbox toggle for individual listing
-  const handleCheckboxToggle = (listingId: string) => {
-    setCheckedListings((prev) => {
-      const newSet = new Set(prev ?? []);
-      if (newSet.has(listingId)) {
-        newSet.delete(listingId);
-      } else {
-        newSet.add(listingId);
-      }
-      return newSet;
-    });
-  };
-
-  // Handle select all
-  const handleSelectAll = () => {
-    const filteredIds = filteredListings.map((l) => l.id);
-    const allSelected = filteredIds.every((id) => activeCheckedListings.has(id));
-    
-    if (allSelected) {
-      // Deselect all filtered listings
-      setCheckedListings((prev) => {
-        const newSet = new Set(prev ?? []);
-        filteredIds.forEach((id) => newSet.delete(id));
-        return newSet;
-      });
-    } else {
-      // Select all filtered listings
-      setCheckedListings((prev) => {
-        const newSet = new Set(prev ?? []);
-        filteredIds.forEach((id) => newSet.add(id));
-        return newSet;
-      });
-    }
-  };
-
-  const allFilteredSelected = filteredListings.length > 0 && filteredListings.every((l) => activeCheckedListings.has(l.id));
 
   // Handle getting user's current location
   const handleGetLocation = () => {
@@ -650,10 +601,8 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
                     title="Drag to search a different location"
                   />
                 )}
-                {/* Markers only for checked listings */}
-                {filteredListings
-                  .filter((listing) => activeCheckedListings.has(listing.id))
-                  .map((listing) => (
+                {/* Markers for all filtered listings */}
+                {filteredListings.map((listing) => (
                     listing.location.lat && listing.location.lng && (
                       <MarkerF
                         key={listing.id}
@@ -752,22 +701,6 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
                   {filteredListings.length} found
                 </span>
               </div>
-              {filteredListings.length > 0 && (
-                <Button
-                  variant="outline"
-                  size="default"
-                  className="mt-2 w-full h-10 sm:h-9 text-sm touch-manipulation"
-                  onClick={handleSelectAll}
-                >
-                  <CheckSquare className="h-5 w-5 sm:h-4 sm:w-4 mr-2" />
-                  {allFilteredSelected ? "Deselect All" : "Select All"}
-                  {checkedListings.size > 0 && (
-                    <span className="ml-2 bg-christmas text-white text-xs px-1.5 py-0.5 rounded-full">
-                      {checkedListings.size}
-                    </span>
-                  )}
-                </Button>
-              )}
             </div>
 
             <div className="divide-y divide-border">
@@ -798,20 +731,6 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
                       onMouseLeave={() => setHoveredListing(null)}
                     >
                       <div className="flex gap-2 sm:gap-3">
-                        <div 
-                          className="flex items-center justify-center flex-shrink-0 p-1 -m-1 touch-manipulation"
-                          onClick={(e) => e.stopPropagation()}
-                          onTouchEnd={(e) => {
-                            e.stopPropagation();
-                            handleCheckboxToggle(listing.id);
-                          }}
-                        >
-                          <Checkbox
-                            checked={activeCheckedListings.has(listing.id)}
-                            onCheckedChange={() => handleCheckboxToggle(listing.id)}
-                            className="h-6 w-6 sm:h-5 sm:w-5"
-                          />
-                        </div>
                         <img
                           src={listing.photos[0] || defaultCoverPhoto}
                           alt={listing.title}
