@@ -25,6 +25,12 @@ export function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-4 lg:gap-6" aria-label="Main navigation">
             <Link 
+              to="/how-to-use" 
+              className="text-muted-foreground hover:text-foreground transition-colors text-sm lg:text-base"
+            >
+              How to Use
+            </Link>
+            <Link 
               to="/browse" 
               className="text-muted-foreground hover:text-foreground transition-colors text-sm lg:text-base"
             >
@@ -67,6 +73,13 @@ export function Header() {
         {mobileMenuOpen && (
           <nav className="md:hidden py-4 border-t border-border" aria-label="Mobile navigation">
             <div className="flex flex-col gap-4">
+              <Link 
+                to="/how-to-use" 
+                className="text-muted-foreground hover:text-foreground transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                How to Use
+              </Link>
               <Link 
                 to="/browse" 
                 className="text-muted-foreground hover:text-foreground transition-colors py-2"
