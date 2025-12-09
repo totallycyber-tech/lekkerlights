@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { useCreateListing, uploadListingImages } from "@/hooks/use-listings";
 import { ImageUploader } from "@/components/ImageUploader";
+import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
 
 const DAYS_OF_WEEK = [
   'Monday',
@@ -51,7 +52,8 @@ export default function CreateListing() {
   const createListing = useCreateListing();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string>('');
-  const [images, setImages] = useState<File[]>([]);
+  const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
+  const [additionalImages, setAdditionalImages] = useState<File[]>([]);
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>(['']);
   const [operatingHours, setOperatingHours] = useState<OperatingHours>(defaultOperatingHours);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -151,10 +153,14 @@ export default function CreateListing() {
         operating_hours: operatingHours,
       });
 
-      // Upload images if any
-      if (images.length > 0) {
-        setUploadProgress(`Uploading ${images.length} photo(s)...`);
-        const imageUrls = await uploadListingImages(images, listing.id);
+      // Upload images if any (cover photo first, then additional)
+      const allImages: File[] = [];
+      if (coverPhoto) allImages.push(coverPhoto);
+      allImages.push(...additionalImages);
+      
+      if (allImages.length > 0) {
+        setUploadProgress(`Uploading ${allImages.length} photo(s)...`);
+        const imageUrls = await uploadListingImages(allImages, listing.id);
         
         // Update listing with image URLs
         const { supabase } = await import('@/integrations/supabase/client');
@@ -374,13 +380,33 @@ export default function CreateListing() {
                 <h2 className="font-display text-lg font-semibold">Photos & Videos</h2>
                 
                 <div className="space-y-6">
-                  {/* Photo Upload */}
+                  {/* Cover Photo Upload */}
                   <div className="space-y-3">
-                    <Label className="text-sm font-medium">Upload Photos</Label>
+                    <div>
+                      <Label className="text-sm font-medium">Cover Photo *</Label>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        This image will be displayed on listing cards in the Browse page
+                      </p>
+                    </div>
+                    <CoverPhotoUploader 
+                      image={coverPhoto}
+                      onImageChange={setCoverPhoto}
+                      maxSizeMB={5}
+                    />
+                  </div>
+
+                  {/* Additional Photos Upload */}
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-sm font-medium">Additional Photos</Label>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Add more photos to showcase your display (optional)
+                      </p>
+                    </div>
                     <ImageUploader 
-                      images={images}
-                      onImagesChange={setImages}
-                      maxImages={10}
+                      images={additionalImages}
+                      onImagesChange={setAdditionalImages}
+                      maxImages={9}
                       maxSizeMB={5}
                     />
                   </div>
