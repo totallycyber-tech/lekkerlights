@@ -18,6 +18,8 @@ export interface Listing {
   lng: number | null;
   contact_email: string | null;
   contact_phone: string | null;
+  email_visible: boolean;
+  phone_visible: boolean;
   image_urls: string[];
   youtube_urls: string[];
   operating_hours: Record<string, { enabled: boolean; startTime: string; endTime: string }>;
@@ -56,6 +58,8 @@ export interface ListingInsert {
   lng?: number | null;
   contact_email?: string | null;
   contact_phone?: string | null;
+  email_visible?: boolean;
+  phone_visible?: boolean;
   image_urls?: string[];
   youtube_urls?: string[];
   operating_hours?: Record<string, { enabled: boolean; startTime: string; endTime: string }>;

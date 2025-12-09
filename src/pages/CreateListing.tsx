@@ -59,6 +59,8 @@ export default function CreateListing() {
   const [operatingHours, setOperatingHours] = useState<OperatingHours>(defaultOperatingHours);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [emailVisible, setEmailVisible] = useState(true);
+  const [phoneVisible, setPhoneVisible] = useState(true);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -150,6 +152,8 @@ export default function CreateListing() {
         postal_code: formData.postalCode,
         contact_email: formData.contactEmail || null,
         contact_phone: formData.contactPhone || null,
+        email_visible: emailVisible,
+        phone_visible: phoneVisible,
         youtube_urls: filteredYoutubeUrls,
         image_urls: [],
         operating_hours: operatingHours,
@@ -548,9 +552,21 @@ export default function CreateListing() {
                   <p className="text-sm text-muted-foreground mt-1">Optional - only if you want visitors to contact you</p>
                 </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="contactEmail">Email</Label>
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="contactEmail">Email</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">
+                          {emailVisible ? 'Visible to public' : 'Hidden from public'}
+                        </span>
+                        <Switch
+                          checked={emailVisible}
+                          onCheckedChange={setEmailVisible}
+                          aria-label="Toggle email visibility"
+                        />
+                      </div>
+                    </div>
                     <Input
                       id="contactEmail"
                       type="email"
@@ -560,8 +576,21 @@ export default function CreateListing() {
                       className="bg-secondary"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="contactPhone">Phone</Label>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="contactPhone">Phone</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">
+                          {phoneVisible ? 'Visible to public' : 'Hidden from public'}
+                        </span>
+                        <Switch
+                          checked={phoneVisible}
+                          onCheckedChange={setPhoneVisible}
+                          aria-label="Toggle phone visibility"
+                        />
+                      </div>
+                    </div>
                     <Input
                       id="contactPhone"
                       type="tel"
