@@ -24,6 +24,7 @@ import { useCreateListing, uploadListingImages } from "@/hooks/use-listings";
 import { ImageUploader } from "@/components/ImageUploader";
 import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
 import { TagSelector } from "@/components/TagSelector";
+import { YouTubePreview } from "@/components/YouTubePreview";
 
 const DAYS_OF_WEEK = [
   'Monday',
@@ -404,6 +405,9 @@ export default function CreateListing() {
                       <p className="text-xs text-muted-foreground mt-1">
                         This image will be displayed on listing cards in the Browse page
                       </p>
+                      <p className="text-xs text-christmas mt-1">
+                        Recommended size: 1200 × 800 pixels (3:2 aspect ratio) for best display quality
+                      </p>
                     </div>
                     <CoverPhotoUploader 
                       image={coverPhoto}
@@ -418,6 +422,9 @@ export default function CreateListing() {
                       <Label className="text-sm font-medium">Additional Photos</Label>
                       <p className="text-xs text-muted-foreground mt-1">
                         Add more photos to showcase your display (optional)
+                      </p>
+                      <p className="text-xs text-christmas mt-1">
+                        Recommended size: 1600 × 1200 pixels or larger for gallery viewing
                       </p>
                     </div>
                     <ImageUploader 
@@ -473,6 +480,9 @@ export default function CreateListing() {
                         )}
                       </div>
                     ))}
+                    
+                    {/* YouTube Video Preview */}
+                    <YouTubePreview urls={youtubeUrls} />
                   </div>
                 </div>
               </div>
