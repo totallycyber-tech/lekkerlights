@@ -22,10 +22,10 @@ const mapContainerStyle = {
   height: "100%",
 };
 
-// Center on South Africa
+// Center on Benoni, Gauteng
 const defaultCenter = {
-  lat: -28.4793,
-  lng: 24.6727,
+  lat: -26.1881,
+  lng: 28.3208,
 };
 
 const mapOptions: google.maps.MapOptions = {
@@ -232,7 +232,7 @@ export default function MapView() {
               <GoogleMap
                 mapContainerStyle={mapContainerStyle}
                 center={defaultCenter}
-                zoom={6}
+                zoom={11}
                 options={mapOptions}
                 onLoad={onMapLoad}
               >
