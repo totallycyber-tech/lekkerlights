@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { provinces } from "@/data/mockListings";
-import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags } from "lucide-react";
+import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Eye } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
@@ -25,6 +25,7 @@ import { ImageUploader } from "@/components/ImageUploader";
 import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
 import { TagSelector } from "@/components/TagSelector";
 import { YouTubePreview } from "@/components/YouTubePreview";
+import { ListingPreview } from "@/components/ListingPreview";
 
 const DAYS_OF_WEEK = [
   'Monday',
@@ -67,6 +68,7 @@ export default function CreateListing() {
   const [showUnitField, setShowUnitField] = useState(false);
   const [addressSelected, setAddressSelected] = useState(false);
   const [addressError, setAddressError] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -714,6 +716,15 @@ export default function CreateListing() {
                   </Button>
                   <Button
                     type="button"
+                    variant="secondary"
+                    size="lg"
+                    onClick={() => setPreviewOpen(true)}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Preview
+                  </Button>
+                  <Button
+                    type="button"
                     variant="outline"
                     size="lg"
                     onClick={() => navigate(-1)}
@@ -749,6 +760,25 @@ export default function CreateListing() {
       </main>
 
       <Footer />
+
+      {/* Preview Dialog */}
+      <ListingPreview
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        data={formData}
+        coverPhoto={coverPhoto ? URL.createObjectURL(coverPhoto) : null}
+        additionalPhotos={additionalImages.map(img => URL.createObjectURL(img))}
+        operatingHours={Object.fromEntries(
+          Object.entries(operatingHours).map(([day, schedule]) => [
+            day.toLowerCase(),
+            { enabled: schedule.enabled, start: schedule.startTime, end: schedule.endTime }
+          ])
+        )}
+        nameVisible={nameVisible}
+        emailVisible={emailVisible}
+        phoneVisible={phoneVisible}
+        selectedTags={selectedTags}
+      />
     </div>
   );
 }
