@@ -19,6 +19,7 @@ export type Database = {
           city: string
           complex_name: string | null
           contact_email: string | null
+          contact_name: string | null
           contact_phone: string | null
           created_at: string
           description: string
@@ -29,6 +30,7 @@ export type Database = {
           image_urls: string[] | null
           lat: number | null
           lng: number | null
+          name_visible: boolean
           operating_hours: Json | null
           phone_visible: boolean
           postal_code: string
@@ -46,6 +48,7 @@ export type Database = {
           city: string
           complex_name?: string | null
           contact_email?: string | null
+          contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
           description: string
@@ -56,6 +59,7 @@ export type Database = {
           image_urls?: string[] | null
           lat?: number | null
           lng?: number | null
+          name_visible?: boolean
           operating_hours?: Json | null
           phone_visible?: boolean
           postal_code: string
@@ -73,6 +77,7 @@ export type Database = {
           city?: string
           complex_name?: string | null
           contact_email?: string | null
+          contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
           description?: string
@@ -83,6 +88,7 @@ export type Database = {
           image_urls?: string[] | null
           lat?: number | null
           lng?: number | null
+          name_visible?: boolean
           operating_hours?: Json | null
           phone_visible?: boolean
           postal_code?: string

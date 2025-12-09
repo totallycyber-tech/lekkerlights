@@ -59,6 +59,7 @@ export default function CreateListing() {
   const [operatingHours, setOperatingHours] = useState<OperatingHours>(defaultOperatingHours);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [nameVisible, setNameVisible] = useState(true);
   const [emailVisible, setEmailVisible] = useState(true);
   const [phoneVisible, setPhoneVisible] = useState(true);
   const [formData, setFormData] = useState({
@@ -72,6 +73,7 @@ export default function CreateListing() {
     city: '',
     province: '',
     postalCode: '',
+    contactName: '',
     contactEmail: '',
     contactPhone: '',
   });
@@ -150,8 +152,10 @@ export default function CreateListing() {
         city: formData.city,
         province: formData.province,
         postal_code: formData.postalCode,
+        contact_name: formData.contactName || null,
         contact_email: formData.contactEmail || null,
         contact_phone: formData.contactPhone || null,
+        name_visible: nameVisible,
         email_visible: emailVisible,
         phone_visible: phoneVisible,
         youtube_urls: filteredYoutubeUrls,
@@ -553,6 +557,30 @@ export default function CreateListing() {
                 </div>
                 
                 <div className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="contactName">Full Name</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">
+                          {nameVisible ? 'Visible to public' : 'Hidden from public'}
+                        </span>
+                        <Switch
+                          checked={nameVisible}
+                          onCheckedChange={setNameVisible}
+                          aria-label="Toggle name visibility"
+                        />
+                      </div>
+                    </div>
+                    <Input
+                      id="contactName"
+                      type="text"
+                      placeholder="John Smith"
+                      value={formData.contactName}
+                      onChange={(e) => handleChange('contactName', e.target.value)}
+                      className="bg-secondary"
+                    />
+                  </div>
+
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="contactEmail">Email</Label>

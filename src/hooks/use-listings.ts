@@ -16,8 +16,10 @@ export interface Listing {
   postal_code: string;
   lat: number | null;
   lng: number | null;
+  contact_name: string | null;
   contact_email: string | null;
   contact_phone: string | null;
+  name_visible: boolean;
   email_visible: boolean;
   phone_visible: boolean;
   image_urls: string[];
@@ -56,8 +58,10 @@ export interface ListingInsert {
   postal_code: string;
   lat?: number | null;
   lng?: number | null;
+  contact_name?: string | null;
   contact_email?: string | null;
   contact_phone?: string | null;
+  name_visible?: boolean;
   email_visible?: boolean;
   phone_visible?: boolean;
   image_urls?: string[];
