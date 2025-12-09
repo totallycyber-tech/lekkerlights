@@ -1,6 +1,26 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Search, Plus, MapPin } from "lucide-react";
+import { Sparkles, Search, Plus } from "lucide-react";
+
+// Generate snowflakes with random positions and delays
+const snowflakes = Array.from({ length: 30 }, (_, i) => ({
+  id: i,
+  left: `${Math.random() * 100}%`,
+  delay: `${Math.random() * 8}s`,
+  duration: `${6 + Math.random() * 6}s`,
+  size: Math.random() > 0.5 ? 'w-1 h-1' : 'w-1.5 h-1.5',
+}));
+
+// Generate twinkling lights with festive colors
+const twinklingLights = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  left: `${5 + Math.random() * 90}%`,
+  top: `${5 + Math.random() * 90}%`,
+  delay: `${Math.random() * 3}s`,
+  duration: `${1.5 + Math.random() * 2}s`,
+  color: ['bg-christmas', 'bg-christmas-secondary', 'bg-primary', 'bg-accent', 'bg-festive-cyan', 'bg-festive-gold'][Math.floor(Math.random() * 6)],
+  size: Math.random() > 0.6 ? 'w-2 h-2' : 'w-1.5 h-1.5',
+}));
 
 export function Hero() {
   return (
@@ -20,6 +40,38 @@ export function Hero() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/80 to-background" />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-background" />
+      </div>
+
+      {/* Snowfall effect */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        {snowflakes.map((flake) => (
+          <div
+            key={flake.id}
+            className={`absolute ${flake.size} bg-white/70 rounded-full animate-snowfall`}
+            style={{
+              left: flake.left,
+              animationDelay: flake.delay,
+              animationDuration: flake.duration,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Twinkling Christmas lights */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        {twinklingLights.map((light) => (
+          <div
+            key={light.id}
+            className={`absolute ${light.size} ${light.color} rounded-full animate-twinkle shadow-lg`}
+            style={{
+              left: light.left,
+              top: light.top,
+              animationDelay: light.delay,
+              animationDuration: light.duration,
+              boxShadow: '0 0 8px currentColor, 0 0 16px currentColor',
+            }}
+          />
+        ))}
       </div>
 
       {/* Floating light effects - decorative */}

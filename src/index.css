@@ -241,6 +241,14 @@
     animation: rainbow 4s ease-in-out infinite;
   }
 
+  .animate-snowfall {
+    animation: snowfall linear infinite;
+  }
+
+  .animate-twinkle {
+    animation: twinkle ease-in-out infinite;
+  }
+
   @keyframes glow {
     from {
       filter: drop-shadow(0 0 10px hsl(var(--primary) / 0.5));
@@ -274,6 +282,31 @@
     }
     50% {
       filter: hue-rotate(30deg);
+    }
+  }
+
+  @keyframes snowfall {
+    0% {
+      transform: translateY(-10vh) translateX(0);
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(100vh) translateX(20px);
+      opacity: 0.3;
+    }
+  }
+
+  @keyframes twinkle {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
     }
   }
 }
