@@ -27,7 +27,7 @@ export interface Listing {
   gate_access_info: string | null;
   image_urls: string[];
   youtube_urls: string[];
-  operating_hours: Record<string, { enabled: boolean; startTime: string; endTime: string }>;
+  operating_hours: Record<string, { enabled: boolean; startTime: string; endTime: string }> | { other: string };
   directions_clicks: number;
   favorites_count: number;
   tags: string[];
@@ -41,7 +41,7 @@ function toListingFromDb(row: any): Listing {
     ...row,
     image_urls: row.image_urls ?? [],
     youtube_urls: row.youtube_urls ?? [],
-    operating_hours: (row.operating_hours as Record<string, { enabled: boolean; startTime: string; endTime: string }>) ?? {},
+    operating_hours: (row.operating_hours as Record<string, { enabled: boolean; startTime: string; endTime: string }> | { other: string }) ?? {},
     directions_clicks: row.directions_clicks ?? 0,
     favorites_count: row.favorites_count ?? 0,
     tags: row.tags ?? [],
@@ -72,7 +72,7 @@ export interface ListingInsert {
   gate_access_info?: string | null;
   image_urls?: string[];
   youtube_urls?: string[];
-  operating_hours?: Record<string, { enabled: boolean; startTime: string; endTime: string }>;
+  operating_hours?: Record<string, { enabled: boolean; startTime: string; endTime: string }> | { other: string };
   tags?: string[];
 }
 

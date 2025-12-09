@@ -30,7 +30,7 @@ export default function Browse() {
 
   // Combine database listings with mock listings for display
   const allListings: Listing[] = useMemo(() => {
-    const transformed = (dbListings || []).map(transformDbListing);
+    const transformed = (dbListings || []).map((listing) => transformDbListing(listing as any));
     // If we have database listings, use them; otherwise fall back to mock
     return transformed.length > 0 ? transformed : mockListings;
   }, [dbListings]);

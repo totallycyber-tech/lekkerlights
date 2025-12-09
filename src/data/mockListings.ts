@@ -27,8 +27,8 @@ export interface Listing {
   featured?: boolean;
 }
 
-// Transform database listing to UI format
-export function transformDbListing(dbListing: {
+// Input type for transformDbListing that's compatible with both useListings and direct DB queries
+type DbListingInput = {
   id: string;
   title: string;
   description: string;
@@ -42,32 +42,42 @@ export function transformDbListing(dbListing: {
   lng: number | null;
   image_urls: string[];
   youtube_urls: string[];
-  operating_hours: Record<string, { enabled: boolean; startTime: string; endTime: string }> | null;
+  operating_hours: Record<string, { enabled: boolean; startTime: string; endTime: string }> | { other: string } | null;
   contact_email: string | null;
   contact_phone: string | null;
   created_at: string;
   directions_clicks: number;
   favorites_count: number;
   tags: string[] | null;
-}): Listing {
+};
+
+// Transform database listing to UI format
+export function transformDbListing(dbListing: DbListingInput): Listing {
   // Build operating hours display string
   const hours = dbListing.operating_hours || {};
-  const enabledDays = Object.entries(hours)
-    .filter(([_, schedule]) => schedule?.enabled)
-    .map(([day, schedule]) => ({ day, ...schedule }));
   
   let daysStr = 'Contact for hours';
   let timesStr = '';
   
-  if (enabledDays.length > 0) {
-    if (enabledDays.length === 7) {
-      daysStr = 'Daily';
-    } else {
-      daysStr = enabledDays.map(d => d.day.substring(0, 3)).join(', ');
+  // Check if it's the "other" type
+  if ('other' in hours && typeof hours.other === 'string') {
+    daysStr = hours.other || 'Contact for hours';
+    timesStr = '';
+  } else {
+    const enabledDays = Object.entries(hours as Record<string, { enabled: boolean; startTime: string; endTime: string }>)
+      .filter(([_, schedule]) => schedule?.enabled)
+      .map(([day, schedule]) => ({ day, ...schedule }));
+    
+    if (enabledDays.length > 0) {
+      if (enabledDays.length === 7) {
+        daysStr = 'Daily';
+      } else {
+        daysStr = enabledDays.map(d => d.day.substring(0, 3)).join(', ');
+      }
+      // Get unique time ranges
+      const timeRanges = [...new Set(enabledDays.map(d => `${d.startTime} - ${d.endTime}`))];
+      timesStr = timeRanges[0] || '';
     }
-    // Get unique time ranges
-    const timeRanges = [...new Set(enabledDays.map(d => `${d.startTime} - ${d.endTime}`))];
-    timesStr = timeRanges[0] || '';
   }
 
   // Use uploaded images as photos, or default cover photo if none
