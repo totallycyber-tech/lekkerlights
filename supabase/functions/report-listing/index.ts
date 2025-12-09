@@ -1,0 +1,132 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
+interface ReportListingRequest {
+  listingId: string;
+  listingTitle: string;
+  reason: string;
+  additionalDetails: string;
+  reporterName: string;
+  reporterEmail: string;
+  reporterPhone: string;
+  reportedAt: string;
+}
+
+const handler = async (req: Request): Promise<Response> => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const {
+      listingId,
+      listingTitle,
+      reason,
+      additionalDetails,
+      reporterName,
+      reporterEmail,
+      reporterPhone,
+      reportedAt,
+    }: ReportListingRequest = await req.json();
+
+    console.log(`Report received for listing: ${listingTitle} (${listingId})`);
+    console.log(`Reason: ${reason}`);
+
+    const siteUrl = Deno.env.get("SITE_URL") || "https://lekkerlights.co.za";
+    const listingUrl = `${siteUrl}/listing/${listingId}`;
+
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Deno.env.get("RESEND_API_KEY")}`,
+      },
+      body: JSON.stringify({
+        from: "Lekker Lights Reports <onboarding@resend.dev>",
+        to: ["totallycyber.tech@gmail.com"],
+        subject: `🚨 Listing Report: ${reason} - ${listingTitle}`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #dc2626;">🚨 Listing Report</h1>
+            
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <h2 style="margin: 0 0 8px; color: #991b1b; font-size: 18px;">Report Details</h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px 0; color: #666; width: 140px;"><strong>Reason:</strong></td>
+                  <td style="padding: 8px 0; color: #111;">${reason}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #666;"><strong>Date & Time:</strong></td>
+                  <td style="padding: 8px 0; color: #111;">${new Date(reportedAt).toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' })}</td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="background: #f3f4f6; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <h3 style="margin: 0 0 12px; color: #111; font-size: 16px;">Listing Information</h3>
+              <p style="margin: 0 0 8px;"><strong>Title:</strong> ${listingTitle}</p>
+              <p style="margin: 0 0 8px;"><strong>ID:</strong> ${listingId}</p>
+              <p style="margin: 0;"><a href="${listingUrl}" style="color: #dc2626;">View Listing →</a></p>
+            </div>
+
+            ${additionalDetails ? `
+            <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <h3 style="margin: 0 0 8px; color: #92400e; font-size: 16px;">Additional Details</h3>
+              <p style="margin: 0; color: #111; white-space: pre-wrap;">${additionalDetails}</p>
+            </div>
+            ` : ''}
+
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <h3 style="margin: 0 0 12px; color: #166534; font-size: 16px;">Reporter Contact</h3>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 4px 0; color: #666; width: 80px;"><strong>Name:</strong></td>
+                  <td style="padding: 4px 0; color: #111;">${reporterName}</td>
+                </tr>
+                ${reporterEmail ? `
+                <tr>
+                  <td style="padding: 4px 0; color: #666;"><strong>Email:</strong></td>
+                  <td style="padding: 4px 0; color: #111;"><a href="mailto:${reporterEmail}" style="color: #dc2626;">${reporterEmail}</a></td>
+                </tr>
+                ` : ''}
+                ${reporterPhone ? `
+                <tr>
+                  <td style="padding: 4px 0; color: #666;"><strong>Phone:</strong></td>
+                  <td style="padding: 4px 0; color: #111;"><a href="tel:${reporterPhone}" style="color: #dc2626;">${reporterPhone}</a></td>
+                </tr>
+                ` : ''}
+              </table>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+            <p style="color: #666; font-size: 12px; text-align: center;">
+              This report was submitted via Lekker Lights
+            </p>
+          </div>
+        `,
+      }),
+    });
+
+    const data = await res.json();
+    console.log("Report email sent:", data);
+
+    return new Response(
+      JSON.stringify({ success: true }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  } catch (error: any) {
+    console.error("Error sending report:", error);
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+};
+
+serve(handler);

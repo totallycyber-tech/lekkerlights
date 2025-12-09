@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { mockListings, provinces, transformDbListing, Listing } from "@/data/mockListings";
-import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation, Crosshair, X, Tags, Star } from "lucide-react";
+import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation, Crosshair, X, Tags, Star, Flag } from "lucide-react";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
 import { useListings } from "@/hooks/use-listings";
@@ -21,6 +21,7 @@ import { useReviewStats } from "@/hooks/use-reviews";
 import { calculateDistance } from "@/lib/geo-utils";
 import { toast } from "@/hooks/use-toast";
 import { TagFilter } from "@/components/TagFilter";
+import { ReportListingDialog } from "@/components/ReportListingDialog";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 const libraries: ("places")[] = ["places"];
@@ -745,20 +746,34 @@ export default function MapView() {
                               </Badge>
                             )}
                           </div>
-                          <a
-                            href={getDirectionsUrl(listing)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              trackDirectionsClick(listing.id);
-                            }}
-                            className="inline-flex items-center text-xs text-christmas hover:underline mt-2"
-                          >
-                            <Navigation className="h-3 w-3 mr-1" />
-                            Get Directions
-                            <ExternalLink className="h-3 w-3 ml-1" />
-                          </a>
+                          <div className="flex items-center justify-between mt-2">
+                            <a
+                              href={getDirectionsUrl(listing)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                trackDirectionsClick(listing.id);
+                              }}
+                              className="inline-flex items-center text-xs text-christmas hover:underline"
+                            >
+                              <Navigation className="h-3 w-3 mr-1" />
+                              Get Directions
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </a>
+                            <div onClick={(e) => e.stopPropagation()}>
+                              <ReportListingDialog
+                                listingId={listing.id}
+                                listingTitle={listing.title}
+                                trigger={
+                                  <button className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors">
+                                    <Flag className="h-3 w-3" />
+                                    Report
+                                  </button>
+                                }
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>

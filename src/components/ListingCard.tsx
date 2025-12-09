@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2 } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { ReportListingDialog } from "@/components/ReportListingDialog";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 interface ListingCardProps {
@@ -175,20 +176,37 @@ export function ListingCard({
         </div>
 
         {/* Get Directions */}
-        <a
-          href={getDirectionsUrl()}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDirectionsClick?.(listing.id);
-          }}
-          className="inline-flex items-center gap-1 text-sm text-christmas hover:text-christmas/80 transition-colors"
-          aria-label={`Get directions to ${listing.title}`}
-        >
-          <ExternalLink className="h-4 w-4" aria-hidden="true" />
-          Get Directions
-        </a>
+        <div className="flex items-center justify-between">
+          <a
+            href={getDirectionsUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDirectionsClick?.(listing.id);
+            }}
+            className="inline-flex items-center gap-1 text-sm text-christmas hover:text-christmas/80 transition-colors"
+            aria-label={`Get directions to ${listing.title}`}
+          >
+            <ExternalLink className="h-4 w-4" aria-hidden="true" />
+            Get Directions
+          </a>
+          <div onClick={(e) => e.preventDefault()}>
+            <ReportListingDialog
+              listingId={listing.id}
+              listingTitle={listing.title}
+              trigger={
+                <button
+                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+                  aria-label={`Report ${listing.title}`}
+                >
+                  <Flag className="h-3 w-3" aria-hidden="true" />
+                  Report
+                </button>
+              }
+            />
+          </div>
+        </div>
       </div>
     </Link>
   );
