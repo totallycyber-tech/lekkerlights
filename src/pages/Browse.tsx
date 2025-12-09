@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { useFavorites } from "@/hooks/use-favorites";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useListings } from "@/hooks/use-listings";
+import { useReviewStats } from "@/hooks/use-reviews";
 import { calculateDistance } from "@/lib/geo-utils";
 
 export default function Browse() {
@@ -38,6 +39,10 @@ export default function Browse() {
     // If we have database listings, use them; otherwise fall back to mock
     return transformed.length > 0 ? transformed : mockListings;
   }, [dbListings]);
+
+  // Fetch review stats for all listings
+  const listingIds = useMemo(() => allListings.map(l => l.id), [allListings]);
+  const { data: reviewStats } = useReviewStats(listingIds);
 
   // Calculate distance for each listing if user location is available
   const getListingDistance = (listing: Listing): number | null => {
@@ -193,6 +198,7 @@ export default function Browse() {
                   isPopular={isPopular(listing.id)}
                   onDirectionsClick={trackDirectionsClick}
                   distance={getListingDistance(listing)}
+                  reviewStats={reviewStats?.[listing.id] || null}
                 />
               ))}
             </div>
