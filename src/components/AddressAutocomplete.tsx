@@ -1,8 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { MapPin } from "lucide-react";
-
-const GOOGLE_MAPS_API_KEY = "AIzaSyAH-g4xwt6nXkCVlRC0eSYkM7-Q19_4gAo";
+import { MapPin, Loader2 } from "lucide-react";
+import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
 
 interface AddressComponents {
   streetNumber: string;
@@ -30,12 +29,15 @@ export function AddressAutocomplete({ onAddressSelect }: AddressAutocompleteProp
   const markerRef = useRef<google.maps.Marker | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
+  const { apiKey, isLoading: isLoadingKey, error: keyError } = useGoogleMapsKey();
 
   useEffect(() => {
+    if (!apiKey) return;
+    
     // Load Google Maps script if not already loaded
     if (!window.google) {
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = () => setIsLoaded(true);
@@ -43,7 +45,7 @@ export function AddressAutocomplete({ onAddressSelect }: AddressAutocompleteProp
     } else {
       setIsLoaded(true);
     }
-  }, []);
+  }, [apiKey]);
 
   // Initialize map when coordinates are set
   useEffect(() => {
@@ -153,6 +155,23 @@ export function AddressAutocomplete({ onAddressSelect }: AddressAutocompleteProp
       onAddressSelect(components);
     });
   }, [isLoaded, onAddressSelect]);
+
+  if (isLoadingKey) {
+    return (
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Loading address search...
+      </div>
+    );
+  }
+
+  if (keyError) {
+    return (
+      <div className="text-sm text-destructive">
+        {keyError}. Please contact support.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
