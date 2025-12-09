@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -18,6 +18,7 @@ import { provinces } from "@/data/mockListings";
 import { Sparkles, ArrowLeft, Check, Youtube, Image, Plus, X, Link as LinkIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
 const DAYS_OF_WEEK = [
   'Monday',
@@ -51,6 +52,8 @@ export default function CreateListing() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    complexName: '',
+    unitNo: '',
     streetNumber: '',
     streetName: '',
     suburb: '',
@@ -78,6 +81,25 @@ export default function CreateListing() {
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  const handleAddressSelect = useCallback((components: {
+    streetNumber: string;
+    streetName: string;
+    suburb: string;
+    city: string;
+    province: string;
+    postalCode: string;
+  }) => {
+    setFormData(prev => ({
+      ...prev,
+      streetNumber: components.streetNumber,
+      streetName: components.streetName,
+      suburb: components.suburb,
+      city: components.city,
+      province: components.province,
+      postalCode: components.postalCode,
+    }));
+  }, []);
 
   const addYoutubeUrl = () => {
     if (youtubeUrls.length < 3) {
@@ -195,7 +217,40 @@ export default function CreateListing() {
 
               {/* Location */}
               <div className="bg-card rounded-xl border border-border p-6 space-y-6">
-                <h2 className="font-display text-lg font-semibold">Location</h2>
+                <div>
+                  <h2 className="font-display text-lg font-semibold">Location</h2>
+                  <p className="text-sm text-muted-foreground mt-1">Start typing your address to auto-fill the fields below</p>
+                </div>
+
+                {/* Address Autocomplete */}
+                <div className="space-y-2">
+                  <Label>Search Address</Label>
+                  <AddressAutocomplete onAddressSelect={handleAddressSelect} />
+                </div>
+
+                {/* Complex/Estate Details */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="complexName">Complex/Estate Name</Label>
+                    <Input
+                      id="complexName"
+                      placeholder="e.g., Silver Lakes Estate"
+                      value={formData.complexName}
+                      onChange={(e) => handleChange('complexName', e.target.value)}
+                      className="bg-secondary"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="unitNo">Unit No</Label>
+                    <Input
+                      id="unitNo"
+                      placeholder="e.g., Unit 12"
+                      value={formData.unitNo}
+                      onChange={(e) => handleChange('unitNo', e.target.value)}
+                      className="bg-secondary"
+                    />
+                  </div>
+                </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
