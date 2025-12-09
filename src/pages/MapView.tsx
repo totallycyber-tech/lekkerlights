@@ -59,7 +59,8 @@ const RADIUS_OPTIONS = [
   { value: 50, label: "50 km" },
 ];
 
-export default function MapView() {
+// Inner component that only renders after API key is loaded
+function MapViewContent({ apiKey }: { apiKey: string }) {
   const [selectedProvince, setSelectedProvince] = useState<string>('all');
   const [suburbSearch, setSuburbSearch] = useState('');
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
@@ -77,11 +78,10 @@ export default function MapView() {
   const addressAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const suburbAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const { trackDirectionsClick } = usePopularity();
-  const { apiKey, isLoading: isLoadingKey, error: keyError } = useGoogleMapsKey();
   const { data: dbListings } = useListings();
 
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: apiKey || '',
+    googleMapsApiKey: apiKey,
     libraries,
   });
 
@@ -338,8 +338,8 @@ export default function MapView() {
     }
   };
 
-  // Show loading state while fetching API key or loading Google Maps
-  if (isLoadingKey || (apiKey && !isLoaded && !loadError)) {
+  // Show loading state while loading Google Maps
+  if (!isLoaded && !loadError) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -353,8 +353,8 @@ export default function MapView() {
     );
   }
 
-  // Show error state if API key failed to load or Google Maps failed to load
-  if (keyError || loadError) {
+  // Show error state if Google Maps failed to load
+  if (loadError) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -363,7 +363,7 @@ export default function MapView() {
             <MapPin className="h-12 w-12 text-destructive mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Unable to Load Map</h2>
             <p className="text-muted-foreground mb-4">
-              {keyError || "Google Maps couldn't be loaded. This may be due to network issues or API configuration."}
+              Google Maps couldn't be loaded. This may be due to network issues or API configuration.
             </p>
             <p className="text-sm text-muted-foreground mb-6">
               You can still browse all Christmas light displays using the grid view.
@@ -786,4 +786,54 @@ export default function MapView() {
       </main>
     </div>
   );
+}
+
+// Wrapper component that fetches API key first
+export default function MapView() {
+  const { apiKey, isLoading: isLoadingKey, error: keyError } = useGoogleMapsKey();
+
+  // Show loading state while fetching API key
+  if (isLoadingKey) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="pt-16 h-screen flex items-center justify-center">
+          <div className="text-center p-8">
+            <Loader2 className="h-12 w-12 text-christmas mx-auto mb-4 animate-spin" />
+            <p className="text-muted-foreground">Loading map...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Show error state if API key failed to load
+  if (keyError || !apiKey) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="pt-16 h-screen flex items-center justify-center">
+          <div className="text-center p-8 max-w-md">
+            <MapPin className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Unable to Load Map</h2>
+            <p className="text-muted-foreground mb-4">
+              {keyError || "Map configuration not available. Please try again later."}
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              You can still browse all Christmas light displays using the grid view.
+            </p>
+            <Link to="/browse">
+              <Button className="bg-christmas hover:bg-christmas/90">
+                <LayoutGrid className="h-4 w-4 mr-2" />
+                Browse Displays
+              </Button>
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Only render the map content after API key is available
+  return <MapViewContent apiKey={apiKey} />;
 }
