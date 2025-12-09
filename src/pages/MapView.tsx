@@ -245,23 +245,35 @@ export default function MapView() {
                       icon={{
                         url: selectedListing === listing.id || hoveredListing === listing.id
                           ? "data:image/svg+xml," + encodeURIComponent(`
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
-                                <circle cx="24" cy="24" r="20" fill="#dc2626" stroke="#fff" stroke-width="3"/>
-                                <text x="24" y="32" font-size="24" text-anchor="middle">🎄</text>
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="36" height="36">
+                                <circle cx="18" cy="18" r="16" fill="#166534" stroke="#fff" stroke-width="2"/>
+                                <polygon points="18,6 22,14 26,14 23,18 25,26 18,22 11,26 13,18 10,14 14,14" fill="#0f5132"/>
+                                <circle cx="14" cy="12" r="2" fill="#ef4444"/>
+                                <circle cx="22" cy="12" r="2" fill="#fbbf24"/>
+                                <circle cx="12" cy="18" r="2" fill="#3b82f6"/>
+                                <circle cx="24" cy="18" r="2" fill="#ef4444"/>
+                                <circle cx="15" cy="23" r="2" fill="#fbbf24"/>
+                                <circle cx="21" cy="23" r="2" fill="#3b82f6"/>
+                                <circle cx="18" cy="16" r="2" fill="#22c55e"/>
                               </svg>
                             `)
                           : "data:image/svg+xml," + encodeURIComponent(`
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
-                                <circle cx="20" cy="20" r="16" fill="#166534" stroke="#fff" stroke-width="2"/>
-                                <text x="20" y="27" font-size="18" text-anchor="middle">🎄</text>
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28">
+                                <circle cx="14" cy="14" r="12" fill="#166534" stroke="#fff" stroke-width="2"/>
+                                <circle cx="10" cy="10" r="2" fill="#ef4444"/>
+                                <circle cx="18" cy="10" r="2" fill="#fbbf24"/>
+                                <circle cx="9" cy="16" r="2" fill="#3b82f6"/>
+                                <circle cx="19" cy="16" r="2" fill="#ef4444"/>
+                                <circle cx="14" cy="13" r="2" fill="#22c55e"/>
+                                <circle cx="14" cy="20" r="2" fill="#fbbf24"/>
                               </svg>
                             `),
                         scaledSize: selectedListing === listing.id || hoveredListing === listing.id
-                          ? new google.maps.Size(48, 48)
-                          : new google.maps.Size(40, 40),
+                          ? new google.maps.Size(36, 36)
+                          : new google.maps.Size(28, 28),
                         anchor: selectedListing === listing.id || hoveredListing === listing.id
-                          ? new google.maps.Point(24, 24)
-                          : new google.maps.Point(20, 20),
+                          ? new google.maps.Point(18, 18)
+                          : new google.maps.Point(14, 14),
                       }}
                       animation={selectedListing === listing.id ? google.maps.Animation.BOUNCE : undefined}
                     />
