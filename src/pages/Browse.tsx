@@ -5,52 +5,11 @@ import { SearchFilters, SearchFilters as SearchFiltersType } from "@/components/
 import { ListingCard } from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
 import { mockListings, transformDbListing, Listing } from "@/data/mockListings";
-import { Sparkles, Heart, Loader2, MapPin, ExternalLink } from "lucide-react";
+import { Sparkles, Heart, Loader2 } from "lucide-react";
 import { useFavorites } from "@/hooks/use-favorites";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useListings } from "@/hooks/use-listings";
 import { useReviewStats } from "@/hooks/use-reviews";
-import { calculateDistance } from "@/lib/geo-utils";
-
-// Generate Google Maps URL with all listings using addresses
-function generateGoogleMapsUrl(listings: Listing[]): string {
-  if (listings.length === 0) {
-    return "";
-  }
-
-  // For a single listing, use the place search
-  if (listings.length === 1) {
-    const listing = listings[0];
-    const address = [
-      listing.location.streetNumber,
-      listing.location.streetName,
-      listing.location.suburb,
-      listing.location.city,
-      listing.location.province,
-    ]
-      .filter(Boolean)
-      .join(" ");
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-  }
-
-  // For multiple listings, use directions mode with waypoints (max 10)
-  const baseUrl = "https://www.google.com/maps/dir/";
-  
-  const waypoints = listings.slice(0, 10).map((listing) => {
-    const address = [
-      listing.location.streetNumber,
-      listing.location.streetName,
-      listing.location.suburb,
-      listing.location.city,
-      listing.location.province,
-    ]
-      .filter(Boolean)
-      .join(" ");
-    return encodeURIComponent(address);
-  });
-
-  return baseUrl + waypoints.join("/");
-}
 
 export default function Browse() {
   const [filters, setFilters] = useState<SearchFiltersType>({
@@ -58,8 +17,6 @@ export default function Browse() {
     province: "",
     suburb: "",
     tags: [],
-    location: null,
-    radius: null,
   });
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
@@ -81,19 +38,6 @@ export default function Browse() {
   // Fetch review stats for all listings
   const listingIds = useMemo(() => allListings.map(l => l.id), [allListings]);
   const { data: reviewStats } = useReviewStats(listingIds);
-
-  // Calculate distance for each listing if user location is available
-  const getListingDistance = (listing: Listing): number | null => {
-    if (!filters.location || !listing.location.lat || !listing.location.lng) {
-      return null;
-    }
-    return calculateDistance(
-      filters.location.lat,
-      filters.location.lng,
-      listing.location.lat,
-      listing.location.lng
-    );
-  };
 
   const filteredListings = useMemo(() => {
     return allListings.filter((listing) => {
@@ -133,20 +77,9 @@ export default function Browse() {
         if (!hasAllTags) return false;
       }
 
-      // Distance filter - only if location and radius are set
-      if (filters.location && filters.radius) {
-        const distance = getListingDistance(listing);
-        if (distance === null || distance > filters.radius) return false;
-      }
-
       return true;
     });
   }, [filters, showFavoritesOnly, favorites, allListings]);
-
-  // Generate Google Maps URL for filtered listings
-  const googleMapsUrl = useMemo(() => {
-    return generateGoogleMapsUrl(filteredListings);
-  }, [filteredListings]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -211,44 +144,20 @@ export default function Browse() {
               <Loader2 className="h-8 w-8 animate-spin text-christmas" />
             </div>
           ) : filteredListings.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredListings.map((listing) => (
-                  <ListingCard 
-                    key={listing.id} 
-                    listing={listing}
-                    isFavorite={isFavorite(listing.id)}
-                    onToggleFavorite={toggleFavorite}
-                    isPopular={isPopular(listing.id)}
-                    onDirectionsClick={trackDirectionsClick}
-                    distance={getListingDistance(listing)}
-                    reviewStats={reviewStats?.[listing.id] || null}
-                  />
-                ))}
-              </div>
-
-              {/* Google Maps External Link */}
-              {googleMapsUrl && (
-                <div className="mt-12 flex justify-center">
-                  <a
-                    href={googleMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group"
-                  >
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="gap-3 border-christmas/30 hover:border-christmas hover:bg-christmas/10 transition-all"
-                    >
-                      <MapPin className="h-5 w-5 text-christmas" />
-                      <span>Open in Google Maps</span>
-                      <ExternalLink className="h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
-                    </Button>
-                  </a>
-                </div>
-              )}
-            </>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredListings.map((listing) => (
+                <ListingCard 
+                  key={listing.id} 
+                  listing={listing}
+                  isFavorite={isFavorite(listing.id)}
+                  onToggleFavorite={toggleFavorite}
+                  isPopular={isPopular(listing.id)}
+                  onDirectionsClick={trackDirectionsClick}
+                  distance={null}
+                  reviewStats={reviewStats?.[listing.id] || null}
+                />
+              ))}
+            </div>
           ) : (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">🔍</div>
@@ -260,7 +169,7 @@ export default function Browse() {
               </p>
               <Button 
                 variant="outline"
-                onClick={() => setFilters({ search: "", province: "", suburb: "", tags: [], location: null, radius: null })}
+                onClick={() => setFilters({ search: "", province: "", suburb: "", tags: [] })}
               >
                 Clear all filters
               </Button>
