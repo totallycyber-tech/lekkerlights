@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.verify-edit-token]
 verify_jwt = false
+
+[functions.delete-listing-image]
+verify_jwt = false

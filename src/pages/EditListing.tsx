@@ -255,7 +255,37 @@ export default function EditListing() {
     setYoutubeUrls(updated);
   };
 
-  const removeExistingImage = (index: number) => {
+  const removeExistingImage = async (index: number) => {
+    const imageUrl = existingImageUrls[index];
+    
+    // Extract the image path from the URL (format: .../listing-images/listingId/filename.jpg)
+    const urlParts = imageUrl.split('/listing-images/');
+    if (urlParts.length === 2) {
+      const imagePath = urlParts[1];
+      
+      try {
+        // Use secure edge function to delete the image
+        const { data, error } = await supabase.functions.invoke('delete-listing-image', {
+          body: {
+            listingId: id,
+            editToken: token,
+            imagePath: imagePath,
+          },
+        });
+
+        if (error) {
+          console.error('Error deleting image:', error);
+          toast({
+            title: "Warning",
+            description: "Image removed from listing but file may not have been deleted from storage.",
+            variant: "destructive",
+          });
+        }
+      } catch (err) {
+        console.error('Error calling delete-listing-image:', err);
+      }
+    }
+    
     setExistingImageUrls(prev => prev.filter((_, i) => i !== index));
   };
 
