@@ -16,11 +16,12 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { provinces } from "@/data/mockListings";
-import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Eye } from "lucide-react";
+import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Eye, Wand2, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { useCreateListing, uploadListingImages } from "@/hooks/use-listings";
+import { supabase } from "@/integrations/supabase/client";
 import { ImageUploader } from "@/components/ImageUploader";
 import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
 import { TagSelector } from "@/components/TagSelector";
@@ -69,6 +70,8 @@ export default function CreateListing() {
   const [addressSelected, setAddressSelected] = useState(false);
   const [addressError, setAddressError] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -141,6 +144,41 @@ export default function CreateListing() {
     const updated = [...youtubeUrls];
     updated[index] = value;
     setYoutubeUrls(updated);
+  };
+
+  const generateWithAI = async (type: 'title' | 'description') => {
+    const setLoading = type === 'title' ? setIsGeneratingTitle : setIsGeneratingDescription;
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-listing-content', {
+        body: {
+          type,
+          tags: selectedTags,
+          existingTitle: formData.title,
+          existingDescription: formData.description,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.text) {
+        handleChange(type, data.text);
+        toast({
+          title: `${type === 'title' ? 'Title' : 'Description'} generated!`,
+          description: "Feel free to edit it to make it your own.",
+        });
+      }
+    } catch (error) {
+      console.error(`Error generating ${type}:`, error);
+      toast({
+        title: "Generation failed",
+        description: "Could not generate content. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -307,7 +345,24 @@ export default function CreateListing() {
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="title">Display Title *</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="title">Display Title *</Label>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => generateWithAI('title')}
+                        disabled={isGeneratingTitle}
+                        className="h-8 text-xs text-muted-foreground hover:text-christmas"
+                      >
+                        {isGeneratingTitle ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Wand2 className="h-3 w-3 mr-1" />
+                        )}
+                        Generate with AI
+                      </Button>
+                    </div>
                     <Input
                       id="title"
                       placeholder="e.g., Winter Wonderland Display"
@@ -319,7 +374,24 @@ export default function CreateListing() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description *</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="description">Description *</Label>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => generateWithAI('description')}
+                        disabled={isGeneratingDescription}
+                        className="h-8 text-xs text-muted-foreground hover:text-christmas"
+                      >
+                        {isGeneratingDescription ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Wand2 className="h-3 w-3 mr-1" />
+                        )}
+                        Generate with AI
+                      </Button>
+                    </div>
                     <Textarea
                       id="description"
                       placeholder="Tell visitors what makes your Christmas display special..."
