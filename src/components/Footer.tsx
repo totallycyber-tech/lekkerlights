@@ -7,25 +7,25 @@ export function Footer() {
   return (
     <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <Sparkles className="h-6 w-6 text-primary" />
+              <Sparkles className="h-6 w-6 text-christmas" />
               <span className="font-display font-bold text-xl glow-text">Lekker Lights</span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              Discover and share beautiful light displays across South Africa. 
+              Discover and share beautiful Christmas light displays across South Africa. 
               Bringing communities together through festive celebrations.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-christmas transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-christmas transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-christmas transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
             </div>
@@ -47,30 +47,11 @@ export function Footer() {
             </nav>
           </div>
 
-          {/* Themes */}
-          <div className="space-y-4">
-            <h4 className="font-display font-semibold">Themes</h4>
-            <nav className="flex flex-col gap-2">
-              <Link to="/browse?theme=christmas" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                🎄 Christmas
-              </Link>
-              <Link to="/browse?theme=diwali" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                🪔 Diwali
-              </Link>
-              <Link to="/browse?theme=halloween" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                🎃 Halloween
-              </Link>
-              <Link to="/browse?theme=eid" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                🌙 Eid
-              </Link>
-            </nav>
-          </div>
-
           {/* Newsletter */}
           <div className="space-y-4">
             <h4 className="font-display font-semibold">Get Notified</h4>
             <p className="text-sm text-muted-foreground">
-              Subscribe to get updates when new displays are added in your area.
+              Subscribe to get updates when new Christmas displays are added in your area.
             </p>
             <div className="flex gap-2">
               <Input 

@@ -1,8 +1,5 @@
-export type Theme = 'christmas' | 'diwali' | 'halloween' | 'eid' | 'hanukkah' | 'other';
-
 export interface Listing {
   id: string;
-  theme: Theme;
   title: string;
   description: string;
   location: {
@@ -30,15 +27,6 @@ export interface Listing {
   featured?: boolean;
 }
 
-export const themes: { value: Theme; label: string; emoji: string }[] = [
-  { value: 'christmas', label: 'Christmas', emoji: '🎄' },
-  { value: 'diwali', label: 'Diwali', emoji: '🪔' },
-  { value: 'halloween', label: 'Halloween', emoji: '🎃' },
-  { value: 'eid', label: 'Eid', emoji: '🌙' },
-  { value: 'hanukkah', label: 'Hanukkah', emoji: '🕎' },
-  { value: 'other', label: 'Other', emoji: '✨' },
-];
-
 export const provinces = [
   'Gauteng',
   'Western Cape',
@@ -54,7 +42,6 @@ export const provinces = [
 export const mockListings: Listing[] = [
   {
     id: '1',
-    theme: 'christmas',
     title: 'Winter Wonderland Display',
     description: 'Our home transforms into a magical winter wonderland every December! Features over 50,000 lights, animated reindeer, a life-size nativity scene, and snow machines. A true Sandton spectacle that has been featured on local news.',
     location: {
@@ -85,63 +72,6 @@ export const mockListings: Listing[] = [
   },
   {
     id: '2',
-    theme: 'diwali',
-    title: 'Festival of Lights Celebration',
-    description: 'Experience the beauty of Diwali with our traditional diyas, rangoli patterns lit with LED lights, and a stunning display of lanterns. Our garden features thousands of fairy lights creating a warm, welcoming atmosphere.',
-    location: {
-      streetNumber: '15',
-      streetName: 'Krishna Road',
-      suburb: 'Chatsworth',
-      city: 'Durban',
-      province: 'KwaZulu-Natal',
-      postalCode: '4030',
-      lat: -29.9167,
-      lng: 30.9167,
-    },
-    photos: [
-      'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800',
-      'https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=800',
-    ],
-    youtubeUrls: [],
-    operatingHours: {
-      days: 'Diwali Week',
-      times: '6:30 PM - 10:00 PM',
-    },
-    createdAt: '2024-10-20',
-    featured: true,
-  },
-  {
-    id: '3',
-    theme: 'halloween',
-    title: 'Spooky Manor',
-    description: 'Welcome to our haunted house! Complete with animatronic ghosts, a fog machine, spooky sound effects, and a graveyard scene. Not for the faint-hearted! Safe trick-or-treat area for kids available.',
-    location: {
-      streetNumber: '666',
-      streetName: 'Raven Street',
-      suburb: 'Camps Bay',
-      city: 'Cape Town',
-      province: 'Western Cape',
-      postalCode: '8005',
-      lat: -33.9506,
-      lng: 18.3776,
-    },
-    photos: [
-      'https://images.unsplash.com/photo-1509557965875-b88c97052f0e?w=800',
-      'https://images.unsplash.com/photo-1508361001413-7a9dca21d08a?w=800',
-    ],
-    youtubeUrls: [],
-    operatingHours: {
-      days: '25-31 October',
-      times: '6:00 PM - 9:00 PM',
-    },
-    contact: {
-      phone: '+27 82 123 4567',
-    },
-    createdAt: '2024-10-01',
-  },
-  {
-    id: '4',
-    theme: 'christmas',
     title: 'Santa\'s Workshop',
     description: 'A family-friendly Christmas display featuring Santa\'s workshop, elves, toy trains, and a beautiful nativity scene. Hot chocolate available on weekends!',
     location: {
@@ -164,35 +94,10 @@ export const mockListings: Listing[] = [
       times: '7:00 PM - 10:00 PM',
     },
     createdAt: '2024-11-20',
+    featured: true,
   },
   {
-    id: '5',
-    theme: 'eid',
-    title: 'Eid Mubarak Lights',
-    description: 'Celebrating Eid with beautiful crescent moon and star displays, green and gold lights throughout the garden, and traditional lanterns.',
-    location: {
-      streetNumber: '23',
-      streetName: 'Mosque Street',
-      suburb: 'Bo-Kaap',
-      city: 'Cape Town',
-      province: 'Western Cape',
-      postalCode: '8001',
-      lat: -33.9213,
-      lng: 18.4165,
-    },
-    photos: [
-      'https://images.unsplash.com/photo-1532635241-17e820acc59f?w=800',
-    ],
-    youtubeUrls: [],
-    operatingHours: {
-      days: 'Eid Week',
-      times: '7:00 PM - 11:00 PM',
-    },
-    createdAt: '2024-03-15',
-  },
-  {
-    id: '6',
-    theme: 'christmas',
+    id: '3',
     title: 'Neighbourhood Christmas Lane',
     description: 'The entire street participates! 12 houses all decorated with synchronized light shows set to music. Drive through or walk and enjoy the magic.',
     location: {
@@ -219,5 +124,57 @@ export const mockListings: Listing[] = [
     },
     createdAt: '2024-11-25',
     featured: true,
+  },
+  {
+    id: '4',
+    title: 'Classic Christmas Cottage',
+    description: 'Traditional Christmas decorations with thousands of warm white lights, candy canes lining the pathway, and a beautiful nativity scene.',
+    location: {
+      streetNumber: '25',
+      streetName: 'Holly Street',
+      suburb: 'Umhlanga',
+      city: 'Durban',
+      province: 'KwaZulu-Natal',
+      postalCode: '4319',
+      lat: -29.7276,
+      lng: 31.0852,
+    },
+    photos: [
+      'https://images.unsplash.com/photo-1512389142860-9c449e58a814?w=800',
+    ],
+    youtubeUrls: [],
+    operatingHours: {
+      days: 'Daily, Dec 1-25',
+      times: '6:30 PM - 10:00 PM',
+    },
+    createdAt: '2024-11-18',
+  },
+  {
+    id: '5',
+    title: 'North Pole Express',
+    description: 'A magical train-themed Christmas display with model trains, a polar express setup, and plenty of snow effects. Kids love it!',
+    location: {
+      streetNumber: '7',
+      streetName: 'Reindeer Road',
+      suburb: 'Centurion',
+      city: 'Pretoria',
+      province: 'Gauteng',
+      postalCode: '0157',
+      lat: -25.8603,
+      lng: 28.1894,
+    },
+    photos: [
+      'https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=800',
+      'https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=800',
+    ],
+    youtubeUrls: [],
+    operatingHours: {
+      days: 'Weekends, Dec',
+      times: '7:00 PM - 9:30 PM',
+    },
+    contact: {
+      phone: '+27 82 555 1234',
+    },
+    createdAt: '2024-11-22',
   },
 ];

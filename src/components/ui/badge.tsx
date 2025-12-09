@@ -13,11 +13,6 @@ const badgeVariants = cva(
         destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
         christmas: "border-transparent bg-christmas text-foreground",
-        diwali: "border-transparent bg-diwali text-foreground",
-        halloween: "border-transparent bg-halloween text-foreground",
-        eid: "border-transparent bg-eid text-foreground",
-        hanukkah: "border-transparent bg-hanukkah text-foreground",
-        other: "border-transparent bg-primary text-primary-foreground",
       },
     },
     defaultVariants: {

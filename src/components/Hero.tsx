@@ -18,30 +18,30 @@ export function Hero() {
       </div>
 
       {/* Floating light effects */}
-      <div className="absolute top-20 left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl animate-float" />
+      <div className="absolute top-20 left-10 w-32 h-32 bg-christmas/20 rounded-full blur-3xl animate-float" />
       <div className="absolute bottom-40 right-20 w-48 h-48 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-      <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-christmas/20 rounded-full blur-2xl animate-float" style={{ animationDelay: '4s' }} />
+      <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-primary/20 rounded-full blur-2xl animate-float" style={{ animationDelay: '4s' }} />
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto space-y-8">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/50 backdrop-blur-sm rounded-full border border-border">
-            <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-            <span className="text-sm font-medium">Discover South Africa's lekker lights</span>
+            <Sparkles className="h-4 w-4 text-christmas animate-pulse" />
+            <span className="text-sm font-medium">Discover South Africa's lekker Christmas lights</span>
           </div>
 
           {/* Main Heading */}
           <h1 className="font-display text-5xl sm:text-6xl md:text-7xl font-bold leading-tight">
             Light Up Your
             <span className="block glow-text">
-              Neighbourhood
+              Christmas
             </span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Explore stunning Christmas, Diwali, Halloween, and festive light displays across South Africa. 
+            Explore stunning Christmas light displays across South Africa. 
             Share your decorations or discover magical displays near you.
           </p>
 
@@ -64,15 +64,15 @@ export function Hero() {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-8 pt-12 max-w-lg mx-auto">
             <div className="text-center">
-              <div className="font-display text-3xl font-bold text-primary">250+</div>
+              <div className="font-display text-3xl font-bold text-christmas">250+</div>
               <div className="text-sm text-muted-foreground">Active Displays</div>
             </div>
             <div className="text-center">
-              <div className="font-display text-3xl font-bold text-primary">9</div>
+              <div className="font-display text-3xl font-bold text-christmas">9</div>
               <div className="text-sm text-muted-foreground">Provinces</div>
             </div>
             <div className="text-center">
-              <div className="font-display text-3xl font-bold text-primary">50K+</div>
+              <div className="font-display text-3xl font-bold text-christmas">50K+</div>
               <div className="text-sm text-muted-foreground">Happy Visitors</div>
             </div>
           </div>
@@ -82,7 +82,7 @@ export function Hero() {
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
         <span className="text-xs text-muted-foreground">Scroll to explore</span>
-        <MapPin className="h-5 w-5 text-primary" />
+        <MapPin className="h-5 w-5 text-christmas" />
       </div>
     </section>
   );

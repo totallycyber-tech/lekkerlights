@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { mockListings, themes } from "@/data/mockListings";
+import { mockListings } from "@/data/mockListings";
 import { 
   MapPin, Clock, Mail, Phone, ExternalLink, 
   ArrowLeft, Share2, Heart, Flag, Calendar 
@@ -36,8 +36,6 @@ export default function ListingDetail() {
       </div>
     );
   }
-
-  const theme = themes.find(t => t.value === listing.theme);
   
   const getDirectionsUrl = () => {
     const address = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}, ${listing.location.postalCode}`;
@@ -49,7 +47,7 @@ export default function ListingDetail() {
       try {
         await navigator.share({
           title: listing.title,
-          text: `Check out this amazing ${theme?.label} display!`,
+          text: `Check out this amazing Christmas display!`,
           url: window.location.href,
         });
       } catch (err) {
@@ -118,8 +116,8 @@ export default function ListingDetail() {
               {/* Header */}
               <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
                 <div className="space-y-2">
-                  <Badge variant={listing.theme as any} className="mb-2">
-                    {theme?.emoji} {theme?.label}
+                  <Badge variant="christmas" className="mb-2">
+                    🎄 Christmas
                   </Badge>
                   <h1 className="font-display text-2xl sm:text-3xl font-bold">
                     {listing.title}
@@ -142,7 +140,7 @@ export default function ListingDetail() {
                 {/* Location */}
                 <div className="space-y-3">
                   <h3 className="font-display font-semibold flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-primary" />
+                    <MapPin className="h-5 w-5 text-christmas" />
                     Location
                   </h3>
                   <p className="text-muted-foreground">
@@ -163,7 +161,7 @@ export default function ListingDetail() {
                 {/* Operating Hours */}
                 <div className="space-y-3">
                   <h3 className="font-display font-semibold flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-primary" />
+                    <Clock className="h-5 w-5 text-christmas" />
                     Viewing Hours
                   </h3>
                   <div className="space-y-1">
@@ -187,7 +185,7 @@ export default function ListingDetail() {
                     {listing.contact.email && (
                       <a 
                         href={`mailto:${listing.contact.email}`}
-                        className="flex items-center gap-2 text-primary hover:underline"
+                        className="flex items-center gap-2 text-christmas hover:underline"
                       >
                         <Mail className="h-4 w-4" />
                         {listing.contact.email}
@@ -196,7 +194,7 @@ export default function ListingDetail() {
                     {listing.contact.phone && (
                       <a 
                         href={`tel:${listing.contact.phone}`}
-                        className="flex items-center gap-2 text-primary hover:underline"
+                        className="flex items-center gap-2 text-christmas hover:underline"
                       >
                         <Phone className="h-4 w-4" />
                         {listing.contact.phone}
@@ -235,7 +233,7 @@ export default function ListingDetail() {
                   className="text-muted-foreground hover:text-destructive"
                   onClick={() => toast({ 
                     title: "Report submitted",
-                    description: "Thank you for helping keep SA Lights safe.",
+                    description: "Thank you for helping keep Lekker Lights safe.",
                   })}
                 >
                   <Flag className="h-4 w-4 mr-1" />
