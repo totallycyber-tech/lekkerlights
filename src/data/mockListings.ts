@@ -70,10 +70,11 @@ export function transformDbListing(dbListing: {
     timesStr = timeRanges[0] || '';
   }
 
-  // Use uploaded images as photos, or placeholder if none
+  // Use uploaded images as photos, or default cover photo if none
+  // Note: The default cover photo is imported in components that use this
   const photos = dbListing.image_urls?.length > 0 
     ? dbListing.image_urls 
-    : ['https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=800'];
+    : [];
 
   return {
     id: dbListing.id,
