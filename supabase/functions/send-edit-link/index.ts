@@ -166,7 +166,7 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${Deno.env.get("RESEND_API_KEY")}`,
       },
       body: JSON.stringify({
-        from: "Lekker Lights <onboarding@resend.dev>",
+        from: "Lekker Lights <noreply@lekkerlights.co.za>",
         to: [email],
         subject: `Your Listing Edit Link - ${safeTitle}`,
         html: `
