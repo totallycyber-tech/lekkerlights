@@ -32,6 +32,9 @@ export function Footer() {
               <Link to="/create" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 List Your Display
               </Link>
+              <Link to="/resend-edit-link" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Lost Edit Link?
+              </Link>
             </nav>
           </div>
 
