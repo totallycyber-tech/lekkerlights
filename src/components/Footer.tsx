@@ -61,9 +61,9 @@ export function Footer() {
             © {new Date().getFullYear()} Lekker Lights. Made with ❤️ in South Africa.
           </p>
           <nav className="flex gap-6">
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Privacy Policy
-            </a>
+            </Link>
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Terms of Service
             </a>
