@@ -80,8 +80,9 @@ export function useListings() {
   return useQuery({
     queryKey: ['listings'],
     queryFn: async () => {
+      // Use the secure public view that excludes edit_token and respects visibility flags
       const { data, error } = await supabase
-        .from('listings')
+        .from('listings_public')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -99,8 +100,9 @@ export function useListing(id: string) {
   return useQuery({
     queryKey: ['listing', id],
     queryFn: async () => {
+      // Use the secure public view that excludes edit_token and respects visibility flags
       const { data, error } = await supabase
-        .from('listings')
+        .from('listings_public')
         .select('*')
         .eq('id', id)
         .maybeSingle();

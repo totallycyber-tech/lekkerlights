@@ -152,11 +152,116 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "reviews_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      listings_public: {
+        Row: {
+          city: string | null
+          complex_name: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string | null
+          directions_clicks: number | null
+          email_visible: boolean | null
+          favorites_count: number | null
+          gate_access_info: string | null
+          id: string | null
+          image_urls: string[] | null
+          lat: number | null
+          lng: number | null
+          max_visitors: number | null
+          name_visible: boolean | null
+          operating_hours: Json | null
+          parking_info: string | null
+          phone_visible: boolean | null
+          postal_code: string | null
+          province: string | null
+          street_name: string | null
+          street_number: string | null
+          suburb: string | null
+          tags: string[] | null
+          title: string | null
+          unit_no: string | null
+          updated_at: string | null
+          youtube_urls: string[] | null
+        }
+        Insert: {
+          city?: string | null
+          complex_name?: string | null
+          contact_email?: never
+          contact_name?: never
+          contact_phone?: never
+          created_at?: string | null
+          description?: string | null
+          directions_clicks?: number | null
+          email_visible?: boolean | null
+          favorites_count?: number | null
+          gate_access_info?: string | null
+          id?: string | null
+          image_urls?: string[] | null
+          lat?: number | null
+          lng?: number | null
+          max_visitors?: number | null
+          name_visible?: boolean | null
+          operating_hours?: Json | null
+          parking_info?: string | null
+          phone_visible?: boolean | null
+          postal_code?: string | null
+          province?: string | null
+          street_name?: string | null
+          street_number?: string | null
+          suburb?: string | null
+          tags?: string[] | null
+          title?: string | null
+          unit_no?: string | null
+          updated_at?: string | null
+          youtube_urls?: string[] | null
+        }
+        Update: {
+          city?: string | null
+          complex_name?: string | null
+          contact_email?: never
+          contact_name?: never
+          contact_phone?: never
+          created_at?: string | null
+          description?: string | null
+          directions_clicks?: number | null
+          email_visible?: boolean | null
+          favorites_count?: number | null
+          gate_access_info?: string | null
+          id?: string | null
+          image_urls?: string[] | null
+          lat?: number | null
+          lng?: number | null
+          max_visitors?: number | null
+          name_visible?: boolean | null
+          operating_hours?: Json | null
+          parking_info?: string | null
+          phone_visible?: boolean | null
+          postal_code?: string | null
+          province?: string | null
+          street_name?: string | null
+          street_number?: string | null
+          suburb?: string | null
+          tags?: string[] | null
+          title?: string | null
+          unit_no?: string | null
+          updated_at?: string | null
+          youtube_urls?: string[] | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
