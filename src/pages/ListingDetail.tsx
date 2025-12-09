@@ -86,17 +86,28 @@ export default function ListingDetail() {
   };
 
   const fullAddress = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}, ${listing.location.postalCode}`;
+  
+  // Check if this is an example listing
+  const isExampleListing = listing.id.startsWith('example-');
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
       <main className="pt-20 pb-12">
+        {/* Example Listing Banner */}
+        {isExampleListing && (
+          <div className="bg-amber-500/90 text-amber-950 py-3 px-4 text-center font-medium">
+            <span className="text-lg">✨ This is an EXAMPLE LISTING</span>
+            <p className="text-sm opacity-90">This is a demonstration of what a listing looks like on Lekker Lights. The address and details shown are fictional.</p>
+          </div>
+        )}
+
         {/* Hero Image Gallery */}
         <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
           <img 
             src={listing.photos[0] || defaultCoverPhoto} 
-            alt={listing.title}
+            alt={isExampleListing ? `Example listing preview: ${listing.title}` : listing.title}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30" />
@@ -118,6 +129,7 @@ export default function ListingDetail() {
               variant="secondary" 
               size="icon"
               onClick={handleShare}
+              aria-label="Share this listing"
             >
               <Share2 className="h-4 w-4" />
             </Button>
@@ -125,6 +137,7 @@ export default function ListingDetail() {
               variant="secondary" 
               size="icon"
               onClick={() => toast({ title: "Added to favorites!" })}
+              aria-label="Add to favorites"
             >
               <Heart className="h-4 w-4" />
             </Button>
@@ -136,6 +149,15 @@ export default function ListingDetail() {
           <div className="max-w-4xl mx-auto">
             {/* Main Card */}
             <div className="bg-card rounded-2xl border border-border p-6 sm:p-8 shadow-lg">
+              {/* Example Notice Inside Card */}
+              {isExampleListing && (
+                <div className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-lg p-4 mb-6">
+                  <p className="text-amber-800 dark:text-amber-200 text-sm">
+                    <strong>📋 Example Listing:</strong> This preview shows you exactly how your listing will appear to visitors. The address, photos, and details here are for demonstration purposes only.
+                  </p>
+                </div>
+              )}
+
               {/* Header */}
               <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
                 <div className="space-y-2">
