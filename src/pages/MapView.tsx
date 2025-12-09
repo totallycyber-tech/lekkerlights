@@ -337,35 +337,40 @@ export default function MapView() {
     }
   };
 
-  // Show loading state while fetching API key
-  if (isLoadingKey) {
+  // Show loading state while fetching API key or loading Google Maps
+  if (isLoadingKey || (apiKey && !isLoaded && !loadError)) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <main className="pt-16 h-screen flex items-center justify-center">
           <div className="text-center p-8">
             <Loader2 className="h-12 w-12 text-christmas mx-auto mb-4 animate-spin" />
-            <p className="text-muted-foreground">Loading map configuration...</p>
+            <p className="text-muted-foreground">Loading map...</p>
           </div>
         </main>
       </div>
     );
   }
 
-  // Show error state if API key failed to load
-  if (keyError) {
+  // Show error state if API key failed to load or Google Maps failed to load
+  if (keyError || loadError) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <main className="pt-16 h-screen flex items-center justify-center">
-          <div className="text-center p-8">
+          <div className="text-center p-8 max-w-md">
             <MapPin className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <p className="text-destructive mb-2">Map configuration error</p>
-            <p className="text-muted-foreground text-sm">{keyError}</p>
+            <h2 className="text-xl font-semibold mb-2">Unable to Load Map</h2>
+            <p className="text-muted-foreground mb-4">
+              {keyError || "Google Maps couldn't be loaded. This may be due to network issues or API configuration."}
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              You can still browse all Christmas light displays using the grid view.
+            </p>
             <Link to="/browse">
-              <Button variant="outline" className="mt-4">
-                <LayoutGrid className="h-4 w-4 mr-1" />
-                View Grid Instead
+              <Button className="bg-christmas hover:bg-christmas/90">
+                <LayoutGrid className="h-4 w-4 mr-2" />
+                Browse Displays
               </Button>
             </Link>
           </div>
