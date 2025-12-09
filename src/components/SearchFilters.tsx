@@ -10,12 +10,14 @@ import {
 } from "@/components/ui/select";
 import { Search, MapPin, SlidersHorizontal, X } from "lucide-react";
 import { provinces } from "@/data/mockListings";
+import { TagFilter } from "@/components/TagFilter";
 
 interface SearchFiltersProps {
   onFilterChange: (filters: {
     search: string;
     province: string;
     suburb: string;
+    tags: string[];
   }) => void;
 }
 
@@ -23,20 +25,27 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
   const [search, setSearch] = useState("");
   const [province, setProvince] = useState("");
   const [suburb, setSuburb] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
   const handleFilterChange = () => {
-    onFilterChange({ search, province, suburb });
+    onFilterChange({ search, province, suburb, tags: selectedTags });
+  };
+
+  const handleTagsChange = (tags: string[]) => {
+    setSelectedTags(tags);
+    onFilterChange({ search, province, suburb, tags });
   };
 
   const clearFilters = () => {
     setSearch("");
     setProvince("");
     setSuburb("");
-    onFilterChange({ search: "", province: "", suburb: "" });
+    setSelectedTags([]);
+    onFilterChange({ search: "", province: "", suburb: "", tags: [] });
   };
 
-  const hasActiveFilters = search || province || suburb;
+  const hasActiveFilters = search || province || suburb || selectedTags.length > 0;
 
   return (
     <div className="space-y-4">
@@ -64,6 +73,11 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
         >
           <SlidersHorizontal className="h-5 w-5 mr-2" />
           Filters
+          {hasActiveFilters && (
+            <span className="ml-2 bg-christmas text-christmas-foreground text-xs px-1.5 py-0.5 rounded-full">
+              {(province ? 1 : 0) + (suburb ? 1 : 0) + selectedTags.length}
+            </span>
+          )}
         </Button>
       </div>
 
@@ -110,6 +124,15 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Tag Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Display Tags</label>
+            <TagFilter 
+              selectedTags={selectedTags}
+              onTagsChange={handleTagsChange}
+            />
           </div>
 
           {hasActiveFilters && (

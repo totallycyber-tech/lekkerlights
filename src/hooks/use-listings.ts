@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 
 export interface Listing {
   id: string;
@@ -22,8 +23,22 @@ export interface Listing {
   operating_hours: Record<string, { enabled: boolean; startTime: string; endTime: string }>;
   directions_clicks: number;
   favorites_count: number;
+  tags: string[];
   created_at: string;
   updated_at: string;
+}
+
+// Helper to safely cast database row to Listing
+function toListingFromDb(row: any): Listing {
+  return {
+    ...row,
+    image_urls: row.image_urls ?? [],
+    youtube_urls: row.youtube_urls ?? [],
+    operating_hours: (row.operating_hours as Record<string, { enabled: boolean; startTime: string; endTime: string }>) ?? {},
+    directions_clicks: row.directions_clicks ?? 0,
+    favorites_count: row.favorites_count ?? 0,
+    tags: row.tags ?? [],
+  };
 }
 
 export interface ListingInsert {
@@ -44,6 +59,7 @@ export interface ListingInsert {
   image_urls?: string[];
   youtube_urls?: string[];
   operating_hours?: Record<string, { enabled: boolean; startTime: string; endTime: string }>;
+  tags?: string[];
 }
 
 export function useListings() {
@@ -60,7 +76,7 @@ export function useListings() {
         throw error;
       }
 
-      return (data || []) as Listing[];
+      return (data || []).map(toListingFromDb);
     },
   });
 }
@@ -80,7 +96,7 @@ export function useListing(id: string) {
         throw error;
       }
 
-      return data as Listing | null;
+      return data ? toListingFromDb(data) : null;
     },
     enabled: !!id,
   });
@@ -102,7 +118,7 @@ export function useCreateListing() {
         throw error;
       }
 
-      return data as Listing;
+      return toListingFromDb(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['listings'] });

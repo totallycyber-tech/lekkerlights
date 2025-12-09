@@ -34,6 +34,7 @@ export type Database = {
           street_name: string
           street_number: string
           suburb: string
+          tags: string[] | null
           title: string
           unit_no: string | null
           updated_at: string
@@ -58,6 +59,7 @@ export type Database = {
           street_name: string
           street_number: string
           suburb: string
+          tags?: string[] | null
           title: string
           unit_no?: string | null
           updated_at?: string
@@ -82,6 +84,7 @@ export type Database = {
           street_name?: string
           street_number?: string
           suburb?: string
+          tags?: string[] | null
           title?: string
           unit_no?: string | null
           updated_at?: string
