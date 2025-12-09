@@ -1,11 +1,58 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ListingCard } from "@/components/ListingCard";
-import { mockListings } from "@/data/mockListings";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useListings } from "@/hooks/use-listings";
+import { transformDbListing } from "@/data/mockListings";
 
 export function FeaturedListings() {
-  const featuredListings = mockListings.filter(l => l.featured).slice(0, 3);
+  const { data: listings = [], isLoading } = useListings();
+  
+  // Get up to 3 most popular listings (sorted by popularity score)
+  const featuredListings = [...listings]
+    .sort((a, b) => {
+      const scoreA = (a.directions_clicks || 0) + (a.favorites_count || 0) * 2;
+      const scoreB = (b.directions_clicks || 0) + (b.favorites_count || 0) * 2;
+      return scoreB - scoreA;
+    })
+    .slice(0, 3)
+    .map(transformDbListing);
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-gradient-night">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-pulse text-muted-foreground">Loading displays...</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (featuredListings.length === 0) {
+    return (
+      <section className="py-20 bg-gradient-night">
+        <div className="container mx-auto px-4">
+          <div className="text-center space-y-4">
+            <Sparkles className="h-12 w-12 text-primary mx-auto" />
+            <h2 className="font-display text-3xl sm:text-4xl font-bold">
+              Be the First to Share!
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              No Christmas light displays have been listed yet. Be the first to share your festive creation with South Africa!
+            </p>
+            <Link to="/create">
+              <Button size="lg" className="mt-4">
+                List Your Display
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 bg-gradient-night">
