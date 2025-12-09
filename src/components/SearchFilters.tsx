@@ -11,14 +11,19 @@ import {
 import { Search, MapPin, SlidersHorizontal, X } from "lucide-react";
 import { provinces } from "@/data/mockListings";
 import { TagFilter } from "@/components/TagFilter";
+import { LocationFilter } from "@/components/LocationFilter";
+
+export interface SearchFilters {
+  search: string;
+  province: string;
+  suburb: string;
+  tags: string[];
+  location: { lat: number; lng: number; label: string } | null;
+  radius: number | null;
+}
 
 interface SearchFiltersProps {
-  onFilterChange: (filters: {
-    search: string;
-    province: string;
-    suburb: string;
-    tags: string[];
-  }) => void;
+  onFilterChange: (filters: SearchFilters) => void;
 }
 
 export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
@@ -26,15 +31,27 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
   const [province, setProvince] = useState("");
   const [suburb, setSuburb] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [location, setLocation] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const [radius, setRadius] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
   const handleFilterChange = () => {
-    onFilterChange({ search, province, suburb, tags: selectedTags });
+    onFilterChange({ search, province, suburb, tags: selectedTags, location, radius });
   };
 
   const handleTagsChange = (tags: string[]) => {
     setSelectedTags(tags);
-    onFilterChange({ search, province, suburb, tags });
+    onFilterChange({ search, province, suburb, tags, location, radius });
+  };
+
+  const handleLocationChange = (newLocation: { lat: number; lng: number; label: string } | null) => {
+    setLocation(newLocation);
+    onFilterChange({ search, province, suburb, tags: selectedTags, location: newLocation, radius });
+  };
+
+  const handleRadiusChange = (newRadius: number | null) => {
+    setRadius(newRadius);
+    onFilterChange({ search, province, suburb, tags: selectedTags, location, radius: newRadius });
   };
 
   const clearFilters = () => {
@@ -42,10 +59,17 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
     setProvince("");
     setSuburb("");
     setSelectedTags([]);
-    onFilterChange({ search: "", province: "", suburb: "", tags: [] });
+    setLocation(null);
+    setRadius(null);
+    onFilterChange({ search: "", province: "", suburb: "", tags: [], location: null, radius: null });
   };
 
-  const hasActiveFilters = search || province || suburb || selectedTags.length > 0;
+  const hasActiveFilters = search || province || suburb || selectedTags.length > 0 || location;
+  const activeFilterCount = 
+    (province ? 1 : 0) + 
+    (suburb ? 1 : 0) + 
+    selectedTags.length + 
+    (location ? 1 : 0);
 
   return (
     <div className="space-y-4">
@@ -73,9 +97,9 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
         >
           <SlidersHorizontal className="h-5 w-5 mr-2" />
           Filters
-          {hasActiveFilters && (
+          {activeFilterCount > 0 && (
             <span className="ml-2 bg-christmas text-christmas-foreground text-xs px-1.5 py-0.5 rounded-full">
-              {(province ? 1 : 0) + (suburb ? 1 : 0) + selectedTags.length}
+              {activeFilterCount}
             </span>
           )}
         </Button>
@@ -125,6 +149,14 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
               </div>
             </div>
           </div>
+
+          {/* Location / Distance Filter */}
+          <LocationFilter
+            location={location}
+            radius={radius}
+            onLocationChange={handleLocationChange}
+            onRadiusChange={handleRadiusChange}
+          />
 
           {/* Tag Filter */}
           <div className="space-y-2">

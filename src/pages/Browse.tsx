@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { SearchFilters } from "@/components/SearchFilters";
+import { SearchFilters, SearchFilters as SearchFiltersType } from "@/components/SearchFilters";
 import { ListingCard } from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
 import { mockListings, transformDbListing, Listing } from "@/data/mockListings";
@@ -10,13 +10,16 @@ import { Link } from "react-router-dom";
 import { useFavorites } from "@/hooks/use-favorites";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useListings } from "@/hooks/use-listings";
+import { calculateDistance } from "@/lib/geo-utils";
 
 export default function Browse() {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<SearchFiltersType>({
     search: "",
     province: "",
     suburb: "",
-    tags: [] as string[],
+    tags: [],
+    location: null,
+    radius: null,
   });
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -72,6 +75,24 @@ export default function Browse() {
         const listingTags = listing.tags || [];
         const hasAllTags = filters.tags.every((tag) => listingTags.includes(tag));
         if (!hasAllTags) return false;
+      }
+
+      // Distance filter - only if location and radius are set
+      if (filters.location && filters.radius) {
+        const listingLat = listing.location.lat;
+        const listingLng = listing.location.lng;
+        
+        // Skip listings without coordinates
+        if (!listingLat || !listingLng) return false;
+        
+        const distance = calculateDistance(
+          filters.location.lat,
+          filters.location.lng,
+          listingLat,
+          listingLng
+        );
+        
+        if (distance > filters.radius) return false;
       }
 
       return true;
@@ -184,7 +205,7 @@ export default function Browse() {
               </p>
               <Button 
                 variant="outline"
-                onClick={() => setFilters({ search: "", province: "", suburb: "", tags: [] })}
+                onClick={() => setFilters({ search: "", province: "", suburb: "", tags: [], location: null, radius: null })}
               >
                 Clear all filters
               </Button>
