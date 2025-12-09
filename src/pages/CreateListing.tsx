@@ -277,13 +277,19 @@ export default function CreateListing() {
               <div className="bg-card rounded-xl border border-border p-6 space-y-6">
                 <div>
                   <h2 className="font-display text-lg font-semibold">Location</h2>
-                  <p className="text-sm text-muted-foreground mt-1">Start typing your address to auto-fill the fields below</p>
+                  <p className="text-sm text-muted-foreground mt-1">Search for your address to auto-fill your location details</p>
                 </div>
 
                 {/* Address Autocomplete */}
                 <div className="space-y-2">
-                  <Label>Search Address</Label>
+                  <Label>Address *</Label>
                   <AddressAutocomplete onAddressSelect={handleAddressSelect} />
+                  {formData.streetNumber && formData.streetName && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      <Check className="h-4 w-4 inline mr-1 text-christmas-secondary" />
+                      {formData.streetNumber} {formData.streetName}, {formData.suburb}, {formData.city}, {formData.province} {formData.postalCode}
+                    </p>
+                  )}
                 </div>
 
                 {/* Complex/Estate Details */}
@@ -306,88 +312,6 @@ export default function CreateListing() {
                       value={formData.unitNo}
                       onChange={(e) => handleChange('unitNo', e.target.value)}
                       className="bg-secondary"
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="streetNumber">Street Number *</Label>
-                    <Input
-                      id="streetNumber"
-                      placeholder="42"
-                      value={formData.streetNumber}
-                      onChange={(e) => handleChange('streetNumber', e.target.value)}
-                      className="bg-secondary"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2 col-span-2 sm:col-span-1">
-                    <Label htmlFor="streetName">Street Name *</Label>
-                    <Input
-                      id="streetName"
-                      placeholder="Jacaranda Avenue"
-                      value={formData.streetName}
-                      onChange={(e) => handleChange('streetName', e.target.value)}
-                      className="bg-secondary"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="suburb">Suburb *</Label>
-                    <Input
-                      id="suburb"
-                      placeholder="Sandton"
-                      value={formData.suburb}
-                      onChange={(e) => handleChange('suburb', e.target.value)}
-                      className="bg-secondary"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="city">City *</Label>
-                    <Input
-                      id="city"
-                      placeholder="Johannesburg"
-                      value={formData.city}
-                      onChange={(e) => handleChange('city', e.target.value)}
-                      className="bg-secondary"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="province">Province *</Label>
-                    <Select 
-                      value={formData.province}
-                      onValueChange={(value) => handleChange('province', value)}
-                    >
-                      <SelectTrigger className="bg-secondary">
-                        <SelectValue placeholder="Select province" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {provinces.map((province) => (
-                          <SelectItem key={province} value={province}>
-                            {province}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="postalCode">Postal Code *</Label>
-                    <Input
-                      id="postalCode"
-                      placeholder="2196"
-                      value={formData.postalCode}
-                      onChange={(e) => handleChange('postalCode', e.target.value)}
-                      className="bg-secondary"
-                      required
                     />
                   </div>
                 </div>
