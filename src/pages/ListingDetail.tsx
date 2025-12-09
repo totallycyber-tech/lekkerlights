@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useListing } from "@/hooks/use-listings";
+import { ListingReviews } from "@/components/ListingReviews";
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -258,6 +259,11 @@ export default function ListingDetail() {
                   Report Listing
                 </Button>
               </div>
+            </div>
+
+            {/* Reviews Section */}
+            <div className="mt-8">
+              <ListingReviews listingId={id || ''} />
             </div>
           </div>
         </div>
