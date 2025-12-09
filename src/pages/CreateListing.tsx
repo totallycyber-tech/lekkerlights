@@ -250,6 +250,30 @@ export default function CreateListing() {
         tags: selectedTags,
       });
 
+      // Geocode the address to get lat/lng coordinates
+      setUploadProgress('Getting location coordinates...');
+      try {
+        const fullAddress = [
+          formData.streetNumber,
+          formData.streetName,
+          formData.suburb,
+          formData.city,
+          formData.province,
+          formData.postalCode,
+          'South Africa'
+        ].filter(Boolean).join(', ');
+
+        await supabase.functions.invoke('geocode-address', {
+          body: {
+            listingId: listing.id,
+            address: fullAddress,
+          },
+        });
+      } catch (geocodeError) {
+        console.error('Failed to geocode address:', geocodeError);
+        // Don't fail the submission, just continue without coordinates
+      }
+
       // Upload images if any (cover photo first, then additional)
       const allImages: File[] = [];
       if (coverPhoto) allImages.push(coverPhoto);
