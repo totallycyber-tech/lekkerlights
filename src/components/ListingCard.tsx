@@ -3,16 +3,33 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Heart, ExternalLink } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 interface ListingCardProps {
   listing: Listing;
   className?: string;
+  isFavorite?: boolean;
+  onToggleFavorite?: (listingId: string) => void;
 }
 
-export function ListingCard({ listing, className }: ListingCardProps) {
+export function ListingCard({ listing, className, isFavorite = false, onToggleFavorite }: ListingCardProps) {
   const getDirectionsUrl = () => {
     const address = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}, ${listing.location.postalCode}`;
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
+  };
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onToggleFavorite) {
+      onToggleFavorite(listing.id);
+      toast({
+        title: isFavorite ? "Removed from favourites" : "Added to favourites",
+        description: isFavorite 
+          ? `${listing.title} has been removed from your favourites.`
+          : `${listing.title} has been added to your favourites.`,
+      });
+    }
   };
 
   return (
@@ -53,13 +70,16 @@ export function ListingCard({ listing, className }: ListingCardProps) {
 
         {/* Favorite Button */}
         <button 
-          className="absolute bottom-3 right-3 p-2 rounded-full bg-background/50 backdrop-blur-sm hover:bg-background/80 transition-colors"
-          onClick={(e) => {
-            e.preventDefault();
-            // TODO: Add to favorites
-          }}
+          className={cn(
+            "absolute bottom-3 right-3 p-2 rounded-full backdrop-blur-sm transition-all",
+            isFavorite 
+              ? "bg-christmas text-white hover:bg-christmas/80" 
+              : "bg-background/50 hover:bg-background/80"
+          )}
+          onClick={handleFavoriteClick}
+          aria-label={isFavorite ? "Remove from favourites" : "Add to favourites"}
         >
-          <Heart className="h-5 w-5" />
+          <Heart className={cn("h-5 w-5", isFavorite && "fill-current")} />
         </button>
       </div>
 
