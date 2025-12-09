@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.generate-listing-content]
 verify_jwt = false
+
+[functions.geocode-address]
+verify_jwt = false
