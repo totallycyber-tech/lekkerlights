@@ -215,8 +215,36 @@ export default function CreateListing() {
       });
       return;
     }
-    
+
+    // Check for duplicate address
     setIsSubmitting(true);
+    setUploadProgress('Checking for duplicate address...');
+    
+    try {
+      const { data: existingListings, error: checkError } = await supabase
+        .from('listings')
+        .select('id, street_number, street_name, suburb, city')
+        .ilike('street_number', formData.streetNumber.trim())
+        .ilike('street_name', formData.streetName.trim())
+        .ilike('suburb', formData.suburb.trim())
+        .ilike('city', formData.city.trim());
+      
+      if (checkError) {
+        console.error('Error checking for duplicate address:', checkError);
+      } else if (existingListings && existingListings.length > 0) {
+        setIsSubmitting(false);
+        setUploadProgress('');
+        toast({
+          title: "Address already listed",
+          description: "This address has already been listed. If this is your listing, you can request an edit link to modify it.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } catch (checkError) {
+      console.error('Error checking for duplicate address:', checkError);
+      // Continue with submission even if check fails
+    }
 
     try {
       // Filter out empty YouTube URLs
