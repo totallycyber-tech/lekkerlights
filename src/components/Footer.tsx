@@ -36,6 +36,9 @@ export function Footer() {
               <Link to="/resend-edit-link" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Lost Edit Link?
               </Link>
+              <Link to="/donate" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Donate
+              </Link>
               <ContactUsDialog
                 trigger={
                   <button className="text-sm text-muted-foreground hover:text-foreground transition-colors text-left flex items-center gap-1">

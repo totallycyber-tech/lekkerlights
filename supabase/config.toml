@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.contact-us]
 verify_jwt = false
+
+[functions.create-donation-checkout]
+verify_jwt = false
