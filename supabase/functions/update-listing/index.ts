@@ -3,7 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface UpdateListingRequest {
@@ -19,60 +20,51 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { listingId, editToken, updates }: UpdateListingRequest = await req.json();
-    
-    console.log(`Attempting to update listing: ${listingId}`);
 
-    if (!listingId || !editToken) {
+    if (!listingId || !editToken || !updates) {
       return new Response(
-        JSON.stringify({ success: false, error: "Missing listingId or editToken" }),
+        JSON.stringify({ success: false, error: "Missing required fields" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Create Supabase client with service role to bypass RLS
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
+    console.log(`Update request for listing: ${listingId}`);
 
-    // First, verify the edit token matches the listing
-    const { data: listing, error: fetchError } = await supabaseAdmin
-      .from("listings")
-      .select("id, edit_token")
-      .eq("id", listingId)
-      .maybeSingle();
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    if (fetchError) {
-      console.error("Error fetching listing:", fetchError);
-      return new Response(
-        JSON.stringify({ success: false, error: "Failed to verify listing" }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
+    // Verify token from secure listing_edit_tokens table
+    const { data: tokenRecord, error: tokenError } = await supabase
+      .from("listing_edit_tokens")
+      .select("edit_token")
+      .eq("listing_id", listingId)
+      .single();
 
-    if (!listing) {
+    if (tokenError || !tokenRecord) {
+      console.error("Token record not found:", tokenError);
       return new Response(
         JSON.stringify({ success: false, error: "Listing not found" }),
         { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Validate the edit token
-    if (listing.edit_token !== editToken) {
-      console.warn(`Invalid edit token attempt for listing: ${listingId}`);
+    if (tokenRecord.edit_token !== editToken) {
+      console.error("Token mismatch for listing:", listingId);
       return new Response(
         JSON.stringify({ success: false, error: "Invalid edit token" }),
         { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Remove edit_token from updates if someone tries to change it
+    // Sanitize updates - remove any sensitive fields that shouldn't be updated
     const sanitizedUpdates = { ...updates };
-    delete sanitizedUpdates.edit_token;
     delete sanitizedUpdates.id;
+    delete sanitizedUpdates.edit_token;
+    delete sanitizedUpdates.created_at;
 
     // Perform the update
-    const { data: updatedListing, error: updateError } = await supabaseAdmin
+    const { data: updatedListing, error: updateError } = await supabase
       .from("listings")
       .update(sanitizedUpdates)
       .eq("id", listingId)
@@ -80,27 +72,26 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     if (updateError) {
-      console.error("Error updating listing:", updateError);
+      console.error("Update error:", updateError);
       return new Response(
         JSON.stringify({ success: false, error: "Failed to update listing" }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    console.log(`Successfully updated listing: ${listingId}`);
-
     // Remove edit_token from response
     const { edit_token: _, ...safeResponse } = updatedListing;
 
+    console.log("Listing updated successfully:", listingId);
+
     return new Response(
-      JSON.stringify({ success: true, data: safeResponse }),
+      JSON.stringify({ success: true, listing: safeResponse }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error("Error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
+      JSON.stringify({ success: false, error: error.message }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }

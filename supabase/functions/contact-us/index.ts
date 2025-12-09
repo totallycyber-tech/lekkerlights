@@ -13,6 +13,18 @@ interface ContactUsRequest {
   submittedAt: string;
 }
 
+// HTML escape function to prevent injection
+function escapeHtml(text: string): string {
+  const entities: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return text.replace(/[&<>"']/g, char => entities[char]);
+}
+
 // In-memory rate limiting store (resets when function cold starts)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
@@ -85,6 +97,11 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Contact form received from: ${name} (${email})`);
 
+    // Escape user content for HTML
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safeMessage = escapeHtml(message);
+
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -94,7 +111,7 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "Lekker Lights Contact <onboarding@resend.dev>",
         to: ["totallycyber.tech@gmail.com"],
-        subject: `💬 Contact Form: Message from ${name}`,
+        subject: `💬 Contact Form: Message from ${safeName}`,
         reply_to: email,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -105,11 +122,11 @@ const handler = async (req: Request): Promise<Response> => {
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td style="padding: 8px 0; color: #666; width: 100px;"><strong>Name:</strong></td>
-                  <td style="padding: 8px 0; color: #111;">${name}</td>
+                  <td style="padding: 8px 0; color: #111;">${safeName}</td>
                 </tr>
                 <tr>
                   <td style="padding: 8px 0; color: #666;"><strong>Email:</strong></td>
-                  <td style="padding: 8px 0; color: #111;"><a href="mailto:${email}" style="color: #16a34a;">${email}</a></td>
+                  <td style="padding: 8px 0; color: #111;"><a href="mailto:${safeEmail}" style="color: #16a34a;">${safeEmail}</a></td>
                 </tr>
                 <tr>
                   <td style="padding: 8px 0; color: #666;"><strong>Sent:</strong></td>
@@ -120,13 +137,13 @@ const handler = async (req: Request): Promise<Response> => {
 
             <div style="background: #f3f4f6; border-radius: 8px; padding: 16px; margin: 20px 0;">
               <h3 style="margin: 0 0 12px; color: #111; font-size: 16px;">Message</h3>
-              <p style="margin: 0; color: #111; white-space: pre-wrap; line-height: 1.6;">${message}</p>
+              <p style="margin: 0; color: #111; white-space: pre-wrap; line-height: 1.6;">${safeMessage}</p>
             </div>
 
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
             <p style="color: #666; font-size: 12px; text-align: center;">
               This message was submitted via the Lekker Lights contact form.<br>
-              You can reply directly to this email to respond to ${name}.
+              You can reply directly to this email to respond to ${safeName}.
             </p>
           </div>
         `,

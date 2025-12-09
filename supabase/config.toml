@@ -26,3 +26,9 @@ verify_jwt = false
 
 [functions.delete-listing]
 verify_jwt = false
+
+[functions.create-listing-token]
+verify_jwt = false
+
+[functions.verify-edit-token]
+verify_jwt = false

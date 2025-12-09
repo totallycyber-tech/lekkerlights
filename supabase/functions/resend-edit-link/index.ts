@@ -90,10 +90,10 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Find all listings with this email
+    // Find all listings with this email (without edit_token - that's in separate secure table)
     const { data: listings, error } = await supabase
       .from("listings")
-      .select("id, title, edit_token")
+      .select("id, title")
       .eq("contact_email", email.trim().toLowerCase());
 
     if (error) {
@@ -113,11 +113,28 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Found ${listings.length} listing(s) for email`);
 
+    // Get tokens from secure table
+    const listingIds = listings.map(l => l.id);
+    const { data: tokens, error: tokenError } = await supabase
+      .from("listing_edit_tokens")
+      .select("listing_id, edit_token")
+      .in("listing_id", listingIds);
+
+    if (tokenError || !tokens) {
+      console.error("Token lookup error:", tokenError);
+      throw new Error("Failed to look up edit tokens");
+    }
+
+    // Create a map of listing_id -> edit_token
+    const tokenMap = new Map(tokens.map(t => [t.listing_id, t.edit_token]));
+
     const siteUrl = Deno.env.get("SITE_URL") || "https://lekkerlights.co.za";
 
     // Build HTML for all listings with escaped content
     const listingsHtml = listings.map(listing => {
-      const editLink = `${siteUrl}/edit-listing/${listing.id}?token=${listing.edit_token}`;
+      const editToken = tokenMap.get(listing.id);
+      if (!editToken) return ''; // Skip if no token found
+      const editLink = `${siteUrl}/edit-listing/${listing.id}?token=${editToken}`;
       const safeTitle = escapeHtml(listing.title);
       return `
         <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0;">
@@ -126,7 +143,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p style="color: #666; font-size: 11px; margin: 12px 0 0; word-break: break-all;">Link: ${editLink}</p>
         </div>
       `;
-    }).join("");
+    }).filter(Boolean).join("");
 
     // Send email with all edit links
     const res = await fetch("https://api.resend.com/emails", {
