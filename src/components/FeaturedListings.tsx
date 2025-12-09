@@ -8,14 +8,13 @@ import { transformDbListing } from "@/data/mockListings";
 export function FeaturedListings() {
   const { data: listings = [], isLoading } = useListings();
   
-  // Get up to 3 most popular listings (sorted by popularity score)
-  const featuredListings = [...listings]
+  // Transform all listings and sort by popularity score
+  const allListings = [...listings]
     .sort((a, b) => {
       const scoreA = (a.directions_clicks || 0) + (a.favorites_count || 0) * 2;
       const scoreB = (b.directions_clicks || 0) + (b.favorites_count || 0) * 2;
       return scoreB - scoreA;
     })
-    .slice(0, 3)
     .map((listing) => transformDbListing(listing as any));
 
   if (isLoading) {
@@ -30,7 +29,7 @@ export function FeaturedListings() {
     );
   }
 
-  if (featuredListings.length === 0) {
+  if (allListings.length === 0) {
     return (
       <section className="py-20 bg-gradient-night">
         <div className="container mx-auto px-4">
@@ -63,28 +62,28 @@ export function FeaturedListings() {
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
               <span className="text-sm font-medium text-primary uppercase tracking-wider">
-                Featured
+                Discover
               </span>
             </div>
             <h2 className="font-display text-3xl sm:text-4xl font-bold">
-              Most Popular Displays
+              Christmas Light Displays
             </h2>
             <p className="text-muted-foreground max-w-xl">
-              Discover the most stunning light displays that have captured hearts across South Africa.
+              Explore stunning light displays across South Africa.
             </p>
           </div>
           
           <Link to="/browse">
             <Button variant="outline" size="lg">
-              View All
+              Browse All
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>
         </div>
 
-        {/* Featured Grid */}
+        {/* Listings Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredListings.map((listing) => (
+          {allListings.map((listing) => (
             <ListingCard key={listing.id} listing={listing} />
           ))}
         </div>
