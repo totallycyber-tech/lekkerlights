@@ -105,18 +105,32 @@ export default function EditListing() {
       }
 
       try {
-        // Fetch listing and verify token
+        // Verify token via edge function (secure - client can't read tokens directly)
+        const verifyResponse = await supabase.functions.invoke('verify-edit-token', {
+          body: { listingId: id, editToken: token },
+        });
+
+        if (verifyResponse.error || !verifyResponse.data?.success) {
+          toast({
+            title: "Unauthorized",
+            description: "This edit link is invalid or the listing no longer exists.",
+            variant: "destructive",
+          });
+          navigate('/');
+          return;
+        }
+
+        // Fetch listing data (without edit_token - that's in secure table)
         const { data: listing, error } = await supabase
           .from('listings')
           .select('*')
           .eq('id', id)
-          .eq('edit_token', token)
           .maybeSingle();
 
         if (error || !listing) {
           toast({
-            title: "Unauthorized",
-            description: "This edit link is invalid or the listing no longer exists.",
+            title: "Error",
+            description: "Failed to load listing data.",
             variant: "destructive",
           });
           navigate('/');

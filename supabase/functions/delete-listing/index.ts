@@ -3,7 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface DeleteListingRequest {
@@ -18,78 +19,67 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { listingId, editToken }: DeleteListingRequest = await req.json();
-    
-    console.log(`Attempting to delete listing: ${listingId}`);
 
     if (!listingId || !editToken) {
       return new Response(
-        JSON.stringify({ success: false, error: "Missing listingId or editToken" }),
+        JSON.stringify({ success: false, error: "Missing required fields" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Create Supabase client with service role to bypass RLS
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
+    console.log(`Delete request for listing: ${listingId}`);
 
-    // First, verify the edit token matches the listing
-    const { data: listing, error: fetchError } = await supabaseAdmin
-      .from("listings")
-      .select("id, edit_token, title")
-      .eq("id", listingId)
-      .maybeSingle();
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    if (fetchError) {
-      console.error("Error fetching listing:", fetchError);
-      return new Response(
-        JSON.stringify({ success: false, error: "Failed to verify listing" }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
+    // Verify token from secure listing_edit_tokens table
+    const { data: tokenRecord, error: tokenError } = await supabase
+      .from("listing_edit_tokens")
+      .select("edit_token")
+      .eq("listing_id", listingId)
+      .single();
 
-    if (!listing) {
+    if (tokenError || !tokenRecord) {
+      console.error("Token record not found:", tokenError);
       return new Response(
         JSON.stringify({ success: false, error: "Listing not found" }),
         { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Validate the edit token
-    if (listing.edit_token !== editToken) {
-      console.warn(`Invalid edit token attempt for listing deletion: ${listingId}`);
+    if (tokenRecord.edit_token !== editToken) {
+      console.error("Token mismatch for listing:", listingId);
       return new Response(
         JSON.stringify({ success: false, error: "Invalid edit token" }),
         { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Perform the deletion
-    const { error: deleteError } = await supabaseAdmin
+    // Delete listing (CASCADE will also delete the token record)
+    const { error: deleteError } = await supabase
       .from("listings")
       .delete()
       .eq("id", listingId);
 
     if (deleteError) {
-      console.error("Error deleting listing:", deleteError);
+      console.error("Delete error:", deleteError);
       return new Response(
         JSON.stringify({ success: false, error: "Failed to delete listing" }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    console.log(`Successfully deleted listing: ${listingId} (${listing.title})`);
+    console.log("Listing deleted successfully:", listingId);
 
     return new Response(
-      JSON.stringify({ success: true, message: "Listing deleted successfully" }),
+      JSON.stringify({ success: true }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error("Error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
+      JSON.stringify({ success: false, error: error.message }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }

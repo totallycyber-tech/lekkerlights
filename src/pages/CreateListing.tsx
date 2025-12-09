@@ -229,28 +229,19 @@ export default function CreateListing() {
           .eq('id', listing.id);
       }
 
-      // Send edit link email
+      // Send edit link email via edge function (which has access to the secure token table)
       setUploadProgress('Sending edit link to your email...');
       try {
         const { supabase } = await import('@/integrations/supabase/client');
         
-        // Fetch the edit_token from the newly created listing
-        const { data: listingData } = await supabase
-          .from('listings')
-          .select('edit_token')
-          .eq('id', listing.id)
-          .single();
-
-        if (listingData?.edit_token) {
-          await supabase.functions.invoke('send-edit-link', {
-            body: {
-              email: formData.contactEmail.trim(),
-              listingTitle: formData.title,
-              editToken: listingData.edit_token,
-              listingId: listing.id,
-            },
-          });
-        }
+        // Create token in secure table first via edge function
+        await supabase.functions.invoke('create-listing-token', {
+          body: {
+            listingId: listing.id,
+            email: formData.contactEmail.trim(),
+            listingTitle: formData.title,
+          },
+        });
       } catch (emailError) {
         console.error('Failed to send edit link email:', emailError);
         // Don't fail the whole submission, just warn the user

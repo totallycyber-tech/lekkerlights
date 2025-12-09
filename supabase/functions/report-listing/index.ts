@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,6 +15,18 @@ interface ReportListingRequest {
   reporterEmail: string;
   reporterPhone: string;
   reportedAt: string;
+}
+
+// HTML escape function to prevent injection
+function escapeHtml(text: string): string {
+  const entities: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return text.replace(/[&<>"']/g, char => entities[char]);
 }
 
 // In-memory rate limiting store (resets when function cold starts)
@@ -87,6 +98,14 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Report received for listing: ${listingTitle} (${listingId}) from IP: ${clientIP}`);
     console.log(`Reason: ${reason}`);
 
+    // Escape user content for HTML
+    const safeTitle = escapeHtml(listingTitle);
+    const safeReason = escapeHtml(reason);
+    const safeDetails = additionalDetails ? escapeHtml(additionalDetails) : '';
+    const safeName = escapeHtml(reporterName);
+    const safeEmail = reporterEmail ? escapeHtml(reporterEmail) : '';
+    const safePhone = reporterPhone ? escapeHtml(reporterPhone) : '';
+
     const siteUrl = Deno.env.get("SITE_URL") || "https://lekkerlights.co.za";
     const listingUrl = `${siteUrl}/listing/${listingId}`;
 
@@ -99,7 +118,7 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "Lekker Lights Reports <onboarding@resend.dev>",
         to: ["totallycyber.tech@gmail.com"],
-        subject: `🚨 Listing Report: ${reason} - ${listingTitle}`,
+        subject: `🚨 Listing Report: ${safeReason} - ${safeTitle}`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h1 style="color: #dc2626;">🚨 Listing Report</h1>
@@ -109,7 +128,7 @@ const handler = async (req: Request): Promise<Response> => {
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td style="padding: 8px 0; color: #666; width: 140px;"><strong>Reason:</strong></td>
-                  <td style="padding: 8px 0; color: #111;">${reason}</td>
+                  <td style="padding: 8px 0; color: #111;">${safeReason}</td>
                 </tr>
                 <tr>
                   <td style="padding: 8px 0; color: #666;"><strong>Date & Time:</strong></td>
@@ -120,15 +139,15 @@ const handler = async (req: Request): Promise<Response> => {
 
             <div style="background: #f3f4f6; border-radius: 8px; padding: 16px; margin: 20px 0;">
               <h3 style="margin: 0 0 12px; color: #111; font-size: 16px;">Listing Information</h3>
-              <p style="margin: 0 0 8px;"><strong>Title:</strong> ${listingTitle}</p>
+              <p style="margin: 0 0 8px;"><strong>Title:</strong> ${safeTitle}</p>
               <p style="margin: 0 0 8px;"><strong>ID:</strong> ${listingId}</p>
               <p style="margin: 0;"><a href="${listingUrl}" style="color: #dc2626;">View Listing →</a></p>
             </div>
 
-            ${additionalDetails ? `
+            ${safeDetails ? `
             <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin: 20px 0;">
               <h3 style="margin: 0 0 8px; color: #92400e; font-size: 16px;">Additional Details</h3>
-              <p style="margin: 0; color: #111; white-space: pre-wrap;">${additionalDetails}</p>
+              <p style="margin: 0; color: #111; white-space: pre-wrap;">${safeDetails}</p>
             </div>
             ` : ''}
 
@@ -137,18 +156,18 @@ const handler = async (req: Request): Promise<Response> => {
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td style="padding: 4px 0; color: #666; width: 80px;"><strong>Name:</strong></td>
-                  <td style="padding: 4px 0; color: #111;">${reporterName}</td>
+                  <td style="padding: 4px 0; color: #111;">${safeName}</td>
                 </tr>
-                ${reporterEmail ? `
+                ${safeEmail ? `
                 <tr>
                   <td style="padding: 4px 0; color: #666;"><strong>Email:</strong></td>
-                  <td style="padding: 4px 0; color: #111;"><a href="mailto:${reporterEmail}" style="color: #dc2626;">${reporterEmail}</a></td>
+                  <td style="padding: 4px 0; color: #111;"><a href="mailto:${safeEmail}" style="color: #dc2626;">${safeEmail}</a></td>
                 </tr>
                 ` : ''}
-                ${reporterPhone ? `
+                ${safePhone ? `
                 <tr>
                   <td style="padding: 4px 0; color: #666;"><strong>Phone:</strong></td>
-                  <td style="padding: 4px 0; color: #111;"><a href="tel:${reporterPhone}" style="color: #dc2626;">${reporterPhone}</a></td>
+                  <td style="padding: 4px 0; color: #111;"><a href="tel:${safePhone}" style="color: #dc2626;">${safePhone}</a></td>
                 </tr>
                 ` : ''}
               </table>

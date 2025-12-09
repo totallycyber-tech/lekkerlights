@@ -94,10 +94,10 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Verify that the editToken matches the listingId and email matches contact_email
+    // Verify listing exists and get details (without edit_token - that's in separate secure table)
     const { data: listing, error: dbError } = await supabase
       .from("listings")
-      .select("id, title, edit_token, contact_email")
+      .select("id, title, contact_email")
       .eq("id", listingId)
       .single();
 
@@ -109,11 +109,35 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Validate that the provided editToken matches the one in the database
-    if (listing.edit_token !== editToken) {
+    // Get token from secure tokens table
+    const { data: tokenRecord, error: tokenError } = await supabase
+      .from("listing_edit_tokens")
+      .select("edit_token")
+      .eq("listing_id", listingId)
+      .single();
+
+    if (tokenError || !tokenRecord) {
+      console.error("Token not found:", tokenError);
+      return new Response(
+        JSON.stringify({ success: false, error: "Listing not found" }),
+        { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Validate that the provided editToken matches the one in the secure table
+    if (tokenRecord.edit_token !== editToken) {
       console.error("Edit token mismatch for listing:", listingId);
       return new Response(
         JSON.stringify({ success: false, error: "Invalid edit token" }),
+        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Validate that the email matches the listing's contact email
+    if (listing.contact_email?.toLowerCase() !== email.trim().toLowerCase()) {
+      console.error("Email mismatch for listing:", listingId);
+      return new Response(
+        JSON.stringify({ success: false, error: "Email does not match listing" }),
         { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }

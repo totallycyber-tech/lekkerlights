@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      listing_edit_tokens: {
+        Row: {
+          created_at: string
+          edit_token: string
+          listing_id: string
+        }
+        Insert: {
+          created_at?: string
+          edit_token?: string
+          listing_id: string
+        }
+        Update: {
+          created_at?: string
+          edit_token?: string
+          listing_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_edit_tokens_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: true
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_edit_tokens_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: true
+            referencedRelation: "listings_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listings: {
         Row: {
           city: string
