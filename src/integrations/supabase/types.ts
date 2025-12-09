@@ -24,6 +24,7 @@ export type Database = {
           created_at: string
           description: string
           directions_clicks: number | null
+          edit_token: string | null
           email_visible: boolean
           favorites_count: number | null
           gate_access_info: string | null
@@ -56,6 +57,7 @@ export type Database = {
           created_at?: string
           description: string
           directions_clicks?: number | null
+          edit_token?: string | null
           email_visible?: boolean
           favorites_count?: number | null
           gate_access_info?: string | null
@@ -88,6 +90,7 @@ export type Database = {
           created_at?: string
           description?: string
           directions_clicks?: number | null
+          edit_token?: string | null
           email_visible?: boolean
           favorites_count?: number | null
           gate_access_info?: string | null
