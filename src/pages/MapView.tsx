@@ -13,7 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { mockListings, provinces, transformDbListing, Listing } from "@/data/mockListings";
-import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation, Crosshair, X, Tags, Star, Flag } from "lucide-react";
+import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation, Crosshair, X, Tags, Star, Flag, CheckSquare } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
 import { useListings } from "@/hooks/use-listings";
@@ -70,6 +71,7 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
   const [radiusFilter, setRadiusFilter] = useState<number | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isLocating, setIsLocating] = useState(false);
+  const [checkedListings, setCheckedListings] = useState<Set<string>>(new Set());
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const mapRef = useRef<google.maps.Map | null>(null);
   const listingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -149,6 +151,43 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
   };
 
   const hasActiveFilters = selectedProvince !== 'all' || suburbSearch || searchMarker || userLocation || selectedTags.length > 0;
+
+  // Handle checkbox toggle for individual listing
+  const handleCheckboxToggle = (listingId: string) => {
+    setCheckedListings((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(listingId)) {
+        newSet.delete(listingId);
+      } else {
+        newSet.add(listingId);
+      }
+      return newSet;
+    });
+  };
+
+  // Handle select all
+  const handleSelectAll = () => {
+    const filteredIds = filteredListings.map((l) => l.id);
+    const allSelected = filteredIds.every((id) => checkedListings.has(id));
+    
+    if (allSelected) {
+      // Deselect all filtered listings
+      setCheckedListings((prev) => {
+        const newSet = new Set(prev);
+        filteredIds.forEach((id) => newSet.delete(id));
+        return newSet;
+      });
+    } else {
+      // Select all filtered listings
+      setCheckedListings((prev) => {
+        const newSet = new Set(prev);
+        filteredIds.forEach((id) => newSet.add(id));
+        return newSet;
+      });
+    }
+  };
+
+  const allFilteredSelected = filteredListings.length > 0 && filteredListings.every((l) => checkedListings.has(l.id));
 
   // Handle getting user's current location
   const handleGetLocation = () => {
@@ -601,49 +640,65 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
                     title="Drag to search a different location"
                   />
                 )}
-                {filteredListings.map((listing) => (
-                  listing.location.lat && listing.location.lng && (
-                    <MarkerF
-                      key={listing.id}
-                      position={{ lat: listing.location.lat, lng: listing.location.lng }}
-                      onClick={() => handleMarkerClick(listing.id)}
-                      icon={{
-                        url: selectedListing === listing.id || hoveredListing === listing.id
-                          ? "data:image/svg+xml," + encodeURIComponent(`
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="36" height="36">
-                                <circle cx="18" cy="18" r="16" fill="#166534" stroke="#fff" stroke-width="2"/>
-                                <polygon points="18,6 22,14 26,14 23,18 25,26 18,22 11,26 13,18 10,14 14,14" fill="#0f5132"/>
-                                <circle cx="14" cy="12" r="2" fill="#ef4444"/>
-                                <circle cx="22" cy="12" r="2" fill="#fbbf24"/>
-                                <circle cx="12" cy="18" r="2" fill="#3b82f6"/>
-                                <circle cx="24" cy="18" r="2" fill="#ef4444"/>
-                                <circle cx="15" cy="23" r="2" fill="#fbbf24"/>
-                                <circle cx="21" cy="23" r="2" fill="#3b82f6"/>
-                                <circle cx="18" cy="16" r="2" fill="#22c55e"/>
-                              </svg>
-                            `)
-                          : "data:image/svg+xml," + encodeURIComponent(`
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28">
-                                <circle cx="14" cy="14" r="12" fill="#166534" stroke="#fff" stroke-width="2"/>
-                                <circle cx="10" cy="10" r="2" fill="#ef4444"/>
-                                <circle cx="18" cy="10" r="2" fill="#fbbf24"/>
-                                <circle cx="9" cy="16" r="2" fill="#3b82f6"/>
-                                <circle cx="19" cy="16" r="2" fill="#ef4444"/>
-                                <circle cx="14" cy="13" r="2" fill="#22c55e"/>
-                                <circle cx="14" cy="20" r="2" fill="#fbbf24"/>
-                              </svg>
-                            `),
-                        scaledSize: selectedListing === listing.id || hoveredListing === listing.id
-                          ? new google.maps.Size(36, 36)
-                          : new google.maps.Size(28, 28),
-                        anchor: selectedListing === listing.id || hoveredListing === listing.id
-                          ? new google.maps.Point(18, 18)
-                          : new google.maps.Point(14, 14),
-                      }}
-                      animation={selectedListing === listing.id ? google.maps.Animation.BOUNCE : undefined}
-                    />
-                  )
-                ))}
+                {/* Markers only for checked listings */}
+                {filteredListings
+                  .filter((listing) => checkedListings.has(listing.id))
+                  .map((listing) => (
+                    listing.location.lat && listing.location.lng && (
+                      <MarkerF
+                        key={listing.id}
+                        position={{ lat: listing.location.lat, lng: listing.location.lng }}
+                        onClick={() => handleMarkerClick(listing.id)}
+                        icon={{
+                          url: "data:image/svg+xml," + encodeURIComponent(`
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" width="40" height="50">
+                              <!-- Tree trunk -->
+                              <rect x="17" y="40" width="6" height="8" fill="#8B4513"/>
+                              <!-- Tree layers -->
+                              <polygon points="20,2 32,18 26,18 35,32 28,32 38,45 2,45 12,32 5,32 14,18 8,18" fill="#166534" stroke="#0f5132" stroke-width="1"/>
+                              <!-- Decorative lights -->
+                              <circle cx="12" cy="38" r="2.5" fill="#ef4444">
+                                <animate attributeName="opacity" values="1;0.5;1" dur="1s" repeatCount="indefinite"/>
+                              </circle>
+                              <circle cx="28" cy="38" r="2.5" fill="#fbbf24">
+                                <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite"/>
+                              </circle>
+                              <circle cx="8" cy="30" r="2.5" fill="#3b82f6">
+                                <animate attributeName="opacity" values="1;0.5;1" dur="0.8s" repeatCount="indefinite"/>
+                              </circle>
+                              <circle cx="32" cy="30" r="2.5" fill="#ef4444">
+                                <animate attributeName="opacity" values="0.5;1;0.5" dur="0.8s" repeatCount="indefinite"/>
+                              </circle>
+                              <circle cx="11" cy="22" r="2.5" fill="#22c55e">
+                                <animate attributeName="opacity" values="1;0.5;1" dur="1.2s" repeatCount="indefinite"/>
+                              </circle>
+                              <circle cx="29" cy="22" r="2.5" fill="#fbbf24">
+                                <animate attributeName="opacity" values="0.5;1;0.5" dur="1.2s" repeatCount="indefinite"/>
+                              </circle>
+                              <circle cx="15" cy="14" r="2.5" fill="#3b82f6">
+                                <animate attributeName="opacity" values="1;0.5;1" dur="0.9s" repeatCount="indefinite"/>
+                              </circle>
+                              <circle cx="25" cy="14" r="2.5" fill="#ef4444">
+                                <animate attributeName="opacity" values="0.5;1;0.5" dur="0.9s" repeatCount="indefinite"/>
+                              </circle>
+                              <circle cx="20" cy="8" r="2" fill="#fbbf24">
+                                <animate attributeName="opacity" values="1;0.5;1" dur="1.1s" repeatCount="indefinite"/>
+                              </circle>
+                              <!-- Star on top -->
+                              <polygon points="20,0 21,4 25,4 22,6 23,10 20,8 17,10 18,6 15,4 19,4" fill="#fbbf24"/>
+                            </svg>
+                          `),
+                          scaledSize: selectedListing === listing.id || hoveredListing === listing.id
+                            ? new google.maps.Size(48, 60)
+                            : new google.maps.Size(40, 50),
+                          anchor: selectedListing === listing.id || hoveredListing === listing.id
+                            ? new google.maps.Point(24, 60)
+                            : new google.maps.Point(20, 50),
+                        }}
+                        animation={selectedListing === listing.id ? google.maps.Animation.BOUNCE : undefined}
+                      />
+                    )
+                  ))}
 
                 {/* Info Window for selected listing */}
                 {selected && selected.location.lat && selected.location.lng && (
@@ -687,6 +742,17 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
                   {filteredListings.length} found
                 </span>
               </div>
+              {filteredListings.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 w-full"
+                  onClick={handleSelectAll}
+                >
+                  <CheckSquare className="h-4 w-4 mr-2" />
+                  {allFilteredSelected ? "Deselect All" : "Select All"}
+                </Button>
+              )}
             </div>
 
             <div className="divide-y divide-border">
@@ -717,6 +783,16 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
                       onMouseLeave={() => setHoveredListing(null)}
                     >
                       <div className="flex gap-3">
+                        <div 
+                          className="flex items-center justify-center flex-shrink-0"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Checkbox
+                            checked={checkedListings.has(listing.id)}
+                            onCheckedChange={() => handleCheckboxToggle(listing.id)}
+                            className="h-5 w-5"
+                          />
+                        </div>
                         <img
                           src={listing.photos[0] || defaultCoverPhoto}
                           alt={listing.title}
