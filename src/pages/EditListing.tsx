@@ -269,37 +269,41 @@ export default function EditListing() {
         }
       }
 
-      const { error } = await supabase
-        .from('listings')
-        .update({
-          title: formData.title,
-          description: formData.description,
-          complex_name: formData.complexName || null,
-          unit_no: formData.unitNo || null,
-          street_number: formData.streetNumber,
-          street_name: formData.streetName,
-          suburb: formData.suburb,
-          city: formData.city,
-          province: formData.province,
-          postal_code: formData.postalCode,
-          contact_name: formData.contactName || null,
-          contact_email: formData.contactEmail || null,
-          contact_phone: formData.contactPhone || null,
-          name_visible: nameVisible,
-          email_visible: emailVisible,
-          phone_visible: phoneVisible,
-          parking_info: formData.parkingInfo || null,
-          max_visitors: formData.maxVisitors ? parseInt(formData.maxVisitors) : null,
-          gate_access_info: formData.gateAccessInfo || null,
-          youtube_urls: filteredYoutubeUrls,
-          image_urls: allImageUrls,
-          operating_hours: operatingHours,
-          tags: selectedTags,
-        } as any)
-        .eq('id', id)
-        .eq('edit_token', token);
+      // Use secure edge function instead of direct database update
+      const { data, error } = await supabase.functions.invoke('update-listing', {
+        body: {
+          listingId: id,
+          editToken: token,
+          updates: {
+            title: formData.title,
+            description: formData.description,
+            complex_name: formData.complexName || null,
+            unit_no: formData.unitNo || null,
+            street_number: formData.streetNumber,
+            street_name: formData.streetName,
+            suburb: formData.suburb,
+            city: formData.city,
+            province: formData.province,
+            postal_code: formData.postalCode,
+            contact_name: formData.contactName || null,
+            contact_email: formData.contactEmail || null,
+            contact_phone: formData.contactPhone || null,
+            name_visible: nameVisible,
+            email_visible: emailVisible,
+            phone_visible: phoneVisible,
+            parking_info: formData.parkingInfo || null,
+            max_visitors: formData.maxVisitors ? parseInt(formData.maxVisitors) : null,
+            gate_access_info: formData.gateAccessInfo || null,
+            youtube_urls: filteredYoutubeUrls,
+            image_urls: allImageUrls,
+            operating_hours: operatingHours,
+            tags: selectedTags,
+          },
+        },
+      });
 
       if (error) throw error;
+      if (data && !data.success) throw new Error(data.error || 'Update failed');
 
       toast({
         title: "Listing updated!",
@@ -323,13 +327,16 @@ export default function EditListing() {
     setIsDeleting(true);
 
     try {
-      const { error } = await supabase
-        .from('listings')
-        .delete()
-        .eq('id', id)
-        .eq('edit_token', token);
+      // Use secure edge function instead of direct database delete
+      const { data, error } = await supabase.functions.invoke('delete-listing', {
+        body: {
+          listingId: id,
+          editToken: token,
+        },
+      });
 
       if (error) throw error;
+      if (data && !data.success) throw new Error(data.error || 'Delete failed');
 
       toast({
         title: "Listing deleted",
