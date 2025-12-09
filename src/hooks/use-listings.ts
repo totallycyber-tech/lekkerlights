@@ -171,32 +171,37 @@ export function useIncrementDirectionsClicks() {
   });
 }
 
-// Upload images to storage and return public URLs
-export async function uploadListingImages(files: File[], listingId: string): Promise<string[]> {
+// Upload images to storage via secure edge function with server-side validation
+export async function uploadListingImages(
+  files: File[], 
+  listingId: string, 
+  editToken?: string
+): Promise<string[]> {
   const urls: string[] = [];
   
   for (const file of files) {
-    const timestamp = Date.now();
-    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const filePath = `${listingId}/${timestamp}-${safeName}`;
-    
-    const { error } = await supabase.storage
-      .from('listing-images')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false,
-      });
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('listingId', listingId);
+    if (editToken) {
+      formData.append('editToken', editToken);
+    }
+
+    const { data, error } = await supabase.functions.invoke('upload-listing-image', {
+      body: formData,
+    });
 
     if (error) {
       console.error('Error uploading image:', error);
-      throw error;
+      throw new Error(error.message || 'Failed to upload image');
     }
 
-    const { data: urlData } = supabase.storage
-      .from('listing-images')
-      .getPublicUrl(filePath);
+    if (!data?.success) {
+      console.error('Upload failed:', data?.error);
+      throw new Error(data?.error || 'Failed to upload image');
+    }
 
-    urls.push(urlData.publicUrl);
+    urls.push(data.url);
   }
 
   return urls;

@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.delete-listing-image]
 verify_jwt = false
+
+[functions.upload-listing-image]
+verify_jwt = false

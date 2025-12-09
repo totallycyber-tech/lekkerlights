@@ -304,7 +304,7 @@ export default function EditListing() {
 
       if (newImages.length > 0) {
         const { uploadListingImages } = await import('@/hooks/use-listings');
-        const newUrls = await uploadListingImages(newImages, id!);
+        const newUrls = await uploadListingImages(newImages, id!, token!);
         // If cover photo was uploaded, prepend it
         if (coverPhoto) {
           allImageUrls = [newUrls[0], ...existingImageUrls, ...newUrls.slice(1)];

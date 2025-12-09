@@ -7,15 +7,71 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+// Simple in-memory rate limiter
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX = 20; // Max 20 deletions per minute per IP
+
+function checkRateLimit(clientIP: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(clientIP);
+
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(clientIP, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+
+  if (record.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+
+  record.count++;
+  return true;
+}
+
+// Clean up old entries periodically
+function cleanupRateLimitMap() {
+  const now = Date.now();
+  for (const [key, value] of rateLimitMap.entries()) {
+    if (now > value.resetTime) {
+      rateLimitMap.delete(key);
+    }
+  }
+}
+
 interface DeleteImageRequest {
   listingId: string;
   editToken: string;
-  imagePath: string; // Full path like "listingId/filename.jpg"
+  imagePath: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Clean up old rate limit entries
+  cleanupRateLimitMap();
+
+  // Get client IP for rate limiting
+  const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() 
+    || req.headers.get("cf-connecting-ip") 
+    || "unknown";
+
+  // Check rate limit
+  if (!checkRateLimit(clientIP)) {
+    console.log(`Rate limit exceeded for IP: ${clientIP}`);
+    return new Response(
+      JSON.stringify({ success: false, error: "Too many requests. Please try again later." }),
+      { 
+        status: 429, 
+        headers: { 
+          "Content-Type": "application/json", 
+          "Retry-After": "60",
+          ...corsHeaders 
+        } 
+      }
+    );
   }
 
   try {
@@ -39,7 +95,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Verifying edit token for listing: ${listingId}`);
+    console.log(`Verifying edit token for listing: ${listingId} (IP: ${clientIP})`);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
