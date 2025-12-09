@@ -12,52 +12,15 @@ import { useListings } from "@/hooks/use-listings";
 import { useReviewStats } from "@/hooks/use-reviews";
 import { calculateDistance } from "@/lib/geo-utils";
 
-// Generate Google My Maps URL with all listings
+// Generate Google Maps URL with all listings using addresses
 function generateGoogleMapsUrl(listings: Listing[]): string {
-  // Filter listings that have valid coordinates
-  const listingsWithCoords = listings.filter(
-    (l) => l.location.lat && l.location.lng
-  );
-
-  if (listingsWithCoords.length === 0) {
-    return "";
-  }
-
-  // Build the URL for Google Maps with multiple markers
-  // Using the directions/search format which supports multiple waypoints
-  const baseUrl = "https://www.google.com/maps/dir/";
-  
-  // Create waypoints from listings (max 10 for Google Maps URL limits)
-  const waypoints = listingsWithCoords.slice(0, 10).map((listing) => {
-    const address = [
-      listing.location.streetNumber,
-      listing.location.streetName,
-      listing.location.suburb,
-      listing.location.city,
-      listing.location.province,
-      listing.location.postalCode,
-    ]
-      .filter(Boolean)
-      .join("+");
-    return encodeURIComponent(address);
-  });
-
-  return baseUrl + waypoints.join("/");
-}
-
-// Generate a simple Google Maps search URL that shows all locations
-function generateSimpleGoogleMapsUrl(listings: Listing[]): string {
-  const listingsWithCoords = listings.filter(
-    (l) => l.location.lat && l.location.lng
-  );
-
-  if (listingsWithCoords.length === 0) {
+  if (listings.length === 0) {
     return "";
   }
 
   // For a single listing, use the place search
-  if (listingsWithCoords.length === 1) {
-    const listing = listingsWithCoords[0];
+  if (listings.length === 1) {
+    const listing = listings[0];
     const address = [
       listing.location.streetNumber,
       listing.location.streetName,
@@ -70,27 +33,23 @@ function generateSimpleGoogleMapsUrl(listings: Listing[]): string {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
   }
 
-  // For multiple listings, create a search that includes all locations
-  // This will show markers for each address searched
-  const addresses = listingsWithCoords.map((listing) => {
+  // For multiple listings, use directions mode with waypoints (max 10)
+  const baseUrl = "https://www.google.com/maps/dir/";
+  
+  const waypoints = listings.slice(0, 10).map((listing) => {
     const address = [
       listing.location.streetNumber,
       listing.location.streetName,
       listing.location.suburb,
       listing.location.city,
+      listing.location.province,
     ]
       .filter(Boolean)
       .join(" ");
-    return address;
+    return encodeURIComponent(address);
   });
 
-  // Use the first listing as the center point
-  const firstListing = listingsWithCoords[0];
-  const centerLat = firstListing.location.lat;
-  const centerLng = firstListing.location.lng;
-
-  // Create a maps URL centered on the first listing with a good zoom level
-  return `https://www.google.com/maps/@${centerLat},${centerLng},10z`;
+  return baseUrl + waypoints.join("/");
 }
 
 export default function Browse() {
