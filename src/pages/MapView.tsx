@@ -12,10 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockListings, provinces } from "@/data/mockListings";
+import { mockListings, provinces, transformDbListing, Listing } from "@/data/mockListings";
 import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation } from "lucide-react";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
+import { useListings } from "@/hooks/use-listings";
 
 const libraries: ("places")[] = ["places"];
 
@@ -60,23 +61,30 @@ export default function MapView() {
   const suburbAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const { trackDirectionsClick } = usePopularity();
   const { apiKey, isLoading: isLoadingKey, error: keyError } = useGoogleMapsKey();
+  const { data: dbListings } = useListings();
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey || '',
     libraries,
   });
 
+  // Combine database listings with mock listings
+  const allListings: Listing[] = useMemo(() => {
+    const transformed = (dbListings || []).map(transformDbListing);
+    return transformed.length > 0 ? transformed : mockListings;
+  }, [dbListings]);
+
   const filteredListings = useMemo(() => {
-    return mockListings.filter(listing => {
+    return allListings.filter(listing => {
       const provinceMatch = selectedProvince === 'all' || listing.location.province === selectedProvince;
       const suburbMatch = !suburbSearch || listing.location.suburb.toLowerCase().includes(suburbSearch.toLowerCase()) || listing.location.city.toLowerCase().includes(suburbSearch.toLowerCase());
       return provinceMatch && suburbMatch;
     });
-  }, [selectedProvince, suburbSearch]);
+  }, [selectedProvince, suburbSearch, allListings]);
 
-  const selected = mockListings.find(l => l.id === selectedListing);
+  const selected = allListings.find(l => l.id === selectedListing);
 
-  const getDirectionsUrl = (listing: typeof mockListings[0]) => {
+  const getDirectionsUrl = (listing: Listing) => {
     const address = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}`;
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
   };
@@ -194,7 +202,7 @@ export default function MapView() {
   // Pan to selected listing
   const handleListingClick = (listingId: string) => {
     setSelectedListing(listingId);
-    const listing = mockListings.find(l => l.id === listingId);
+    const listing = allListings.find(l => l.id === listingId);
     if (listing && mapRef.current && listing.location.lat && listing.location.lng) {
       mapRef.current.panTo({ lat: listing.location.lat, lng: listing.location.lng });
       mapRef.current.setZoom(14);

@@ -20,6 +20,7 @@ import { Sparkles, ArrowLeft, Check, Youtube, Image, Plus, X, Link as LinkIcon }
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { useCreateListing } from "@/hooks/use-listings";
 
 const DAYS_OF_WEEK = [
   'Monday',
@@ -46,6 +47,7 @@ const defaultOperatingHours: OperatingHours = DAYS_OF_WEEK.reduce((acc, day) => 
 
 export default function CreateListing() {
   const navigate = useNavigate();
+  const createListing = useCreateListing();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>(['']);
   const [googleDriveUrls, setGoogleDriveUrls] = useState<string[]>(['']);
@@ -139,16 +141,45 @@ export default function CreateListing() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      // Filter out empty URLs
+      const filteredYoutubeUrls = youtubeUrls.filter(url => url.trim() !== '');
+      const filteredGoogleDriveUrls = googleDriveUrls.filter(url => url.trim() !== '');
 
-    toast({
-      title: "Listing published!",
-      description: "Your Christmas display is now live for everyone to see.",
-    });
+      await createListing.mutateAsync({
+        title: formData.title,
+        description: formData.description,
+        complex_name: formData.complexName || null,
+        unit_no: formData.unitNo || null,
+        street_number: formData.streetNumber,
+        street_name: formData.streetName,
+        suburb: formData.suburb,
+        city: formData.city,
+        province: formData.province,
+        postal_code: formData.postalCode,
+        contact_email: formData.contactEmail || null,
+        contact_phone: formData.contactPhone || null,
+        youtube_urls: filteredYoutubeUrls,
+        google_drive_urls: filteredGoogleDriveUrls,
+        operating_hours: operatingHours,
+      });
 
-    setIsSubmitting(false);
-    navigate('/browse');
+      toast({
+        title: "Listing published!",
+        description: "Your Christmas display is now live for everyone to see.",
+      });
+
+      navigate('/browse');
+    } catch (error) {
+      console.error('Error creating listing:', error);
+      toast({
+        title: "Error",
+        description: "Failed to publish your listing. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

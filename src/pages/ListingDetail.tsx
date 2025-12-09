@@ -3,16 +3,37 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { mockListings } from "@/data/mockListings";
+import { mockListings, transformDbListing } from "@/data/mockListings";
 import { 
   MapPin, Clock, Mail, Phone, ExternalLink, 
-  ArrowLeft, Share2, Heart, Flag, Calendar 
+  ArrowLeft, Share2, Heart, Flag, Calendar, Loader2 
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useListing } from "@/hooks/use-listings";
 
 export default function ListingDetail() {
   const { id } = useParams();
-  const listing = mockListings.find(l => l.id === id);
+  const { data: dbListing, isLoading, error } = useListing(id || '');
+  
+  // Try to find in database first, then fall back to mock
+  const listing = dbListing 
+    ? transformDbListing(dbListing as any)
+    : mockListings.find(l => l.id === id);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="pt-24 pb-12">
+          <div className="container mx-auto px-4 text-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-christmas mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading display...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!listing) {
     return (
@@ -123,11 +144,6 @@ export default function ListingDetail() {
                     {listing.title}
                   </h1>
                 </div>
-                {listing.featured && (
-                  <Badge variant="default" className="bg-primary/90">
-                    ⭐ Featured Display
-                  </Badge>
-                )}
               </div>
 
               {/* Description */}
@@ -169,10 +185,12 @@ export default function ListingDetail() {
                       <Calendar className="h-4 w-4" />
                       {listing.operatingHours.days}
                     </p>
-                    <p className="flex items-center gap-2 text-muted-foreground">
-                      <Clock className="h-4 w-4" />
-                      {listing.operatingHours.times}
-                    </p>
+                    {listing.operatingHours.times && (
+                      <p className="flex items-center gap-2 text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        {listing.operatingHours.times}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

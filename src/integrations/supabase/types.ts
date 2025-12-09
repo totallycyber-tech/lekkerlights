@@ -14,7 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      listings: {
+        Row: {
+          city: string
+          complex_name: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string
+          directions_clicks: number | null
+          favorites_count: number | null
+          google_drive_urls: string[] | null
+          id: string
+          lat: number | null
+          lng: number | null
+          operating_hours: Json | null
+          postal_code: string
+          province: string
+          street_name: string
+          street_number: string
+          suburb: string
+          title: string
+          unit_no: string | null
+          updated_at: string
+          youtube_urls: string[] | null
+        }
+        Insert: {
+          city: string
+          complex_name?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description: string
+          directions_clicks?: number | null
+          favorites_count?: number | null
+          google_drive_urls?: string[] | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          operating_hours?: Json | null
+          postal_code: string
+          province: string
+          street_name: string
+          street_number: string
+          suburb: string
+          title: string
+          unit_no?: string | null
+          updated_at?: string
+          youtube_urls?: string[] | null
+        }
+        Update: {
+          city?: string
+          complex_name?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string
+          directions_clicks?: number | null
+          favorites_count?: number | null
+          google_drive_urls?: string[] | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          operating_hours?: Json | null
+          postal_code?: string
+          province?: string
+          street_name?: string
+          street_number?: string
+          suburb?: string
+          title?: string
+          unit_no?: string | null
+          updated_at?: string
+          youtube_urls?: string[] | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
