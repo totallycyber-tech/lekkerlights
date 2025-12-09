@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -16,12 +17,37 @@ import {
 import { provinces } from "@/data/mockListings";
 import { Sparkles, ArrowLeft, Check, Youtube, Image, Plus, X, Link as LinkIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+
+const DAYS_OF_WEEK = [
+  'Monday',
+  'Tuesday', 
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+] as const;
+
+type DaySchedule = {
+  enabled: boolean;
+  startTime: string;
+  endTime: string;
+};
+
+type OperatingHours = Record<string, DaySchedule>;
+
+const defaultOperatingHours: OperatingHours = DAYS_OF_WEEK.reduce((acc, day) => {
+  acc[day] = { enabled: false, startTime: '18:00', endTime: '22:00' };
+  return acc;
+}, {} as OperatingHours);
 
 export default function CreateListing() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>(['']);
   const [googleDriveUrls, setGoogleDriveUrls] = useState<string[]>(['']);
+  const [operatingHours, setOperatingHours] = useState<OperatingHours>(defaultOperatingHours);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -31,11 +57,23 @@ export default function CreateListing() {
     city: '',
     province: '',
     postalCode: '',
-    operatingDays: '',
-    operatingTimes: '',
     contactEmail: '',
     contactPhone: '',
   });
+
+  const toggleDay = (day: string) => {
+    setOperatingHours(prev => ({
+      ...prev,
+      [day]: { ...prev[day], enabled: !prev[day].enabled }
+    }));
+  };
+
+  const updateDayTime = (day: string, field: 'startTime' | 'endTime', value: string) => {
+    setOperatingHours(prev => ({
+      ...prev,
+      [day]: { ...prev[day], [field]: value }
+    }));
+  };
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -345,31 +383,60 @@ export default function CreateListing() {
 
               {/* Operating Hours */}
               <div className="bg-card rounded-xl border border-border p-6 space-y-6">
-                <h2 className="font-display text-lg font-semibold">Operating Hours</h2>
+                <div>
+                  <h2 className="font-display text-lg font-semibold">Operating Hours</h2>
+                  <p className="text-sm text-muted-foreground mt-1">Select which days your display is viewable and set the times</p>
+                </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="operatingDays">Days *</Label>
-                    <Input
-                      id="operatingDays"
-                      placeholder="e.g., Daily from 1 Dec - 6 Jan"
-                      value={formData.operatingDays}
-                      onChange={(e) => handleChange('operatingDays', e.target.value)}
-                      className="bg-secondary"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="operatingTimes">Times *</Label>
-                    <Input
-                      id="operatingTimes"
-                      placeholder="e.g., 7:00 PM - 11:00 PM"
-                      value={formData.operatingTimes}
-                      onChange={(e) => handleChange('operatingTimes', e.target.value)}
-                      className="bg-secondary"
-                      required
-                    />
-                  </div>
+                <div className="space-y-3">
+                  {DAYS_OF_WEEK.map((day) => (
+                    <div 
+                      key={day} 
+                      className={cn(
+                        "flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-lg border transition-colors",
+                        operatingHours[day].enabled 
+                          ? "bg-christmas/5 border-christmas/30" 
+                          : "bg-secondary/50 border-border"
+                      )}
+                    >
+                      <div className="flex items-center gap-3 min-w-[140px]">
+                        <Switch
+                          checked={operatingHours[day].enabled}
+                          onCheckedChange={() => toggleDay(day)}
+                        />
+                        <span className={cn(
+                          "font-medium text-sm",
+                          operatingHours[day].enabled ? "text-foreground" : "text-muted-foreground"
+                        )}>
+                          {day}
+                        </span>
+                      </div>
+                      
+                      {operatingHours[day].enabled && (
+                        <div className="flex items-center gap-2 flex-1">
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
+                            <Input
+                              type="time"
+                              value={operatingHours[day].startTime}
+                              onChange={(e) => updateDayTime(day, 'startTime', e.target.value)}
+                              className="bg-background w-[120px] text-sm"
+                            />
+                          </div>
+                          <span className="text-muted-foreground">–</span>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground whitespace-nowrap">To</Label>
+                            <Input
+                              type="time"
+                              value={operatingHours[day].endTime}
+                              onChange={(e) => updateDayTime(day, 'endTime', e.target.value)}
+                              className="bg-background w-[120px] text-sm"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
