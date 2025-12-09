@@ -66,28 +66,17 @@ export function Hero() {
             </Link>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 md:gap-8 pt-8 md:pt-12 max-w-lg mx-auto" role="list" aria-label="Platform statistics">
-            <div className="text-center" role="listitem">
-              <div className="font-display text-2xl md:text-3xl font-bold text-christmas">250+</div>
-              <div className="text-xs md:text-sm text-muted-foreground">Active Displays</div>
-            </div>
-            <div className="text-center" role="listitem">
-              <div className="font-display text-2xl md:text-3xl font-bold text-christmas">9</div>
-              <div className="text-xs md:text-sm text-muted-foreground">Provinces</div>
-            </div>
-            <div className="text-center" role="listitem">
-              <div className="font-display text-2xl md:text-3xl font-bold text-christmas">50K+</div>
-              <div className="text-xs md:text-sm text-muted-foreground">Happy Visitors</div>
-            </div>
+          {/* Christmas Ornaments Decoration */}
+          <div className="flex items-center justify-center gap-3 md:gap-6 pt-8 md:pt-12" aria-hidden="true">
+            <div className="w-3 h-3 md:w-4 md:h-4 rounded-full bg-christmas animate-pulse" style={{ animationDelay: '0s' }} />
+            <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-accent animate-pulse" style={{ animationDelay: '0.5s' }} />
+            <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-primary animate-pulse" style={{ animationDelay: '1s' }} />
+            <Sparkles className="h-6 w-6 md:h-8 md:w-8 text-christmas animate-pulse" style={{ animationDelay: '1.5s' }} />
+            <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-primary animate-pulse" style={{ animationDelay: '2s' }} />
+            <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-accent animate-pulse" style={{ animationDelay: '2.5s' }} />
+            <div className="w-3 h-3 md:w-4 md:h-4 rounded-full bg-christmas animate-pulse" style={{ animationDelay: '3s' }} />
           </div>
         </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce" aria-hidden="true">
-        <span className="text-xs text-muted-foreground">Scroll to explore</span>
-        <MapPin className="h-5 w-5 text-christmas" />
       </div>
     </section>
   );
