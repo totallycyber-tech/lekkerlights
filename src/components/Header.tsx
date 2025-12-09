@@ -30,12 +30,6 @@ export function Header() {
             >
               Browse Displays
             </Link>
-            <Link 
-              to="/map" 
-              className="text-muted-foreground hover:text-foreground transition-colors text-sm lg:text-base"
-            >
-              Map View
-            </Link>
             <ThemeToggle />
             <Link to="/donate">
               <Button variant="outline" size="sm">
@@ -79,13 +73,6 @@ export function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Browse Displays
-              </Link>
-              <Link 
-                to="/map" 
-                className="text-muted-foreground hover:text-foreground transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Map View
               </Link>
               <Link to="/donate" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="outline" size="sm" className="w-full">

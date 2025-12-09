@@ -9,7 +9,6 @@ import ListingDetail from "./pages/ListingDetail";
 import CreateListing from "./pages/CreateListing";
 import EditListing from "./pages/EditListing";
 import ResendEditLink from "./pages/ResendEditLink";
-import MapView from "./pages/MapView";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Donate from "./pages/Donate";
@@ -32,7 +31,6 @@ const App = () => (
           <Route path="/create" element={<CreateListing />} />
           <Route path="/edit-listing/:id" element={<EditListing />} />
           <Route path="/resend-edit-link" element={<ResendEditLink />} />
-          <Route path="/map" element={<MapView />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/donate" element={<Donate />} />
