@@ -731,7 +731,7 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
           </div>
 
           {/* Sidebar List */}
-          <div className="w-full lg:w-96 bg-card border-t lg:border-t-0 lg:border-l border-border overflow-y-auto max-h-[50vh] lg:max-h-none">
+          <div className="w-full lg:w-96 bg-card border-t lg:border-t-0 lg:border-l border-border overflow-y-auto max-h-[40vh] sm:max-h-[50vh] lg:max-h-none">
             <div className="p-4 border-b border-border sticky top-0 bg-card z-10">
               <div className="flex items-center justify-between">
                 <h2 className="font-display font-semibold">
@@ -745,12 +745,17 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
               {filteredListings.length > 0 && (
                 <Button
                   variant="outline"
-                  size="sm"
-                  className="mt-2 w-full"
+                  size="default"
+                  className="mt-2 w-full h-10 sm:h-9 text-sm touch-manipulation"
                   onClick={handleSelectAll}
                 >
-                  <CheckSquare className="h-4 w-4 mr-2" />
+                  <CheckSquare className="h-5 w-5 sm:h-4 sm:w-4 mr-2" />
                   {allFilteredSelected ? "Deselect All" : "Select All"}
+                  {checkedListings.size > 0 && (
+                    <span className="ml-2 bg-christmas text-white text-xs px-1.5 py-0.5 rounded-full">
+                      {checkedListings.size}
+                    </span>
+                  )}
                 </Button>
               )}
             </div>
@@ -782,21 +787,25 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
                       onMouseEnter={() => setHoveredListing(listing.id)}
                       onMouseLeave={() => setHoveredListing(null)}
                     >
-                      <div className="flex gap-3">
+                      <div className="flex gap-2 sm:gap-3">
                         <div 
-                          className="flex items-center justify-center flex-shrink-0"
+                          className="flex items-center justify-center flex-shrink-0 p-1 -m-1 touch-manipulation"
                           onClick={(e) => e.stopPropagation()}
+                          onTouchEnd={(e) => {
+                            e.stopPropagation();
+                            handleCheckboxToggle(listing.id);
+                          }}
                         >
                           <Checkbox
                             checked={checkedListings.has(listing.id)}
                             onCheckedChange={() => handleCheckboxToggle(listing.id)}
-                            className="h-5 w-5"
+                            className="h-6 w-6 sm:h-5 sm:w-5"
                           />
                         </div>
                         <img
                           src={listing.photos[0] || defaultCoverPhoto}
                           alt={listing.title}
-                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                          className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-1">
