@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2 } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -43,6 +43,17 @@ export function ListingCard({
           : `${listing.title} has been added to your favourites.`,
       });
     }
+  };
+
+  const handleShareClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const listingUrl = `${window.location.origin}/listing/${listing.id}`;
+    navigator.clipboard.writeText(listingUrl);
+    toast({
+      title: "Link copied!",
+      description: "Share this display with friends and family.",
+    });
   };
 
   const formatDistance = (km: number) => {
@@ -100,19 +111,28 @@ export function ListingCard({
           </Badge>
         )}
 
-        {/* Favorite Button */}
-        <button 
-          className={cn(
-            "absolute bottom-3 right-3 p-2 rounded-full backdrop-blur-sm transition-all",
-            isFavorite 
-              ? "bg-christmas text-white hover:bg-christmas/80" 
-              : "bg-background/50 hover:bg-background/80"
-          )}
-          onClick={handleFavoriteClick}
-          aria-label={isFavorite ? "Remove from favourites" : "Add to favourites"}
-        >
-          <Heart className={cn("h-5 w-5", isFavorite && "fill-current")} />
-        </button>
+        {/* Action Buttons */}
+        <div className="absolute bottom-3 right-3 flex gap-2">
+          <button 
+            className="p-2 rounded-full backdrop-blur-sm transition-all bg-background/50 hover:bg-background/80"
+            onClick={handleShareClick}
+            aria-label="Share listing"
+          >
+            <Share2 className="h-5 w-5" />
+          </button>
+          <button 
+            className={cn(
+              "p-2 rounded-full backdrop-blur-sm transition-all",
+              isFavorite 
+                ? "bg-christmas text-white hover:bg-christmas/80" 
+                : "bg-background/50 hover:bg-background/80"
+            )}
+            onClick={handleFavoriteClick}
+            aria-label={isFavorite ? "Remove from favourites" : "Add to favourites"}
+          >
+            <Heart className={cn("h-5 w-5", isFavorite && "fill-current")} />
+          </button>
+        </div>
       </div>
 
       {/* Content */}
