@@ -71,7 +71,7 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
   const [radiusFilter, setRadiusFilter] = useState<number | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isLocating, setIsLocating] = useState(false);
-  const [checkedListings, setCheckedListings] = useState<Set<string>>(new Set());
+  const [checkedListings, setCheckedListings] = useState<Set<string> | null>(null);
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const mapRef = useRef<google.maps.Map | null>(null);
   const listingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -152,10 +152,20 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
 
   const hasActiveFilters = selectedProvince !== 'all' || suburbSearch || searchMarker || userLocation || selectedTags.length > 0;
 
+  // Auto-select all listings when they first load
+  useEffect(() => {
+    if (checkedListings === null && filteredListings.length > 0) {
+      setCheckedListings(new Set(filteredListings.map((l) => l.id)));
+    }
+  }, [filteredListings, checkedListings]);
+
+  // Ensure checkedListings is always a Set for operations
+  const activeCheckedListings = checkedListings ?? new Set<string>();
+
   // Handle checkbox toggle for individual listing
   const handleCheckboxToggle = (listingId: string) => {
     setCheckedListings((prev) => {
-      const newSet = new Set(prev);
+      const newSet = new Set(prev ?? []);
       if (newSet.has(listingId)) {
         newSet.delete(listingId);
       } else {
@@ -168,26 +178,26 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
   // Handle select all
   const handleSelectAll = () => {
     const filteredIds = filteredListings.map((l) => l.id);
-    const allSelected = filteredIds.every((id) => checkedListings.has(id));
+    const allSelected = filteredIds.every((id) => activeCheckedListings.has(id));
     
     if (allSelected) {
       // Deselect all filtered listings
       setCheckedListings((prev) => {
-        const newSet = new Set(prev);
+        const newSet = new Set(prev ?? []);
         filteredIds.forEach((id) => newSet.delete(id));
         return newSet;
       });
     } else {
       // Select all filtered listings
       setCheckedListings((prev) => {
-        const newSet = new Set(prev);
+        const newSet = new Set(prev ?? []);
         filteredIds.forEach((id) => newSet.add(id));
         return newSet;
       });
     }
   };
 
-  const allFilteredSelected = filteredListings.length > 0 && filteredListings.every((l) => checkedListings.has(l.id));
+  const allFilteredSelected = filteredListings.length > 0 && filteredListings.every((l) => activeCheckedListings.has(l.id));
 
   // Handle getting user's current location
   const handleGetLocation = () => {
@@ -642,7 +652,7 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
                 )}
                 {/* Markers only for checked listings */}
                 {filteredListings
-                  .filter((listing) => checkedListings.has(listing.id))
+                  .filter((listing) => activeCheckedListings.has(listing.id))
                   .map((listing) => (
                     listing.location.lat && listing.location.lng && (
                       <MarkerF
@@ -797,7 +807,7 @@ function MapViewContent({ apiKey }: { apiKey: string }) {
                           }}
                         >
                           <Checkbox
-                            checked={checkedListings.has(listing.id)}
+                            checked={activeCheckedListings.has(listing.id)}
                             onCheckedChange={() => handleCheckboxToggle(listing.id)}
                             className="h-6 w-6 sm:h-5 sm:w-5"
                           />
