@@ -23,12 +23,14 @@ export type Database = {
           created_at: string
           description: string
           directions_clicks: number | null
+          email_visible: boolean
           favorites_count: number | null
           id: string
           image_urls: string[] | null
           lat: number | null
           lng: number | null
           operating_hours: Json | null
+          phone_visible: boolean
           postal_code: string
           province: string
           street_name: string
@@ -48,12 +50,14 @@ export type Database = {
           created_at?: string
           description: string
           directions_clicks?: number | null
+          email_visible?: boolean
           favorites_count?: number | null
           id?: string
           image_urls?: string[] | null
           lat?: number | null
           lng?: number | null
           operating_hours?: Json | null
+          phone_visible?: boolean
           postal_code: string
           province: string
           street_name: string
@@ -73,12 +77,14 @@ export type Database = {
           created_at?: string
           description?: string
           directions_clicks?: number | null
+          email_visible?: boolean
           favorites_count?: number | null
           id?: string
           image_urls?: string[] | null
           lat?: number | null
           lng?: number | null
           operating_hours?: Json | null
+          phone_visible?: boolean
           postal_code?: string
           province?: string
           street_name?: string
