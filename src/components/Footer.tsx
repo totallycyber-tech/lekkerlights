@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
-import { Sparkles, Mail } from "lucide-react";
+import { Sparkles, Heart, Mail } from "lucide-react";
 import { ContactUsDialog } from "@/components/ContactUsDialog";
+import { Button } from "@/components/ui/button";
 
 export function Footer() {
   return (
     <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
@@ -32,25 +33,43 @@ export function Footer() {
               <Link to="/resend-edit-link" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Lost Edit Link?
               </Link>
-              <Link to="/donate" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Donate
+            </nav>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="space-y-4">
+            <h4 className="font-display font-semibold">Get Involved</h4>
+            <div className="flex flex-col gap-3">
+              <Link to="/donate">
+                <Button variant="outline" size="lg" className="w-full justify-start">
+                  <Heart className="h-5 w-5 mr-2 text-christmas" />
+                  Donate
+                </Button>
               </Link>
               <ContactUsDialog
                 trigger={
-                  <button className="text-sm text-muted-foreground hover:text-foreground transition-colors text-left flex items-center gap-1">
-                    <Mail className="h-3 w-3" />
+                  <Button variant="outline" size="lg" className="w-full justify-start">
+                    <Mail className="h-5 w-5 mr-2 text-primary" />
                     Contact Us
-                  </button>
+                  </Button>
                 }
               />
-            </nav>
+            </div>
           </div>
         </div>
 
         {/* Bottom */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Lekker Lights. Made with ❤️ in South Africa.
+            © {new Date().getFullYear()} Lekker Lights. Made with ❤️ in South Africa by{" "}
+            <a 
+              href="https://www.linkedin.com/in/chintan-patel-za/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Chintan Patel
+            </a>.
           </p>
           <nav className="flex gap-6">
             <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
