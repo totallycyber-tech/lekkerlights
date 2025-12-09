@@ -119,8 +119,8 @@ export default function CreateListing() {
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     toast({
-      title: "Listing submitted!",
-      description: "Your Christmas display will be reviewed and published soon.",
+      title: "Listing published!",
+      description: "Your Christmas display is now live for everyone to see.",
     });
 
     setIsSubmitting(false);
@@ -490,7 +490,7 @@ export default function CreateListing() {
                   ) : (
                     <>
                       <Check className="h-5 w-5 mr-2" />
-                      Submit for Review
+                      Publish Listing
                     </>
                   )}
                 </Button>
@@ -503,11 +503,6 @@ export default function CreateListing() {
                   Cancel
                 </Button>
               </div>
-
-              <p className="text-sm text-muted-foreground text-center">
-                Your listing will be reviewed by our team before going live. 
-                This usually takes 1-2 business days.
-              </p>
             </form>
           </div>
         </div>
