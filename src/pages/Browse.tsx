@@ -39,6 +39,19 @@ export default function Browse() {
     return transformed.length > 0 ? transformed : mockListings;
   }, [dbListings]);
 
+  // Calculate distance for each listing if user location is available
+  const getListingDistance = (listing: Listing): number | null => {
+    if (!filters.location || !listing.location.lat || !listing.location.lng) {
+      return null;
+    }
+    return calculateDistance(
+      filters.location.lat,
+      filters.location.lng,
+      listing.location.lat,
+      listing.location.lng
+    );
+  };
+
   const filteredListings = useMemo(() => {
     return allListings.filter((listing) => {
       // Favorites filter
@@ -79,20 +92,8 @@ export default function Browse() {
 
       // Distance filter - only if location and radius are set
       if (filters.location && filters.radius) {
-        const listingLat = listing.location.lat;
-        const listingLng = listing.location.lng;
-        
-        // Skip listings without coordinates
-        if (!listingLat || !listingLng) return false;
-        
-        const distance = calculateDistance(
-          filters.location.lat,
-          filters.location.lng,
-          listingLat,
-          listingLng
-        );
-        
-        if (distance > filters.radius) return false;
+        const distance = getListingDistance(listing);
+        if (distance === null || distance > filters.radius) return false;
       }
 
       return true;
@@ -191,6 +192,7 @@ export default function Browse() {
                   onToggleFavorite={toggleFavorite}
                   isPopular={isPopular(listing.id)}
                   onDirectionsClick={trackDirectionsClick}
+                  distance={getListingDistance(listing)}
                 />
               ))}
             </div>

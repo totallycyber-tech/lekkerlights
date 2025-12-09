@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { GoogleMap, useLoadScript, MarkerF, InfoWindowF } from "@react-google-maps/api";
+import { GoogleMap, useLoadScript, MarkerF, InfoWindowF, CircleF } from "@react-google-maps/api";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,10 +13,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { mockListings, provinces, transformDbListing, Listing } from "@/data/mockListings";
-import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation } from "lucide-react";
+import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation, Crosshair, X } from "lucide-react";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
 import { useListings } from "@/hooks/use-listings";
+import { calculateDistance } from "@/lib/geo-utils";
+import { toast } from "@/hooks/use-toast";
 
 const libraries: ("places")[] = ["places"];
 
@@ -46,12 +48,22 @@ const mapOptions: google.maps.MapOptions = {
   ],
 };
 
+const RADIUS_OPTIONS = [
+  { value: 5, label: "5 km" },
+  { value: 10, label: "10 km" },
+  { value: 20, label: "20 km" },
+  { value: 50, label: "50 km" },
+];
+
 export default function MapView() {
   const [selectedProvince, setSelectedProvince] = useState<string>('all');
   const [suburbSearch, setSuburbSearch] = useState('');
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
   const [hoveredListing, setHoveredListing] = useState<string | null>(null);
   const [searchMarker, setSearchMarker] = useState<{ lat: number; lng: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const [radiusFilter, setRadiusFilter] = useState<number | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const mapRef = useRef<google.maps.Map | null>(null);
   const listingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -74,13 +86,33 @@ export default function MapView() {
     return transformed.length > 0 ? transformed : mockListings;
   }, [dbListings]);
 
+  // Calculate distance for each listing
+  const getListingDistance = (listing: Listing): number | null => {
+    if (!userLocation || !listing.location.lat || !listing.location.lng) {
+      return null;
+    }
+    return calculateDistance(
+      userLocation.lat,
+      userLocation.lng,
+      listing.location.lat,
+      listing.location.lng
+    );
+  };
+
   const filteredListings = useMemo(() => {
     return allListings.filter(listing => {
       const provinceMatch = selectedProvince === 'all' || listing.location.province === selectedProvince;
       const suburbMatch = !suburbSearch || listing.location.suburb.toLowerCase().includes(suburbSearch.toLowerCase()) || listing.location.city.toLowerCase().includes(suburbSearch.toLowerCase());
+      
+      // Distance filter
+      if (userLocation && radiusFilter) {
+        const distance = getListingDistance(listing);
+        if (distance === null || distance > radiusFilter) return false;
+      }
+      
       return provinceMatch && suburbMatch;
     });
-  }, [selectedProvince, suburbSearch, allListings]);
+  }, [selectedProvince, suburbSearch, allListings, userLocation, radiusFilter]);
 
   const selected = allListings.find(l => l.id === selectedListing);
 
@@ -93,11 +125,82 @@ export default function MapView() {
     setSelectedProvince('all');
     setSuburbSearch('');
     setSearchMarker(null);
+    setUserLocation(null);
+    setRadiusFilter(null);
     if (addressInputRef.current) addressInputRef.current.value = '';
     if (suburbInputRef.current) suburbInputRef.current.value = '';
   };
 
-  const hasActiveFilters = selectedProvince !== 'all' || suburbSearch || searchMarker;
+  const hasActiveFilters = selectedProvince !== 'all' || suburbSearch || searchMarker || userLocation;
+
+  // Handle getting user's current location
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Geolocation not supported",
+        description: "Your browser doesn't support location services.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLocating(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        let label = "Your location";
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=14`
+          );
+          const data = await response.json();
+          if (data.address) {
+            const { suburb, city, town, village } = data.address;
+            label = suburb || city || town || village || "Your location";
+          }
+        } catch (error) {
+          console.error("Reverse geocoding failed:", error);
+        }
+
+        setUserLocation({ lat: latitude, lng: longitude, label });
+        setMapCenter({ lat: latitude, lng: longitude });
+        mapRef.current?.panTo({ lat: latitude, lng: longitude });
+        
+        // Auto-set radius to 10km if not already set
+        if (!radiusFilter) {
+          setRadiusFilter(10);
+          mapRef.current?.setZoom(12);
+        }
+        
+        setIsLocating(false);
+        
+        toast({
+          title: "Location captured",
+          description: `Searching near ${label}`,
+        });
+      },
+      (error) => {
+        setIsLocating(false);
+        let message = "Unable to get your location.";
+        if (error.code === error.PERMISSION_DENIED) {
+          message = "Location permission denied. Please enable location access.";
+        }
+        toast({
+          title: "Location error",
+          description: message,
+          variant: "destructive",
+        });
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+    );
+  };
+
+  const clearProximityFilter = () => {
+    setUserLocation(null);
+    setRadiusFilter(null);
+  };
 
   // Initialize address autocomplete
   useEffect(() => {
@@ -285,7 +388,7 @@ export default function MapView() {
             </div>
 
             {/* Location Filters */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               <Select 
                 value={selectedProvince} 
                 onValueChange={setSelectedProvince}
@@ -321,11 +424,65 @@ export default function MapView() {
                 />
               </div>
 
-              <div className="flex items-center">
-                <span className="text-sm text-muted-foreground">
-                  {filteredListings.length} display{filteredListings.length !== 1 ? 's' : ''} found
-                </span>
-              </div>
+              {/* Proximity Filter */}
+              {!userLocation ? (
+                <Button
+                  variant="outline"
+                  className="bg-secondary"
+                  onClick={handleGetLocation}
+                  disabled={isLocating}
+                >
+                  {isLocating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Locating...
+                    </>
+                  ) : (
+                    <>
+                      <Crosshair className="h-4 w-4 mr-2" />
+                      My location
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Select
+                  value={radiusFilter?.toString() || ""}
+                  onValueChange={(value) => setRadiusFilter(value ? parseInt(value) : null)}
+                >
+                  <SelectTrigger className="bg-christmas/10 border-christmas/30">
+                    <SelectValue placeholder="Select radius" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RADIUS_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value.toString()}>
+                        Within {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+
+              {/* Location indicator or results count */}
+              {userLocation ? (
+                <div className="flex items-center gap-2 px-3 py-2 bg-christmas/10 border border-christmas/30 rounded-md">
+                  <Navigation className="h-4 w-4 text-christmas flex-shrink-0" />
+                  <span className="text-sm truncate">{userLocation.label}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0.5 ml-auto"
+                    onClick={clearProximityFilter}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <span className="text-sm text-muted-foreground">
+                    {filteredListings.length} display{filteredListings.length !== 1 ? 's' : ''} found
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -360,6 +517,40 @@ export default function MapView() {
                 options={mapOptions}
                 onLoad={onMapLoad}
               >
+                {/* User location marker and radius circle */}
+                {userLocation && (
+                  <>
+                    <MarkerF
+                      position={{ lat: userLocation.lat, lng: userLocation.lng }}
+                      icon={{
+                        url: "data:image/svg+xml," + encodeURIComponent(`
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+                            <circle cx="20" cy="20" r="18" fill="#3b82f6" fill-opacity="0.3" stroke="#3b82f6" stroke-width="3"/>
+                            <circle cx="20" cy="20" r="8" fill="#3b82f6"/>
+                            <circle cx="20" cy="20" r="4" fill="#fff"/>
+                          </svg>
+                        `),
+                        scaledSize: new google.maps.Size(40, 40),
+                        anchor: new google.maps.Point(20, 20),
+                      }}
+                      title="Your location"
+                    />
+                    {radiusFilter && (
+                      <CircleF
+                        center={{ lat: userLocation.lat, lng: userLocation.lng }}
+                        radius={radiusFilter * 1000} // Convert km to meters
+                        options={{
+                          fillColor: "#3b82f6",
+                          fillOpacity: 0.1,
+                          strokeColor: "#3b82f6",
+                          strokeOpacity: 0.5,
+                          strokeWeight: 2,
+                        }}
+                      />
+                    )}
+                  </>
+                )}
+
                 {/* Draggable search marker */}
                 {searchMarker && (
                   <MarkerF
@@ -460,8 +651,11 @@ export default function MapView() {
               <div className="flex items-center justify-between">
                 <h2 className="font-display font-semibold">
                   <List className="h-4 w-4 inline mr-2" />
-                  Nearby Displays
+                  {userLocation ? "Displays Near You" : "Nearby Displays"}
                 </h2>
+                <span className="text-xs text-muted-foreground">
+                  {filteredListings.length} found
+                </span>
               </div>
             </div>
 
@@ -473,51 +667,65 @@ export default function MapView() {
                   <p className="text-sm">Try adjusting your filters</p>
                 </div>
               ) : (
-                filteredListings.map((listing) => (
-                  <div
-                    key={listing.id}
-                    ref={(el) => (listingRefs.current[listing.id] = el)}
-                    className={`p-4 cursor-pointer transition-colors hover:bg-secondary/50 ${
-                      selectedListing === listing.id ? "bg-christmas/10 border-l-2 border-christmas" : ""
-                    }`}
-                    onClick={() => handleListingClick(listing.id)}
-                    onMouseEnter={() => setHoveredListing(listing.id)}
-                    onMouseLeave={() => setHoveredListing(null)}
-                  >
-                    <div className="flex gap-3">
-                      <img
-                        src={listing.photos[0]}
-                        alt={listing.title}
-                        className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-sm truncate">{listing.title}</h3>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {listing.location.suburb}, {listing.location.city}
-                        </p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="secondary" className="text-xs">
-                            {listing.location.province}
-                          </Badge>
+                filteredListings.map((listing) => {
+                  const distance = getListingDistance(listing);
+                  const formatDistance = (km: number) => {
+                    if (km < 1) return `${Math.round(km * 1000)} m`;
+                    return `${km.toFixed(1)} km`;
+                  };
+                  
+                  return (
+                    <div
+                      key={listing.id}
+                      ref={(el) => (listingRefs.current[listing.id] = el)}
+                      className={`p-4 cursor-pointer transition-colors hover:bg-secondary/50 ${
+                        selectedListing === listing.id ? "bg-christmas/10 border-l-2 border-christmas" : ""
+                      }`}
+                      onClick={() => handleListingClick(listing.id)}
+                      onMouseEnter={() => setHoveredListing(listing.id)}
+                      onMouseLeave={() => setHoveredListing(null)}
+                    >
+                      <div className="flex gap-3">
+                        <img
+                          src={listing.photos[0]}
+                          alt={listing.title}
+                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm truncate">{listing.title}</h3>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {listing.location.suburb}, {listing.location.city}
+                          </p>
+                          <div className="flex items-center gap-2 mt-2 flex-wrap">
+                            <Badge variant="secondary" className="text-xs">
+                              {listing.location.province}
+                            </Badge>
+                            {distance !== null && (
+                              <Badge variant="outline" className="text-xs">
+                                <Navigation className="h-2.5 w-2.5 mr-1" />
+                                {formatDistance(distance)}
+                              </Badge>
+                            )}
+                          </div>
+                          <a
+                            href={getDirectionsUrl(listing)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              trackDirectionsClick(listing.id);
+                            }}
+                            className="inline-flex items-center text-xs text-christmas hover:underline mt-2"
+                          >
+                            <Navigation className="h-3 w-3 mr-1" />
+                            Get Directions
+                            <ExternalLink className="h-3 w-3 ml-1" />
+                          </a>
                         </div>
-                        <a
-                          href={getDirectionsUrl(listing)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            trackDirectionsClick(listing.id);
-                          }}
-                          className="inline-flex items-center text-xs text-christmas hover:underline mt-2"
-                        >
-                          <Navigation className="h-3 w-3 mr-1" />
-                          Get Directions
-                          <ExternalLink className="h-3 w-3 ml-1" />
-                        </a>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
