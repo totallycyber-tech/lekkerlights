@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { mockListings, provinces } from "@/data/mockListings";
 import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation } from "lucide-react";
+import { usePopularity } from "@/hooks/use-popularity";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyAH-g4xwt6nXkCVlRC0eSYkM7-Q19_4gAo";
 const libraries: ("places")[] = ["places"];
@@ -57,6 +58,7 @@ export default function MapView() {
   const suburbInputRef = useRef<HTMLInputElement>(null);
   const addressAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const suburbAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const { trackDirectionsClick } = usePopularity();
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -478,6 +480,7 @@ export default function MapView() {
                             href={getDirectionsUrl(listing)}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={() => trackDirectionsClick(listing.id)}
                           >
                             <Button variant="outline" size="sm">
                               <ExternalLink className="h-4 w-4" />
