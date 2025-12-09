@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { provinces } from "@/data/mockListings";
 import { Sparkles, ArrowLeft, Check, Youtube, Image, Plus, X, Link as LinkIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -49,6 +50,7 @@ export default function CreateListing() {
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>(['']);
   const [googleDriveUrls, setGoogleDriveUrls] = useState<string[]>(['']);
   const [operatingHours, setOperatingHours] = useState<OperatingHours>(defaultOperatingHours);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -529,34 +531,57 @@ export default function CreateListing() {
               </div>
 
               {/* Submit */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  type="submit"
-                  variant="hero"
-                  size="lg"
-                  className="flex-1"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <span className="animate-spin mr-2">⏳</span>
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="h-5 w-5 mr-2" />
-                      Publish Listing
-                    </>
-                  )}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  onClick={() => navigate(-1)}
-                >
-                  Cancel
-                </Button>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    type="submit"
+                    variant="hero"
+                    size="lg"
+                    className="flex-1"
+                    disabled={isSubmitting || !agreedToTerms}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="animate-spin mr-2">⏳</span>
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="h-5 w-5 mr-2" />
+                        Publish Listing
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    onClick={() => navigate(-1)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    id="terms"
+                    checked={agreedToTerms}
+                    onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
+                  />
+                  <label
+                    htmlFor="terms"
+                    className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
+                  >
+                    By submitting this listing, you confirm that you have read and agree to the{" "}
+                    <Link to="/terms-of-service" className="text-christmas hover:underline" target="_blank">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link to="/privacy-policy" className="text-christmas hover:underline" target="_blank">
+                      Privacy Policy
+                    </Link>.
+                  </label>
+                </div>
               </div>
             </form>
           </div>
