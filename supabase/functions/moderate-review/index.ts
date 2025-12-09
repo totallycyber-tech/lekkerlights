@@ -63,6 +63,15 @@ serve(async (req) => {
       );
     }
 
+    // Validate comment length (max 2000 characters)
+    const MAX_COMMENT_LENGTH = 2000;
+    if (comment && typeof comment === 'string' && comment.length > MAX_COMMENT_LENGTH) {
+      return new Response(
+        JSON.stringify({ error: `Comment must be ${MAX_COMMENT_LENGTH} characters or less` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
