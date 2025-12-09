@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { provinces } from "@/data/mockListings";
-import { Sparkles, Upload, ArrowLeft, Check, Youtube, Image, Plus, X, Link as LinkIcon } from "lucide-react";
+import { Sparkles, ArrowLeft, Check, Youtube, Image, Plus, X, Link as LinkIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 export default function CreateListing() {
@@ -247,18 +247,6 @@ export default function CreateListing() {
                 <h2 className="font-display text-lg font-semibold">Photos & Videos</h2>
                 
                 <div className="space-y-6">
-                  {/* Photo Upload */}
-                  <div className="space-y-4">
-                    <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-christmas/50 transition-colors cursor-pointer">
-                      <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
-                      <p className="font-medium mb-1">Upload Photos</p>
-                      <p className="text-sm text-muted-foreground">
-                        Drag and drop or click to upload (up to 10 photos)
-                      </p>
-                      <input type="file" className="hidden" accept="image/*" multiple />
-                    </div>
-                  </div>
-
                   {/* Google Drive Import */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
