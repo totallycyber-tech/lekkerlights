@@ -5,8 +5,9 @@ import { SearchFilters } from "@/components/SearchFilters";
 import { ListingCard } from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
 import { mockListings } from "@/data/mockListings";
-import { LayoutGrid, Map, Sparkles } from "lucide-react";
+import { LayoutGrid, Map, Sparkles, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useFavorites } from "@/hooks/use-favorites";
 
 export default function Browse() {
   const [filters, setFilters] = useState({
@@ -15,9 +16,16 @@ export default function Browse() {
     suburb: "",
   });
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
 
   const filteredListings = useMemo(() => {
     return mockListings.filter((listing) => {
+      // Favorites filter
+      if (showFavoritesOnly && !favorites.includes(listing.id)) {
+        return false;
+      }
+
       // Search filter
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
@@ -44,7 +52,7 @@ export default function Browse() {
 
       return true;
     });
-  }, [filters]);
+  }, [filters, showFavoritesOnly, favorites]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -98,18 +106,32 @@ export default function Browse() {
             <SearchFilters onFilterChange={setFilters} />
           </div>
 
-          {/* Results */}
-          <div className="mb-4">
+          {/* Results Header */}
+          <div className="mb-4 flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
               Showing {filteredListings.length} display{filteredListings.length !== 1 ? 's' : ''}
+              {showFavoritesOnly && ' (favourites only)'}
             </p>
+            <Button
+              variant={showFavoritesOnly ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+              className="gap-2"
+            >
+              <Heart className={`h-4 w-4 ${showFavoritesOnly ? 'fill-current' : ''}`} />
+              Favourites {favoritesCount > 0 && `(${favoritesCount})`}
+            </Button>
           </div>
 
-          {/* Listings Grid */}
           {filteredListings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredListings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} />
+                <ListingCard 
+                  key={listing.id} 
+                  listing={listing}
+                  isFavorite={isFavorite(listing.id)}
+                  onToggleFavorite={toggleFavorite}
+                />
               ))}
             </div>
           ) : (
