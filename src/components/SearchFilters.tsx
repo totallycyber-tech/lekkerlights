@@ -35,23 +35,20 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
   const [radius, setRadius] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
-  const handleFilterChange = () => {
+  const handleSearch = () => {
     onFilterChange({ search, province, suburb, tags: selectedTags, location, radius });
   };
 
   const handleTagsChange = (tags: string[]) => {
     setSelectedTags(tags);
-    onFilterChange({ search, province, suburb, tags, location, radius });
   };
 
   const handleLocationChange = (newLocation: { lat: number; lng: number; label: string } | null) => {
     setLocation(newLocation);
-    onFilterChange({ search, province, suburb, tags: selectedTags, location: newLocation, radius });
   };
 
   const handleRadiusChange = (newRadius: number | null) => {
     setRadius(newRadius);
-    onFilterChange({ search, province, suburb, tags: selectedTags, location, radius: newRadius });
   };
 
   const clearFilters = () => {
@@ -81,10 +78,8 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
             type="text"
             placeholder="Search by title, suburb, or city..."
             value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setTimeout(handleFilterChange, 300);
-            }}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             className="pl-10 bg-secondary border-border h-12"
           />
         </div>
@@ -103,6 +98,15 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
             </span>
           )}
         </Button>
+
+        <Button
+          size="lg"
+          onClick={handleSearch}
+          className="h-12 bg-christmas hover:bg-christmas/90"
+        >
+          <Search className="h-5 w-5 mr-2" />
+          Search
+        </Button>
       </div>
 
       {/* Extended Filters */}
@@ -113,10 +117,7 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
               <label className="text-sm font-medium">Province</label>
               <Select 
                 value={province || "all"} 
-                onValueChange={(value) => {
-                  setProvince(value === "all" ? "" : value);
-                  setTimeout(handleFilterChange, 0);
-                }}
+                onValueChange={(value) => setProvince(value === "all" ? "" : value)}
               >
                 <SelectTrigger className="bg-background border-border">
                   <SelectValue placeholder="All Provinces" />
@@ -140,10 +141,8 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
                   type="text"
                   placeholder="Enter suburb..."
                   value={suburb}
-                  onChange={(e) => {
-                    setSuburb(e.target.value);
-                    setTimeout(handleFilterChange, 300);
-                  }}
+                  onChange={(e) => setSuburb(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   className="pl-9 bg-background border-border"
                 />
               </div>
@@ -167,17 +166,19 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
             />
           </div>
 
-          {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearFilters}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4 mr-1" />
-              Clear all filters
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4 mr-1" />
+                Clear all filters
+              </Button>
+            )}
+          </div>
         </div>
       )}
     </div>
