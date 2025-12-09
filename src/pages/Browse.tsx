@@ -5,7 +5,7 @@ import { SearchFilters, SearchFilters as SearchFiltersType } from "@/components/
 import { ListingCard } from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
 import { mockListings, transformDbListing, Listing } from "@/data/mockListings";
-import { LayoutGrid, Sparkles, Heart, Loader2, MapPin, ExternalLink } from "lucide-react";
+import { Sparkles, Heart, Loader2, MapPin, ExternalLink } from "lucide-react";
 import { useFavorites } from "@/hooks/use-favorites";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useListings } from "@/hooks/use-listings";
@@ -213,16 +213,6 @@ export default function Browse() {
                 </p>
               </div>
               
-              {/* Grid View Indicator */}
-              <div className="flex items-center gap-2 bg-secondary rounded-lg p-1">
-                <Button
-                  variant="default"
-                  size="sm"
-                >
-                  <LayoutGrid className="h-4 w-4 mr-1" />
-                  Grid
-                </Button>
-              </div>
             </div>
           </div>
 

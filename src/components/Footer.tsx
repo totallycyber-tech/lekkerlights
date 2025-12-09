@@ -26,9 +26,6 @@ export function Footer() {
               <Link to="/browse" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Browse Displays
               </Link>
-              <Link to="/map" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Map View
-              </Link>
               <Link to="/create" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 List Your Display
               </Link>
