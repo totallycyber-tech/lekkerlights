@@ -13,9 +13,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { mockListings, provinces } from "@/data/mockListings";
-import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2 } from "lucide-react";
+import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation } from "lucide-react";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyAH-g4xwt6nXkCVlRC0eSYkM7-Q19_4gAo";
+const libraries: ("places")[] = ["places"];
 
 const mapContainerStyle = {
   width: "100%",
@@ -45,25 +46,30 @@ const mapOptions: google.maps.MapOptions = {
 
 export default function MapView() {
   const [selectedProvince, setSelectedProvince] = useState<string>('all');
-  const [citySearch, setCitySearch] = useState('');
   const [suburbSearch, setSuburbSearch] = useState('');
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
   const [hoveredListing, setHoveredListing] = useState<string | null>(null);
+  const [searchMarker, setSearchMarker] = useState<{ lat: number; lng: number } | null>(null);
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
   const mapRef = useRef<google.maps.Map | null>(null);
   const listingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const addressInputRef = useRef<HTMLInputElement>(null);
+  const suburbInputRef = useRef<HTMLInputElement>(null);
+  const addressAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const suburbAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries,
   });
 
   const filteredListings = useMemo(() => {
     return mockListings.filter(listing => {
       const provinceMatch = selectedProvince === 'all' || listing.location.province === selectedProvince;
-      const cityMatch = !citySearch || listing.location.city.toLowerCase().includes(citySearch.toLowerCase());
-      const suburbMatch = !suburbSearch || listing.location.suburb.toLowerCase().includes(suburbSearch.toLowerCase());
-      return provinceMatch && cityMatch && suburbMatch;
+      const suburbMatch = !suburbSearch || listing.location.suburb.toLowerCase().includes(suburbSearch.toLowerCase()) || listing.location.city.toLowerCase().includes(suburbSearch.toLowerCase());
+      return provinceMatch && suburbMatch;
     });
-  }, [selectedProvince, citySearch, suburbSearch]);
+  }, [selectedProvince, suburbSearch]);
 
   const selected = mockListings.find(l => l.id === selectedListing);
 
@@ -74,11 +80,83 @@ export default function MapView() {
 
   const clearFilters = () => {
     setSelectedProvince('all');
-    setCitySearch('');
     setSuburbSearch('');
+    setSearchMarker(null);
+    if (addressInputRef.current) addressInputRef.current.value = '';
+    if (suburbInputRef.current) suburbInputRef.current.value = '';
   };
 
-  const hasActiveFilters = selectedProvince !== 'all' || citySearch || suburbSearch;
+  const hasActiveFilters = selectedProvince !== 'all' || suburbSearch || searchMarker;
+
+  // Initialize address autocomplete
+  useEffect(() => {
+    if (!isLoaded || !addressInputRef.current || addressAutocompleteRef.current) return;
+
+    addressAutocompleteRef.current = new google.maps.places.Autocomplete(addressInputRef.current, {
+      componentRestrictions: { country: "za" },
+      types: ["address"],
+      fields: ["geometry", "formatted_address"],
+    });
+
+    addressAutocompleteRef.current.addListener("place_changed", () => {
+      const place = addressAutocompleteRef.current?.getPlace();
+      if (place?.geometry?.location) {
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        setSearchMarker({ lat, lng });
+        setMapCenter({ lat, lng });
+        mapRef.current?.panTo({ lat, lng });
+        mapRef.current?.setZoom(15);
+      }
+    });
+  }, [isLoaded]);
+
+  // Initialize suburb autocomplete with province restriction
+  useEffect(() => {
+    if (!isLoaded || !suburbInputRef.current) return;
+
+    // Clear previous autocomplete
+    if (suburbAutocompleteRef.current) {
+      google.maps.event.clearInstanceListeners(suburbAutocompleteRef.current);
+    }
+
+    suburbAutocompleteRef.current = new google.maps.places.Autocomplete(suburbInputRef.current, {
+      componentRestrictions: { country: "za" },
+      types: ["(regions)"],
+      fields: ["geometry", "address_components", "name"],
+    });
+
+    suburbAutocompleteRef.current.addListener("place_changed", () => {
+      const place = suburbAutocompleteRef.current?.getPlace();
+      if (place?.geometry?.location) {
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        setSearchMarker({ lat, lng });
+        setMapCenter({ lat, lng });
+        mapRef.current?.panTo({ lat, lng });
+        mapRef.current?.setZoom(13);
+
+        // Extract suburb/locality name for filtering
+        const suburbComponent = place.address_components?.find(
+          c => c.types.includes("sublocality") || c.types.includes("locality") || c.types.includes("neighborhood")
+        );
+        if (suburbComponent) {
+          setSuburbSearch(suburbComponent.long_name);
+        } else if (place.name) {
+          setSuburbSearch(place.name);
+        }
+      }
+    });
+  }, [isLoaded, selectedProvince]);
+
+  // Handle draggable marker position change
+  const handleSearchMarkerDragEnd = useCallback((e: google.maps.MapMouseEvent) => {
+    if (e.latLng) {
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
+      setSearchMarker({ lat, lng });
+    }
+  }, []);
 
   const onMapLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
@@ -178,11 +256,10 @@ export default function MapView() {
               </Select>
 
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search city..."
-                  value={citySearch}
-                  onChange={(e) => setCitySearch(e.target.value)}
+                  ref={addressInputRef}
+                  placeholder="Search address..."
                   className="bg-secondary pl-9"
                 />
               </div>
@@ -190,9 +267,8 @@ export default function MapView() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search suburb..."
-                  value={suburbSearch}
-                  onChange={(e) => setSuburbSearch(e.target.value)}
+                  ref={suburbInputRef}
+                  placeholder={selectedProvince !== 'all' ? `Search suburb in ${selectedProvince}...` : "Search suburb..."}
                   className="bg-secondary pl-9"
                 />
               </div>
@@ -231,11 +307,31 @@ export default function MapView() {
             {isLoaded && !loadError && (
               <GoogleMap
                 mapContainerStyle={mapContainerStyle}
-                center={defaultCenter}
+                center={mapCenter}
                 zoom={11}
                 options={mapOptions}
                 onLoad={onMapLoad}
               >
+                {/* Draggable search marker */}
+                {searchMarker && (
+                  <MarkerF
+                    position={searchMarker}
+                    draggable={true}
+                    onDragEnd={handleSearchMarkerDragEnd}
+                    icon={{
+                      url: "data:image/svg+xml," + encodeURIComponent(`
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" width="40" height="50">
+                          <path d="M20 0C9 0 0 9 0 20c0 15 20 30 20 30s20-15 20-30C40 9 31 0 20 0z" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
+                          <circle cx="20" cy="18" r="8" fill="#fff"/>
+                          <circle cx="20" cy="18" r="4" fill="#3b82f6"/>
+                        </svg>
+                      `),
+                      scaledSize: new google.maps.Size(40, 50),
+                      anchor: new google.maps.Point(20, 50),
+                    }}
+                    title="Drag to search a different location"
+                  />
+                )}
                 {filteredListings.map((listing) => (
                   listing.location.lat && listing.location.lng && (
                     <MarkerF
