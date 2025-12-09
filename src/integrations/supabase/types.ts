@@ -24,8 +24,8 @@ export type Database = {
           description: string
           directions_clicks: number | null
           favorites_count: number | null
-          google_drive_urls: string[] | null
           id: string
+          image_urls: string[] | null
           lat: number | null
           lng: number | null
           operating_hours: Json | null
@@ -48,8 +48,8 @@ export type Database = {
           description: string
           directions_clicks?: number | null
           favorites_count?: number | null
-          google_drive_urls?: string[] | null
           id?: string
+          image_urls?: string[] | null
           lat?: number | null
           lng?: number | null
           operating_hours?: Json | null
@@ -72,8 +72,8 @@ export type Database = {
           description?: string
           directions_clicks?: number | null
           favorites_count?: number | null
-          google_drive_urls?: string[] | null
           id?: string
+          image_urls?: string[] | null
           lat?: number | null
           lng?: number | null
           operating_hours?: Json | null

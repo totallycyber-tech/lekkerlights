@@ -16,11 +16,12 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { provinces } from "@/data/mockListings";
-import { Sparkles, ArrowLeft, Check, Youtube, Image, Plus, X, Link as LinkIcon } from "lucide-react";
+import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
-import { useCreateListing } from "@/hooks/use-listings";
+import { useCreateListing, uploadListingImages } from "@/hooks/use-listings";
+import { ImageUploader } from "@/components/ImageUploader";
 
 const DAYS_OF_WEEK = [
   'Monday',
@@ -49,8 +50,9 @@ export default function CreateListing() {
   const navigate = useNavigate();
   const createListing = useCreateListing();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<string>('');
+  const [images, setImages] = useState<File[]>([]);
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>(['']);
-  const [googleDriveUrls, setGoogleDriveUrls] = useState<string[]>(['']);
   const [operatingHours, setOperatingHours] = useState<OperatingHours>(defaultOperatingHours);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [formData, setFormData] = useState({
@@ -121,32 +123,17 @@ export default function CreateListing() {
     setYoutubeUrls(updated);
   };
 
-  const addGoogleDriveUrl = () => {
-    if (googleDriveUrls.length < 10) {
-      setGoogleDriveUrls([...googleDriveUrls, '']);
-    }
-  };
-
-  const removeGoogleDriveUrl = (index: number) => {
-    setGoogleDriveUrls(googleDriveUrls.filter((_, i) => i !== index));
-  };
-
-  const updateGoogleDriveUrl = (index: number, value: string) => {
-    const updated = [...googleDriveUrls];
-    updated[index] = value;
-    setGoogleDriveUrls(updated);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      // Filter out empty URLs
+      // Filter out empty YouTube URLs
       const filteredYoutubeUrls = youtubeUrls.filter(url => url.trim() !== '');
-      const filteredGoogleDriveUrls = googleDriveUrls.filter(url => url.trim() !== '');
 
-      await createListing.mutateAsync({
+      // First create the listing to get an ID
+      setUploadProgress('Creating listing...');
+      const listing = await createListing.mutateAsync({
         title: formData.title,
         description: formData.description,
         complex_name: formData.complexName || null,
@@ -160,9 +147,22 @@ export default function CreateListing() {
         contact_email: formData.contactEmail || null,
         contact_phone: formData.contactPhone || null,
         youtube_urls: filteredYoutubeUrls,
-        google_drive_urls: filteredGoogleDriveUrls,
+        image_urls: [],
         operating_hours: operatingHours,
       });
+
+      // Upload images if any
+      if (images.length > 0) {
+        setUploadProgress(`Uploading ${images.length} photo(s)...`);
+        const imageUrls = await uploadListingImages(images, listing.id);
+        
+        // Update listing with image URLs
+        const { supabase } = await import('@/integrations/supabase/client');
+        await supabase
+          .from('listings')
+          .update({ image_urls: imageUrls } as any)
+          .eq('id', listing.id);
+      }
 
       toast({
         title: "Listing published!",
@@ -179,6 +179,7 @@ export default function CreateListing() {
       });
     } finally {
       setIsSubmitting(false);
+      setUploadProgress('');
     }
   };
 
@@ -373,51 +374,15 @@ export default function CreateListing() {
                 <h2 className="font-display text-lg font-semibold">Photos & Videos</h2>
                 
                 <div className="space-y-6">
-                  {/* Google Drive Import */}
+                  {/* Photo Upload */}
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Image className="h-5 w-5 text-festive-cyan" />
-                        <Label className="text-sm font-medium">Import from Google Drive</Label>
-                      </div>
-                      {googleDriveUrls.length < 10 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={addGoogleDriveUrl}
-                        >
-                          <Plus className="h-4 w-4 mr-1" />
-                          Add More
-                        </Button>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Paste shareable Google Drive image links (up to 10)
-                    </p>
-                    {googleDriveUrls.map((url, index) => (
-                      <div key={index} className="flex gap-2">
-                        <div className="relative flex-1">
-                          <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            placeholder="https://drive.google.com/file/d/..."
-                            value={url}
-                            onChange={(e) => updateGoogleDriveUrl(index, e.target.value)}
-                            className="bg-secondary pl-10"
-                          />
-                        </div>
-                        {googleDriveUrls.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeGoogleDriveUrl(index)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
+                    <Label className="text-sm font-medium">Upload Photos</Label>
+                    <ImageUploader 
+                      images={images}
+                      onImagesChange={setImages}
+                      maxImages={10}
+                      maxSizeMB={5}
+                    />
                   </div>
 
                   {/* YouTube URLs */}
@@ -574,7 +539,7 @@ export default function CreateListing() {
                     {isSubmitting ? (
                       <>
                         <span className="animate-spin mr-2">⏳</span>
-                        Submitting...
+                        {uploadProgress || 'Submitting...'}
                       </>
                     ) : (
                       <>
