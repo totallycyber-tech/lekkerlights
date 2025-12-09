@@ -146,6 +146,27 @@ export default function CreateListing() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate email (required for edit link)
+    if (!formData.contactEmail || !formData.contactEmail.trim()) {
+      toast({
+        title: "Email required",
+        description: "Please provide your email address so we can send you a secure edit link.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.contactEmail.trim())) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Validate address selection
     if (!addressSelected || !formData.streetName || !formData.city || !formData.province) {
       setAddressError(true);
@@ -177,7 +198,7 @@ export default function CreateListing() {
         province: formData.province,
         postal_code: formData.postalCode,
         contact_name: formData.contactName || null,
-        contact_email: formData.contactEmail || null,
+        contact_email: formData.contactEmail.trim(),
         contact_phone: formData.contactPhone || null,
         name_visible: nameVisible,
         email_visible: emailVisible,
@@ -208,9 +229,36 @@ export default function CreateListing() {
           .eq('id', listing.id);
       }
 
+      // Send edit link email
+      setUploadProgress('Sending edit link to your email...');
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        
+        // Fetch the edit_token from the newly created listing
+        const { data: listingData } = await supabase
+          .from('listings')
+          .select('edit_token')
+          .eq('id', listing.id)
+          .single();
+
+        if (listingData?.edit_token) {
+          await supabase.functions.invoke('send-edit-link', {
+            body: {
+              email: formData.contactEmail.trim(),
+              listingTitle: formData.title,
+              editToken: listingData.edit_token,
+              listingId: listing.id,
+            },
+          });
+        }
+      } catch (emailError) {
+        console.error('Failed to send edit link email:', emailError);
+        // Don't fail the whole submission, just warn the user
+      }
+
       toast({
         title: "Listing published!",
-        description: "Your Christmas display is now live for everyone to see.",
+        description: "Your Christmas display is now live. Check your email for the edit link.",
       });
 
       navigate('/browse');
@@ -614,10 +662,39 @@ export default function CreateListing() {
               <div className="bg-card rounded-xl border border-border p-6 space-y-6">
                 <div>
                   <h2 className="font-display text-lg font-semibold">Contact Information</h2>
-                  <p className="text-sm text-muted-foreground mt-1">Optional - only if you want visitors to contact you</p>
+                  <p className="text-sm text-muted-foreground mt-1">Your email is required so we can send you a secure link to edit or delete your listing</p>
                 </div>
                 
                 <div className="space-y-4">
+                  {/* Email - Required */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="contactEmail">Email Address *</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">
+                          {emailVisible ? 'Visible to public' : 'Hidden from public'}
+                        </span>
+                        <Switch
+                          checked={emailVisible}
+                          onCheckedChange={setEmailVisible}
+                          aria-label="Toggle email visibility"
+                        />
+                      </div>
+                    </div>
+                    <Input
+                      id="contactEmail"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={formData.contactEmail}
+                      onChange={(e) => handleChange('contactEmail', e.target.value)}
+                      className="bg-secondary"
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      We'll send you a secure edit link to this email. You can choose whether to show it publicly using the toggle above.
+                    </p>
+                  </div>
+
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="contactName">Full Name</Label>
@@ -638,30 +715,6 @@ export default function CreateListing() {
                       placeholder="John Smith"
                       value={formData.contactName}
                       onChange={(e) => handleChange('contactName', e.target.value)}
-                      className="bg-secondary"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="contactEmail">Email</Label>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">
-                          {emailVisible ? 'Visible to public' : 'Hidden from public'}
-                        </span>
-                        <Switch
-                          checked={emailVisible}
-                          onCheckedChange={setEmailVisible}
-                          aria-label="Toggle email visibility"
-                        />
-                      </div>
-                    </div>
-                    <Input
-                      id="contactEmail"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={formData.contactEmail}
-                      onChange={(e) => handleChange('contactEmail', e.target.value)}
                       className="bg-secondary"
                     />
                   </div>
