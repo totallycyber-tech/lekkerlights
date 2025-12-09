@@ -24,6 +24,9 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-display font-semibold">Quick Links</h4>
             <nav className="flex flex-col gap-2">
+              <Link to="/how-to-use" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                How to Use
+              </Link>
               <Link to="/browse" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Browse Displays
               </Link>
