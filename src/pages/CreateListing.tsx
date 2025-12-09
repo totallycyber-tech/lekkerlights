@@ -16,13 +16,14 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { provinces } from "@/data/mockListings";
-import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon } from "lucide-react";
+import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { useCreateListing, uploadListingImages } from "@/hooks/use-listings";
 import { ImageUploader } from "@/components/ImageUploader";
 import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
+import { TagSelector } from "@/components/TagSelector";
 
 const DAYS_OF_WEEK = [
   'Monday',
@@ -56,6 +57,7 @@ export default function CreateListing() {
   const [additionalImages, setAdditionalImages] = useState<File[]>([]);
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>(['']);
   const [operatingHours, setOperatingHours] = useState<OperatingHours>(defaultOperatingHours);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -151,6 +153,7 @@ export default function CreateListing() {
         youtube_urls: filteredYoutubeUrls,
         image_urls: [],
         operating_hours: operatingHours,
+        tags: selectedTags,
       });
 
       // Upload images if any (cover photo first, then additional)
@@ -458,6 +461,25 @@ export default function CreateListing() {
                     ))}
                   </div>
                 </div>
+              </div>
+
+              {/* Display Tags */}
+              <div className="bg-card rounded-xl border border-border p-6 space-y-6">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Tags className="h-5 w-5 text-christmas" />
+                    <h2 className="font-display text-lg font-semibold">Display Tags</h2>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Select tags that best describe your display to help visitors find you
+                  </p>
+                </div>
+                
+                <TagSelector 
+                  selectedTags={selectedTags}
+                  onTagsChange={setSelectedTags}
+                  maxTags={20}
+                />
               </div>
 
               {/* Operating Hours */}

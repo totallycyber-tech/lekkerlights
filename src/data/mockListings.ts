@@ -22,6 +22,7 @@ export interface Listing {
     email?: string;
     phone?: string;
   };
+  tags?: string[];
   createdAt: string;
   featured?: boolean;
 }
@@ -47,6 +48,7 @@ export function transformDbListing(dbListing: {
   created_at: string;
   directions_clicks: number;
   favorites_count: number;
+  tags: string[] | null;
 }): Listing {
   // Build operating hours display string
   const hours = dbListing.operating_hours || {};
@@ -97,6 +99,7 @@ export function transformDbListing(dbListing: {
       email: dbListing.contact_email || undefined,
       phone: dbListing.contact_phone || undefined,
     },
+    tags: dbListing.tags || [],
     createdAt: dbListing.created_at,
   };
 }

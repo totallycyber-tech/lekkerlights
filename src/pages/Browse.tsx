@@ -16,6 +16,7 @@ export default function Browse() {
     search: "",
     province: "",
     suburb: "",
+    tags: [] as string[],
   });
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -64,6 +65,13 @@ export default function Browse() {
         if (!listing.location.suburb.toLowerCase().includes(suburbLower)) {
           return false;
         }
+      }
+
+      // Tags filter - listing must have ALL selected tags
+      if (filters.tags.length > 0) {
+        const listingTags = listing.tags || [];
+        const hasAllTags = filters.tags.every((tag) => listingTags.includes(tag));
+        if (!hasAllTags) return false;
       }
 
       return true;
@@ -176,7 +184,7 @@ export default function Browse() {
               </p>
               <Button 
                 variant="outline"
-                onClick={() => setFilters({ search: "", province: "", suburb: "" })}
+                onClick={() => setFilters({ search: "", province: "", suburb: "", tags: [] })}
               >
                 Clear all filters
               </Button>
