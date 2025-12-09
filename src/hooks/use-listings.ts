@@ -22,6 +22,9 @@ export interface Listing {
   name_visible: boolean;
   email_visible: boolean;
   phone_visible: boolean;
+  parking_info: string | null;
+  max_visitors: number | null;
+  gate_access_info: string | null;
   image_urls: string[];
   youtube_urls: string[];
   operating_hours: Record<string, { enabled: boolean; startTime: string; endTime: string }>;
@@ -64,6 +67,9 @@ export interface ListingInsert {
   name_visible?: boolean;
   email_visible?: boolean;
   phone_visible?: boolean;
+  parking_info?: string | null;
+  max_visitors?: number | null;
+  gate_access_info?: string | null;
   image_urls?: string[];
   youtube_urls?: string[];
   operating_hours?: Record<string, { enabled: boolean; startTime: string; endTime: string }>;

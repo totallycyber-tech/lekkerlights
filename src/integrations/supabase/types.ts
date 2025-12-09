@@ -26,12 +26,15 @@ export type Database = {
           directions_clicks: number | null
           email_visible: boolean
           favorites_count: number | null
+          gate_access_info: string | null
           id: string
           image_urls: string[] | null
           lat: number | null
           lng: number | null
+          max_visitors: number | null
           name_visible: boolean
           operating_hours: Json | null
+          parking_info: string | null
           phone_visible: boolean
           postal_code: string
           province: string
@@ -55,12 +58,15 @@ export type Database = {
           directions_clicks?: number | null
           email_visible?: boolean
           favorites_count?: number | null
+          gate_access_info?: string | null
           id?: string
           image_urls?: string[] | null
           lat?: number | null
           lng?: number | null
+          max_visitors?: number | null
           name_visible?: boolean
           operating_hours?: Json | null
+          parking_info?: string | null
           phone_visible?: boolean
           postal_code: string
           province: string
@@ -84,12 +90,15 @@ export type Database = {
           directions_clicks?: number | null
           email_visible?: boolean
           favorites_count?: number | null
+          gate_access_info?: string | null
           id?: string
           image_urls?: string[] | null
           lat?: number | null
           lng?: number | null
+          max_visitors?: number | null
           name_visible?: boolean
           operating_hours?: Json | null
+          parking_info?: string | null
           phone_visible?: boolean
           postal_code?: string
           province?: string
