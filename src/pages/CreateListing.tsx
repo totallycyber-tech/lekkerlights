@@ -65,6 +65,8 @@ export default function CreateListing() {
   const [phoneVisible, setPhoneVisible] = useState(true);
   const [showComplexField, setShowComplexField] = useState(false);
   const [showUnitField, setShowUnitField] = useState(false);
+  const [addressSelected, setAddressSelected] = useState(false);
+  const [addressError, setAddressError] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -119,6 +121,8 @@ export default function CreateListing() {
       province: components.province,
       postalCode: components.postalCode,
     }));
+    setAddressSelected(true);
+    setAddressError(false);
   }, []);
 
   const addYoutubeUrl = () => {
@@ -139,6 +143,18 @@ export default function CreateListing() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate address selection
+    if (!addressSelected || !formData.streetName || !formData.city || !formData.province) {
+      setAddressError(true);
+      toast({
+        title: "Address required",
+        description: "Please select an address from the autocomplete suggestions.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
@@ -285,7 +301,17 @@ export default function CreateListing() {
                 {/* Address Autocomplete */}
                 <div className="space-y-2">
                   <Label>Address *</Label>
-                  <AddressAutocomplete onAddressSelect={handleAddressSelect} />
+                  <div className={cn(
+                    "rounded-lg transition-colors",
+                    addressError && "ring-2 ring-destructive ring-offset-2 ring-offset-background"
+                  )}>
+                    <AddressAutocomplete onAddressSelect={handleAddressSelect} />
+                  </div>
+                  {addressError && !addressSelected && (
+                    <p className="text-sm text-destructive">
+                      Please select an address from the suggestions
+                    </p>
+                  )}
                   {formData.streetNumber && formData.streetName && (
                     <p className="text-sm text-muted-foreground mt-2">
                       <Check className="h-4 w-4 inline mr-1 text-christmas-secondary" />
