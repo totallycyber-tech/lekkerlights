@@ -76,6 +76,9 @@ export default function CreateListing() {
     contactName: '',
     contactEmail: '',
     contactPhone: '',
+    parkingInfo: '',
+    maxVisitors: '',
+    gateAccessInfo: '',
   });
 
   const toggleDay = (day: string) => {
@@ -158,6 +161,9 @@ export default function CreateListing() {
         name_visible: nameVisible,
         email_visible: emailVisible,
         phone_visible: phoneVisible,
+        parking_info: formData.parkingInfo || null,
+        max_visitors: formData.maxVisitors ? parseInt(formData.maxVisitors) : null,
+        gate_access_info: formData.gateAccessInfo || null,
         youtube_urls: filteredYoutubeUrls,
         image_urls: [],
         operating_hours: operatingHours,
@@ -546,6 +552,53 @@ export default function CreateListing() {
                       )}
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* Visit Guidance */}
+              <div className="bg-card rounded-xl border border-border p-6 space-y-6">
+                <div>
+                  <h2 className="font-display text-lg font-semibold">Visit Guidance</h2>
+                  <p className="text-sm text-muted-foreground mt-1">Help visitors know what to expect when visiting</p>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="parkingInfo">Parking Information</Label>
+                    <Textarea
+                      id="parkingInfo"
+                      placeholder="e.g., Street parking available, park on the left side of the road, dedicated visitor parking in the complex..."
+                      value={formData.parkingInfo}
+                      onChange={(e) => handleChange('parkingInfo', e.target.value)}
+                      className="bg-secondary min-h-[80px]"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="maxVisitors">Maximum Visitors at a Time</Label>
+                    <Input
+                      id="maxVisitors"
+                      type="number"
+                      min="1"
+                      placeholder="e.g., 20"
+                      value={formData.maxVisitors}
+                      onChange={(e) => handleChange('maxVisitors', e.target.value)}
+                      className="bg-secondary w-32"
+                    />
+                    <p className="text-xs text-muted-foreground">Leave empty if no limit</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="gateAccessInfo">Gate/Complex Access Requirements</Label>
+                    <Textarea
+                      id="gateAccessInfo"
+                      placeholder="e.g., Show driver's license at security gate, dial code #1234 at the gate, call ahead for access..."
+                      value={formData.gateAccessInfo}
+                      onChange={(e) => handleChange('gateAccessInfo', e.target.value)}
+                      className="bg-secondary min-h-[80px]"
+                    />
+                    <p className="text-xs text-muted-foreground">Only fill in if your display is within a complex or gated estate</p>
+                  </div>
                 </div>
               </div>
 
