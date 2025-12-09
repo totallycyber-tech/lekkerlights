@@ -1,21 +1,16 @@
 import { useState, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchFilters } from "@/components/SearchFilters";
 import { ListingCard } from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
-import { mockListings, Theme } from "@/data/mockListings";
+import { mockListings } from "@/data/mockListings";
 import { LayoutGrid, Map, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Browse() {
-  const [searchParams] = useSearchParams();
-  const initialTheme = searchParams.get('theme') as Theme | 'all' || 'all';
-  
   const [filters, setFilters] = useState({
     search: "",
-    theme: initialTheme,
     province: "",
     suburb: "",
   });
@@ -32,11 +27,6 @@ export default function Browse() {
           listing.location.suburb.toLowerCase().includes(searchLower) ||
           listing.location.city.toLowerCase().includes(searchLower);
         if (!matchesSearch) return false;
-      }
-
-      // Theme filter
-      if (filters.theme !== 'all' && listing.theme !== filters.theme) {
-        return false;
       }
 
       // Province filter
@@ -65,18 +55,18 @@ export default function Browse() {
           {/* Page Header */}
           <div className="mb-8 space-y-4">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium text-primary uppercase tracking-wider">
+              <Sparkles className="h-5 w-5 text-christmas" />
+              <span className="text-sm font-medium text-christmas uppercase tracking-wider">
                 Discover
               </span>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h1 className="font-display text-3xl sm:text-4xl font-bold">
-                  Browse Displays
+                  Browse Christmas Displays
                 </h1>
                 <p className="text-muted-foreground mt-2">
-                  Find stunning light displays across South Africa
+                  Find stunning Christmas light displays across South Africa
                 </p>
               </div>
               
@@ -133,7 +123,7 @@ export default function Browse() {
               </p>
               <Button 
                 variant="outline"
-                onClick={() => setFilters({ search: "", theme: 'all', province: "", suburb: "" })}
+                onClick={() => setFilters({ search: "", province: "", suburb: "" })}
               >
                 Clear all filters
               </Button>

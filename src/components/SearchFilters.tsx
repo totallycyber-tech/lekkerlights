@@ -9,12 +9,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, MapPin, SlidersHorizontal, X } from "lucide-react";
-import { themes, provinces, Theme } from "@/data/mockListings";
+import { provinces } from "@/data/mockListings";
 
 interface SearchFiltersProps {
   onFilterChange: (filters: {
     search: string;
-    theme: Theme | 'all';
     province: string;
     suburb: string;
   }) => void;
@@ -22,24 +21,22 @@ interface SearchFiltersProps {
 
 export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
   const [search, setSearch] = useState("");
-  const [theme, setTheme] = useState<Theme | 'all'>('all');
   const [province, setProvince] = useState("");
   const [suburb, setSuburb] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
   const handleFilterChange = () => {
-    onFilterChange({ search, theme, province, suburb });
+    onFilterChange({ search, province, suburb });
   };
 
   const clearFilters = () => {
     setSearch("");
-    setTheme('all');
     setProvince("");
     setSuburb("");
-    onFilterChange({ search: "", theme: 'all', province: "", suburb: "" });
+    onFilterChange({ search: "", province: "", suburb: "" });
   };
 
-  const hasActiveFilters = search || theme !== 'all' || province || suburb;
+  const hasActiveFilters = search || province || suburb;
 
   return (
     <div className="space-y-4">
@@ -58,26 +55,6 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
             className="pl-10 bg-secondary border-border h-12"
           />
         </div>
-        
-        <Select 
-          value={theme} 
-          onValueChange={(value) => {
-            setTheme(value as Theme | 'all');
-            setTimeout(handleFilterChange, 0);
-          }}
-        >
-          <SelectTrigger className="w-full sm:w-48 bg-secondary border-border h-12">
-            <SelectValue placeholder="All Themes" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Themes</SelectItem>
-            {themes.map((t) => (
-              <SelectItem key={t.value} value={t.value}>
-                {t.emoji} {t.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
 
         <Button
           variant={showFilters ? "default" : "outline"}
@@ -93,7 +70,7 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
       {/* Extended Filters */}
       {showFilters && (
         <div className="p-4 bg-secondary rounded-lg border border-border space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Province</label>
               <Select 

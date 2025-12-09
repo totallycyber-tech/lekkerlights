@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Heart, ExternalLink } from "lucide-react";
-import { Listing, themes } from "@/data/mockListings";
+import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 
 interface ListingCardProps {
@@ -10,8 +10,6 @@ interface ListingCardProps {
 }
 
 export function ListingCard({ listing, className }: ListingCardProps) {
-  const theme = themes.find(t => t.value === listing.theme);
-  
   const getDirectionsUrl = () => {
     const address = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}, ${listing.location.postalCode}`;
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
@@ -22,7 +20,7 @@ export function ListingCard({ listing, className }: ListingCardProps) {
       to={`/listing/${listing.id}`}
       className={cn(
         "group block bg-card rounded-xl overflow-hidden border border-border",
-        "transition-all duration-300 hover:border-primary/50 card-glow",
+        "transition-all duration-300 hover:border-christmas/50 card-glow",
         className
       )}
     >
@@ -37,10 +35,10 @@ export function ListingCard({ listing, className }: ListingCardProps) {
         
         {/* Theme Badge */}
         <Badge 
-          variant={listing.theme as any}
+          variant="christmas"
           className="absolute top-3 left-3"
         >
-          {theme?.emoji} {theme?.label}
+          🎄 Christmas
         </Badge>
 
         {/* Featured Badge */}
@@ -67,7 +65,7 @@ export function ListingCard({ listing, className }: ListingCardProps) {
 
       {/* Content */}
       <div className="p-4 space-y-3">
-        <h3 className="font-display font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1">
+        <h3 className="font-display font-semibold text-lg group-hover:text-christmas transition-colors line-clamp-1">
           {listing.title}
         </h3>
         
@@ -77,7 +75,7 @@ export function ListingCard({ listing, className }: ListingCardProps) {
 
         {/* Location */}
         <div className="flex items-start gap-2 text-sm">
-          <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+          <MapPin className="h-4 w-4 text-christmas shrink-0 mt-0.5" />
           <span className="text-muted-foreground">
             {listing.location.suburb}, {listing.location.city}
           </span>
@@ -85,7 +83,7 @@ export function ListingCard({ listing, className }: ListingCardProps) {
 
         {/* Operating Hours */}
         <div className="flex items-start gap-2 text-sm">
-          <Clock className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+          <Clock className="h-4 w-4 text-christmas shrink-0 mt-0.5" />
           <span className="text-muted-foreground">
             {listing.operatingHours.days} • {listing.operatingHours.times}
           </span>
@@ -97,7 +95,7 @@ export function ListingCard({ listing, className }: ListingCardProps) {
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
+          className="inline-flex items-center gap-1 text-sm text-christmas hover:text-christmas/80 transition-colors"
         >
           <ExternalLink className="h-4 w-4" />
           Get Directions

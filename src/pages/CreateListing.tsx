@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { themes, provinces } from "@/data/mockListings";
+import { provinces } from "@/data/mockListings";
 import { Sparkles, Upload, ArrowLeft, Check, Youtube, Image, Plus, X, Link as LinkIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -23,7 +23,6 @@ export default function CreateListing() {
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>(['']);
   const [googleDriveUrls, setGoogleDriveUrls] = useState<string[]>(['']);
   const [formData, setFormData] = useState({
-    theme: '',
     title: '',
     description: '',
     streetNumber: '',
@@ -83,7 +82,7 @@ export default function CreateListing() {
 
     toast({
       title: "Listing submitted!",
-      description: "Your display will be reviewed and published soon.",
+      description: "Your Christmas display will be reviewed and published soon.",
     });
 
     setIsSubmitting(false);
@@ -110,16 +109,16 @@ export default function CreateListing() {
               </Button>
               
               <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium text-primary uppercase tracking-wider">
+                <Sparkles className="h-5 w-5 text-christmas" />
+                <span className="text-sm font-medium text-christmas uppercase tracking-wider">
                   Share Your Display
                 </span>
               </div>
               <h1 className="font-display text-3xl sm:text-4xl font-bold">
-                List Your Light Display
+                List Your Christmas Display
               </h1>
               <p className="text-muted-foreground">
-                Share your festive decorations with your community and help spread the joy!
+                Share your Christmas decorations with your community and help spread the festive joy!
               </p>
             </div>
 
@@ -130,25 +129,6 @@ export default function CreateListing() {
                 <h2 className="font-display text-lg font-semibold">Basic Information</h2>
                 
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="theme">Theme *</Label>
-                    <Select 
-                      value={formData.theme}
-                      onValueChange={(value) => handleChange('theme', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a theme" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {themes.map((theme) => (
-                          <SelectItem key={theme.value} value={theme.value}>
-                            {theme.emoji} {theme.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
                   <div className="space-y-2">
                     <Label htmlFor="title">Display Title *</Label>
                     <Input
@@ -165,7 +145,7 @@ export default function CreateListing() {
                     <Label htmlFor="description">Description *</Label>
                     <Textarea
                       id="description"
-                      placeholder="Tell visitors what makes your display special..."
+                      placeholder="Tell visitors what makes your Christmas display special..."
                       value={formData.description}
                       onChange={(e) => handleChange('description', e.target.value)}
                       className="bg-secondary min-h-[120px]"
@@ -269,7 +249,7 @@ export default function CreateListing() {
                 <div className="space-y-6">
                   {/* Photo Upload */}
                   <div className="space-y-4">
-                    <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer">
+                    <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-christmas/50 transition-colors cursor-pointer">
                       <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
                       <p className="font-medium mb-1">Upload Photos</p>
                       <p className="text-sm text-muted-foreground">
@@ -448,11 +428,14 @@ export default function CreateListing() {
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
-                    "Submitting..."
+                    <>
+                      <span className="animate-spin mr-2">⏳</span>
+                      Submitting...
+                    </>
                   ) : (
                     <>
-                      <Check className="h-5 w-5" />
-                      Submit Listing
+                      <Check className="h-5 w-5 mr-2" />
+                      Submit for Review
                     </>
                   )}
                 </Button>
@@ -467,8 +450,8 @@ export default function CreateListing() {
               </div>
 
               <p className="text-sm text-muted-foreground text-center">
-                By submitting, you agree to our Terms of Service and Privacy Policy. 
-                Listings are reviewed before being published.
+                Your listing will be reviewed by our team before going live. 
+                This usually takes 1-2 business days.
               </p>
             </form>
           </div>
