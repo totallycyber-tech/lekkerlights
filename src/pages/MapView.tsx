@@ -13,12 +13,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { mockListings, provinces, transformDbListing, Listing } from "@/data/mockListings";
-import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation, Crosshair, X } from "lucide-react";
+import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2, Navigation, Crosshair, X, Tags } from "lucide-react";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
 import { useListings } from "@/hooks/use-listings";
 import { calculateDistance } from "@/lib/geo-utils";
 import { toast } from "@/hooks/use-toast";
+import { TagFilter } from "@/components/TagFilter";
 
 const libraries: ("places")[] = ["places"];
 
@@ -63,6 +64,7 @@ export default function MapView() {
   const [searchMarker, setSearchMarker] = useState<{ lat: number; lng: number } | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const [radiusFilter, setRadiusFilter] = useState<number | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isLocating, setIsLocating] = useState(false);
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -109,10 +111,17 @@ export default function MapView() {
         const distance = getListingDistance(listing);
         if (distance === null || distance > radiusFilter) return false;
       }
+
+      // Tags filter - listing must have ALL selected tags
+      if (selectedTags.length > 0) {
+        const listingTags = listing.tags || [];
+        const hasAllTags = selectedTags.every((tag) => listingTags.includes(tag));
+        if (!hasAllTags) return false;
+      }
       
       return provinceMatch && suburbMatch;
     });
-  }, [selectedProvince, suburbSearch, allListings, userLocation, radiusFilter]);
+  }, [selectedProvince, suburbSearch, allListings, userLocation, radiusFilter, selectedTags]);
 
   const selected = allListings.find(l => l.id === selectedListing);
 
@@ -127,11 +136,12 @@ export default function MapView() {
     setSearchMarker(null);
     setUserLocation(null);
     setRadiusFilter(null);
+    setSelectedTags([]);
     if (addressInputRef.current) addressInputRef.current.value = '';
     if (suburbInputRef.current) suburbInputRef.current.value = '';
   };
 
-  const hasActiveFilters = selectedProvince !== 'all' || suburbSearch || searchMarker || userLocation;
+  const hasActiveFilters = selectedProvince !== 'all' || suburbSearch || searchMarker || userLocation || selectedTags.length > 0;
 
   // Handle getting user's current location
   const handleGetLocation = () => {
@@ -483,6 +493,14 @@ export default function MapView() {
                   </span>
                 </div>
               )}
+            </div>
+
+            {/* Tag Filter Row */}
+            <div className="pt-2">
+              <TagFilter
+                selectedTags={selectedTags}
+                onTagsChange={setSelectedTags}
+              />
             </div>
           </div>
         </div>
