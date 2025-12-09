@@ -17,7 +17,7 @@ export interface Listing {
   lng: number | null;
   contact_email: string | null;
   contact_phone: string | null;
-  google_drive_urls: string[];
+  image_urls: string[];
   youtube_urls: string[];
   operating_hours: Record<string, { enabled: boolean; startTime: string; endTime: string }>;
   directions_clicks: number;
@@ -41,7 +41,7 @@ export interface ListingInsert {
   lng?: number | null;
   contact_email?: string | null;
   contact_phone?: string | null;
-  google_drive_urls?: string[];
+  image_urls?: string[];
   youtube_urls?: string[];
   operating_hours?: Record<string, { enabled: boolean; startTime: string; endTime: string }>;
 }
@@ -137,4 +137,35 @@ export function useIncrementDirectionsClicks() {
       queryClient.invalidateQueries({ queryKey: ['listings'] });
     },
   });
+}
+
+// Upload images to storage and return public URLs
+export async function uploadListingImages(files: File[], listingId: string): Promise<string[]> {
+  const urls: string[] = [];
+  
+  for (const file of files) {
+    const timestamp = Date.now();
+    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const filePath = `${listingId}/${timestamp}-${safeName}`;
+    
+    const { error } = await supabase.storage
+      .from('listing-images')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('listing-images')
+      .getPublicUrl(filePath);
+
+    urls.push(urlData.publicUrl);
+  }
+
+  return urls;
 }

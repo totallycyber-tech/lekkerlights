@@ -14,7 +14,6 @@ export interface Listing {
   };
   photos: string[];
   youtubeUrls: string[];
-  googleDrivePhotos?: string[];
   operatingHours: {
     days: string;
     times: string;
@@ -40,7 +39,7 @@ export function transformDbListing(dbListing: {
   postal_code: string;
   lat: number | null;
   lng: number | null;
-  google_drive_urls: string[];
+  image_urls: string[];
   youtube_urls: string[];
   operating_hours: Record<string, { enabled: boolean; startTime: string; endTime: string }> | null;
   contact_email: string | null;
@@ -69,9 +68,9 @@ export function transformDbListing(dbListing: {
     timesStr = timeRanges[0] || '';
   }
 
-  // Use Google Drive URLs as photos, or placeholder if none
-  const photos = dbListing.google_drive_urls?.length > 0 
-    ? dbListing.google_drive_urls 
+  // Use uploaded images as photos, or placeholder if none
+  const photos = dbListing.image_urls?.length > 0 
+    ? dbListing.image_urls 
     : ['https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=800'];
 
   return {
@@ -90,7 +89,6 @@ export function transformDbListing(dbListing: {
     },
     photos,
     youtubeUrls: dbListing.youtube_urls || [],
-    googleDrivePhotos: dbListing.google_drive_urls || [],
     operatingHours: {
       days: daysStr,
       times: timesStr,
