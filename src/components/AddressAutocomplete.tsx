@@ -70,6 +70,19 @@ export function AddressAutocomplete({ onAddressSelect }: AddressAutocompleteProp
         position: coordinates,
         map: mapRef.current,
         animation: google.maps.Animation.DROP,
+        draggable: true,
+      });
+
+      // Update coordinates when marker is dragged
+      markerRef.current.addListener("dragend", () => {
+        const position = markerRef.current?.getPosition();
+        if (position) {
+          const newCoords = {
+            lat: position.lat(),
+            lng: position.lng(),
+          };
+          setCoordinates(newCoords);
+        }
       });
     }
   }, [isLoaded, coordinates]);
