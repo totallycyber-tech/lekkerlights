@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Plus, Menu, X } from "lucide-react";
+import { Sparkles, Plus, Menu, X, Heart } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -37,6 +37,12 @@ export function Header() {
               Map View
             </Link>
             <ThemeToggle />
+            <Link to="/donate">
+              <Button variant="outline" size="sm">
+                <Heart className="h-4 w-4" aria-hidden="true" />
+                Donate
+              </Button>
+            </Link>
             <Link to="/create">
               <Button variant="glow" size="sm">
                 <Plus className="h-4 w-4" aria-hidden="true" />
@@ -80,6 +86,12 @@ export function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Map View
+              </Link>
+              <Link to="/donate" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="outline" size="sm" className="w-full">
+                  <Heart className="h-4 w-4" aria-hidden="true" />
+                  Donate
+                </Button>
               </Link>
               <Link to="/create" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="glow" size="sm" className="w-full">
