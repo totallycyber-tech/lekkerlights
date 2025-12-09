@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Sparkles, Mail, Facebook, Instagram, Twitter } from "lucide-react";
+import { Sparkles, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -18,17 +18,6 @@ export function Footer() {
               Discover and share beautiful Christmas light displays across South Africa. 
               Bringing communities together through festive celebrations.
             </p>
-            <div className="flex gap-4">
-              <a href="#" className="text-muted-foreground hover:text-christmas transition-colors">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-christmas transition-colors">
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-christmas transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-            </div>
           </div>
 
           {/* Quick Links */}
