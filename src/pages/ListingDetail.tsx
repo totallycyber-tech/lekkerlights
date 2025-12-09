@@ -11,6 +11,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { useListing } from "@/hooks/use-listings";
 import { ListingReviews } from "@/components/ListingReviews";
+import { ReportListingDialog } from "@/components/ReportListingDialog";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 export default function ListingDetail() {
@@ -269,18 +270,20 @@ export default function ListingDetail() {
 
               {/* Report Button */}
               <div className="border-t border-border pt-6 flex justify-end">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="text-muted-foreground hover:text-destructive"
-                  onClick={() => toast({ 
-                    title: "Report submitted",
-                    description: "Thank you for helping keep Lekker Lights safe.",
-                  })}
-                >
-                  <Flag className="h-4 w-4 mr-1" />
-                  Report Listing
-                </Button>
+                <ReportListingDialog
+                  listingId={listing.id}
+                  listingTitle={listing.title}
+                  trigger={
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="text-muted-foreground hover:text-destructive"
+                    >
+                      <Flag className="h-4 w-4 mr-1" />
+                      Report Listing
+                    </Button>
+                  }
+                />
               </div>
             </div>
 

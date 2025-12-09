@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,6 +16,39 @@ interface ReportListingRequest {
   reporterEmail: string;
   reporterPhone: string;
   reportedAt: string;
+}
+
+// In-memory rate limiting store (resets when function cold starts)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+const RATE_LIMIT_MAX = 3; // Max 3 reports per window
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour window
+
+function checkRateLimit(identifier: string): { allowed: boolean; remainingTime?: number } {
+  const now = Date.now();
+  const record = rateLimitStore.get(identifier);
+
+  if (!record || now > record.resetTime) {
+    // Create new rate limit record
+    rateLimitStore.set(identifier, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true };
+  }
+
+  if (record.count >= RATE_LIMIT_MAX) {
+    const remainingTime = Math.ceil((record.resetTime - now) / 1000 / 60); // minutes
+    return { allowed: false, remainingTime };
+  }
+
+  // Increment count
+  record.count++;
+  rateLimitStore.set(identifier, record);
+  return { allowed: true };
+}
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+         req.headers.get("x-real-ip") || 
+         "unknown";
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -34,7 +68,23 @@ const handler = async (req: Request): Promise<Response> => {
       reportedAt,
     }: ReportListingRequest = await req.json();
 
-    console.log(`Report received for listing: ${listingTitle} (${listingId})`);
+    // Rate limiting based on IP + listing combination
+    const clientIP = getClientIP(req);
+    const rateLimitKey = `${clientIP}:${listingId}`;
+    
+    const rateLimit = checkRateLimit(rateLimitKey);
+    if (!rateLimit.allowed) {
+      console.log(`Rate limit exceeded for ${clientIP} on listing ${listingId}`);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `Too many reports. Please try again in ${rateLimit.remainingTime} minutes.` 
+        }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    console.log(`Report received for listing: ${listingTitle} (${listingId}) from IP: ${clientIP}`);
     console.log(`Reason: ${reason}`);
 
     const siteUrl = Deno.env.get("SITE_URL") || "https://lekkerlights.co.za";
