@@ -16,7 +16,7 @@ export function FeaturedListings() {
       return scoreB - scoreA;
     })
     .slice(0, 3)
-    .map(transformDbListing);
+    .map((listing) => transformDbListing(listing as any));
 
   if (isLoading) {
     return (

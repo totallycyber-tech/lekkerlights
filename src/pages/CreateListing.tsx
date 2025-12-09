@@ -60,6 +60,7 @@ export default function CreateListing() {
   const [additionalImages, setAdditionalImages] = useState<File[]>([]);
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>(['']);
   const [operatingHours, setOperatingHours] = useState<OperatingHours>(defaultOperatingHours);
+  const [operatingHoursOther, setOperatingHoursOther] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [nameVisible, setNameVisible] = useState(true);
@@ -274,7 +275,9 @@ export default function CreateListing() {
         gate_access_info: formData.gateAccessInfo || null,
         youtube_urls: filteredYoutubeUrls,
         image_urls: [],
-        operating_hours: operatingHours,
+        operating_hours: DAYS_OF_WEEK.some(day => operatingHours[day].enabled) 
+          ? operatingHours 
+          : { other: operatingHoursOther },
         tags: selectedTags,
       });
 
@@ -675,55 +678,81 @@ export default function CreateListing() {
                 </div>
                 
                 <div className="space-y-3">
-                  {DAYS_OF_WEEK.map((day) => (
-                    <div 
-                      key={day} 
-                      className={cn(
-                        "flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-lg border transition-colors",
-                        operatingHours[day].enabled 
-                          ? "bg-christmas/5 border-christmas/30" 
-                          : "bg-secondary/50 border-border"
-                      )}
-                    >
-                      <div className="flex items-center gap-3 min-w-[140px]">
-                        <Switch
-                          checked={operatingHours[day].enabled}
-                          onCheckedChange={() => toggleDay(day)}
-                        />
-                        <span className={cn(
-                          "font-medium text-sm",
-                          operatingHours[day].enabled ? "text-foreground" : "text-muted-foreground"
-                        )}>
-                          {day}
-                        </span>
-                      </div>
-                      
-                      {operatingHours[day].enabled && (
-                        <div className="flex items-center gap-2 flex-1">
-                          <div className="flex items-center gap-2">
-                            <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
-                            <Input
-                              type="time"
-                              value={operatingHours[day].startTime}
-                              onChange={(e) => updateDayTime(day, 'startTime', e.target.value)}
-                              className="bg-background w-[120px] text-sm"
-                            />
-                          </div>
-                          <span className="text-muted-foreground">–</span>
-                          <div className="flex items-center gap-2">
-                            <Label className="text-xs text-muted-foreground whitespace-nowrap">To</Label>
-                            <Input
-                              type="time"
-                              value={operatingHours[day].endTime}
-                              onChange={(e) => updateDayTime(day, 'endTime', e.target.value)}
-                              className="bg-background w-[120px] text-sm"
-                            />
-                          </div>
+                  {DAYS_OF_WEEK.map((day) => {
+                    const hasAnyDayEnabled = DAYS_OF_WEEK.some(d => operatingHours[d].enabled);
+                    return (
+                      <div 
+                        key={day} 
+                        className={cn(
+                          "flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-lg border transition-colors",
+                          operatingHours[day].enabled 
+                            ? "bg-christmas/5 border-christmas/30" 
+                            : "bg-secondary/50 border-border"
+                        )}
+                      >
+                        <div className="flex items-center gap-3 min-w-[140px]">
+                          <Switch
+                            checked={operatingHours[day].enabled}
+                            onCheckedChange={() => {
+                              toggleDay(day);
+                              // Clear "Other" field when enabling a day
+                              if (!operatingHours[day].enabled) {
+                                setOperatingHoursOther('');
+                              }
+                            }}
+                          />
+                          <span className={cn(
+                            "font-medium text-sm",
+                            operatingHours[day].enabled ? "text-foreground" : "text-muted-foreground"
+                          )}>
+                            {day}
+                          </span>
                         </div>
-                      )}
-                    </div>
-                  ))}
+                        
+                        {operatingHours[day].enabled && (
+                          <div className="flex items-center gap-2 flex-1">
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
+                              <Input
+                                type="time"
+                                value={operatingHours[day].startTime}
+                                onChange={(e) => updateDayTime(day, 'startTime', e.target.value)}
+                                className="bg-background w-[120px] text-sm"
+                              />
+                            </div>
+                            <span className="text-muted-foreground">–</span>
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs text-muted-foreground whitespace-nowrap">To</Label>
+                              <Input
+                                type="time"
+                                value={operatingHours[day].endTime}
+                                onChange={(e) => updateDayTime(day, 'endTime', e.target.value)}
+                                className="bg-background w-[120px] text-sm"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
+
+                {/* Other option - shown when no days are selected */}
+                {!DAYS_OF_WEEK.some(day => operatingHours[day].enabled) && (
+                  <div className="space-y-3 pt-3 border-t border-border">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="operatingHoursOther" className="font-medium">Other</Label>
+                      <span className="text-xs text-muted-foreground">(If your hours vary or are not listed above)</span>
+                    </div>
+                    <Textarea
+                      id="operatingHoursOther"
+                      placeholder="e.g., Lights on from sunset to midnight daily, or by appointment only, or weekends only during December..."
+                      value={operatingHoursOther}
+                      onChange={(e) => setOperatingHoursOther(e.target.value)}
+                      className="bg-secondary min-h-[80px]"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Visit Guidance */}
