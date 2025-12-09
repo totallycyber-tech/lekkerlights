@@ -1,13 +1,12 @@
 import { Link } from "react-router-dom";
-import { Sparkles, MessageCircle, Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Sparkles, Mail } from "lucide-react";
 import { ContactUsDialog } from "@/components/ContactUsDialog";
 
 export function Footer() {
   return (
     <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
@@ -48,25 +47,6 @@ export function Footer() {
                 }
               />
             </nav>
-          </div>
-
-          {/* WhatsApp Community */}
-          <div className="space-y-4">
-            <h4 className="font-display font-semibold">Join Our Community</h4>
-            <p className="text-sm text-muted-foreground">
-              Join our WhatsApp group to get updates on new Christmas displays and connect with fellow enthusiasts.
-            </p>
-            <a 
-              className="mt-2 inline-block"
-              href="https://chat.whatsapp.com/EX3d4STqIA79fxHNUKTL5v?mode=hqrt3"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="default" className="gap-2">
-                <MessageCircle className="h-4 w-4" />
-                Join WhatsApp Group
-              </Button>
-            </a>
           </div>
         </div>
 
