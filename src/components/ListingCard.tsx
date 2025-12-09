@@ -77,17 +77,17 @@ export function ListingCard({
       <div className="relative aspect-[4/3] overflow-hidden">
         <img 
           src={listing.photos[0] || defaultCoverPhoto} 
-          alt={listing.title}
+          alt={`Christmas light display: ${listing.title} in ${listing.location.suburb}, ${listing.location.city}`}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" aria-hidden="true" />
         
         {/* Theme Badge */}
         <Badge 
           variant="christmas"
           className="absolute top-3 left-3"
         >
-          🎄 Christmas
+          <span aria-hidden="true">🎄</span> Christmas
         </Badge>
 
         {/* Popular Badge */}
@@ -96,7 +96,7 @@ export function ListingCard({
             variant="default"
             className="absolute top-3 right-3 bg-amber-500/90 text-white"
           >
-            <TrendingUp className="h-3 w-3 mr-1" />
+            <TrendingUp className="h-3 w-3 mr-1" aria-hidden="true" />
             Popular
           </Badge>
         )}
@@ -107,8 +107,8 @@ export function ListingCard({
             variant="secondary"
             className="absolute bottom-3 left-3 bg-background/80 backdrop-blur-sm"
           >
-            <Navigation className="h-3 w-3 mr-1" />
-            {formatDistance(distance)}
+            <Navigation className="h-3 w-3 mr-1" aria-hidden="true" />
+            <span className="sr-only">Distance: </span>{formatDistance(distance)}
           </Badge>
         )}
 
@@ -117,9 +117,9 @@ export function ListingCard({
           <button 
             className="p-2 rounded-full backdrop-blur-sm transition-all bg-background/50 hover:bg-background/80"
             onClick={handleShareClick}
-            aria-label="Share listing"
+            aria-label={`Share ${listing.title}`}
           >
-            <Share2 className="h-5 w-5" />
+            <Share2 className="h-5 w-5" aria-hidden="true" />
           </button>
           <button 
             className={cn(
@@ -129,9 +129,10 @@ export function ListingCard({
                 : "bg-background/50 hover:bg-background/80"
             )}
             onClick={handleFavoriteClick}
-            aria-label={isFavorite ? "Remove from favourites" : "Add to favourites"}
+            aria-label={isFavorite ? `Remove ${listing.title} from favourites` : `Add ${listing.title} to favourites`}
+            aria-pressed={isFavorite}
           >
-            <Heart className={cn("h-5 w-5", isFavorite && "fill-current")} />
+            <Heart className={cn("h-5 w-5", isFavorite && "fill-current")} aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -143,8 +144,8 @@ export function ListingCard({
             {listing.title}
           </h3>
           {reviewStats && reviewStats.review_count > 0 && (
-            <div className="flex items-center gap-1 shrink-0">
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            <div className="flex items-center gap-1 shrink-0" aria-label={`Rating: ${reviewStats.average_rating} out of 5 from ${reviewStats.review_count} reviews`}>
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" aria-hidden="true" />
               <span className="text-sm font-medium">{reviewStats.average_rating}</span>
               <span className="text-xs text-muted-foreground">({reviewStats.review_count})</span>
             </div>
@@ -157,16 +158,18 @@ export function ListingCard({
 
         {/* Location */}
         <div className="flex items-start gap-2 text-sm">
-          <MapPin className="h-4 w-4 text-christmas shrink-0 mt-0.5" />
+          <MapPin className="h-4 w-4 text-christmas shrink-0 mt-0.5" aria-hidden="true" />
           <span className="text-muted-foreground">
+            <span className="sr-only">Location: </span>
             {listing.location.suburb}, {listing.location.city}
           </span>
         </div>
 
         {/* Operating Hours */}
         <div className="flex items-start gap-2 text-sm">
-          <Clock className="h-4 w-4 text-christmas shrink-0 mt-0.5" />
+          <Clock className="h-4 w-4 text-christmas shrink-0 mt-0.5" aria-hidden="true" />
           <span className="text-muted-foreground">
+            <span className="sr-only">Operating hours: </span>
             {listing.operatingHours.days} • {listing.operatingHours.times}
           </span>
         </div>
@@ -181,8 +184,9 @@ export function ListingCard({
             onDirectionsClick?.(listing.id);
           }}
           className="inline-flex items-center gap-1 text-sm text-christmas hover:text-christmas/80 transition-colors"
+          aria-label={`Get directions to ${listing.title}`}
         >
-          <ExternalLink className="h-4 w-4" />
+          <ExternalLink className="h-4 w-4" aria-hidden="true" />
           Get Directions
         </a>
       </div>

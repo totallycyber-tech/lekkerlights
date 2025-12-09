@@ -23,15 +23,16 @@ const extractYouTubeId = (url: string): string | null => {
   return null;
 };
 
-const YouTubeEmbed = ({ videoId, className }: { videoId: string; className?: string }) => (
+const YouTubeEmbed = ({ videoId, className, index }: { videoId: string; className?: string; index?: number }) => (
   <div className={`relative overflow-hidden rounded-lg bg-secondary ${className}`}>
     <div className="aspect-video">
       <iframe
         src={`https://www.youtube.com/embed/${videoId}`}
-        title="YouTube video"
+        title={`Christmas lights video ${index !== undefined ? index + 1 : ''}`}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
         className="absolute inset-0 w-full h-full"
+        loading="lazy"
       />
     </div>
   </div>
@@ -49,26 +50,26 @@ export function YouTubePreview({ urls }: YouTubePreviewProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" role="region" aria-label="Video previews">
       <p className="text-sm font-medium text-muted-foreground">Video Preview</p>
       
       {validVideos.length === 1 && (
-        <YouTubeEmbed videoId={validVideos[0].id} />
+        <YouTubeEmbed videoId={validVideos[0].id} index={0} />
       )}
 
       {validVideos.length === 2 && (
         <div className="space-y-3">
-          <YouTubeEmbed videoId={validVideos[0].id} />
-          <YouTubeEmbed videoId={validVideos[1].id} className="max-w-md" />
+          <YouTubeEmbed videoId={validVideos[0].id} index={0} />
+          <YouTubeEmbed videoId={validVideos[1].id} className="max-w-md" index={1} />
         </div>
       )}
 
       {validVideos.length === 3 && (
         <div className="space-y-3">
-          <YouTubeEmbed videoId={validVideos[0].id} />
-          <div className="grid grid-cols-2 gap-3">
-            <YouTubeEmbed videoId={validVideos[1].id} />
-            <YouTubeEmbed videoId={validVideos[2].id} />
+          <YouTubeEmbed videoId={validVideos[0].id} index={0} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <YouTubeEmbed videoId={validVideos[1].id} index={1} />
+            <YouTubeEmbed videoId={validVideos[2].id} index={2} />
           </div>
         </div>
       )}
