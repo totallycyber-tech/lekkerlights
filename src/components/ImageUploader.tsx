@@ -134,7 +134,7 @@ export function ImageUploader({
             JPEG, PNG, WebP or GIF (max {maxSizeMB}MB each)
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            {images.length}/{maxImages} images
+            {images.length}/{maxImages} additional photos
           </p>
         </div>
         <input
@@ -166,20 +166,8 @@ export function ImageUploader({
               >
                 <X className="h-3 w-3" />
               </Button>
-              {index === 0 && (
-                <span className="absolute bottom-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
-                  Cover
-                </span>
-              )}
             </div>
           ))}
-        </div>
-      )}
-
-      {images.length === 0 && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <ImageIcon className="h-4 w-4" />
-          <span>The first image will be used as the cover photo</span>
         </div>
       )}
     </div>
