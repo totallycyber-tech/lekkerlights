@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.moderate-review]
 verify_jwt = false
+
+[functions.send-edit-link]
+verify_jwt = false
