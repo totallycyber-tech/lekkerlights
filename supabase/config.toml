@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.resend-edit-link]
 verify_jwt = false
+
+[functions.report-listing]
+verify_jwt = false
