@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
-import { Sparkles, Mail } from "lucide-react";
+import { Sparkles, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export function Footer() {
   return (
@@ -36,22 +35,22 @@ export function Footer() {
             </nav>
           </div>
 
-          {/* Newsletter */}
+          {/* WhatsApp Community */}
           <div className="space-y-4">
-            <h4 className="font-display font-semibold">Get Notified</h4>
+            <h4 className="font-display font-semibold">Join Our Community</h4>
             <p className="text-sm text-muted-foreground">
-              Subscribe to get updates when new Christmas displays are added in your area.
+              Join our WhatsApp group to get updates on new Christmas displays and connect with fellow enthusiasts.
             </p>
-            <div className="flex gap-2">
-              <Input 
-                type="email" 
-                placeholder="Enter your email" 
-                className="bg-secondary border-border"
-              />
-              <Button variant="default" size="icon">
-                <Mail className="h-4 w-4" />
+            <a 
+              href="https://chat.whatsapp.com/EX3d4STqIA79fxHNUKTL5v?mode=hqrt3"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="default" className="gap-2">
+                <MessageCircle className="h-4 w-4" />
+                Join WhatsApp Group
               </Button>
-            </div>
+            </a>
           </div>
         </div>
 
