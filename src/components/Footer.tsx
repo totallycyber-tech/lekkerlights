@@ -42,6 +42,7 @@ export function Footer() {
               Join our WhatsApp group to get updates on new Christmas displays and connect with fellow enthusiasts.
             </p>
             <a 
+              className="mt-2 inline-block"
               href="https://chat.whatsapp.com/EX3d4STqIA79fxHNUKTL5v?mode=hqrt3"
               target="_blank"
               rel="noopener noreferrer"
