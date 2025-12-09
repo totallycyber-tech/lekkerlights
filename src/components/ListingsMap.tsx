@@ -61,12 +61,12 @@ const createChristmasTreeMarker = () => {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 };
 
-export function ListingsMap({ listings }: ListingsMapProps) {
-  const { apiKey, isLoading: isLoadingKey } = useGoogleMapsKey();
+// Inner map component that only renders when API key is available
+function ListingsMapInner({ listings, apiKey }: { listings: Listing[]; apiKey: string }) {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
 
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: apiKey || "",
+    googleMapsApiKey: apiKey,
     id: "google-map-script",
   });
 
@@ -118,15 +118,7 @@ export function ListingsMap({ listings }: ListingsMapProps) {
     setSelectedListing(null);
   }, []);
 
-  if (isLoadingKey) {
-    return (
-      <div className="w-full h-[400px] bg-secondary rounded-xl flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-christmas" />
-      </div>
-    );
-  }
-
-  if (!apiKey || loadError) {
+  if (loadError) {
     return (
       <div className="w-full h-[400px] bg-secondary rounded-xl flex items-center justify-center">
         <div className="text-center text-muted-foreground">
@@ -214,4 +206,31 @@ export function ListingsMap({ listings }: ListingsMapProps) {
       </GoogleMap>
     </div>
   );
+}
+
+// Wrapper component that fetches the API key first
+export function ListingsMap({ listings }: ListingsMapProps) {
+  const { apiKey, isLoading: isLoadingKey } = useGoogleMapsKey();
+
+  if (isLoadingKey) {
+    return (
+      <div className="w-full h-[400px] bg-secondary rounded-xl flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-christmas" />
+      </div>
+    );
+  }
+
+  if (!apiKey) {
+    return (
+      <div className="w-full h-[400px] bg-secondary rounded-xl flex items-center justify-center">
+        <div className="text-center text-muted-foreground">
+          <MapPin className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <p>Map unavailable</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Only render the inner map component once we have the API key
+  return <ListingsMapInner listings={listings} apiKey={apiKey} />;
 }
