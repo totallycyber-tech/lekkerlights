@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
+import { GoogleMap, useLoadScript, MarkerF, InfoWindowF } from "@react-google-maps/api";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,13 +13,48 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { mockListings, provinces } from "@/data/mockListings";
-import { MapPin, LayoutGrid, List, ExternalLink, Search } from "lucide-react";
+import { MapPin, LayoutGrid, List, ExternalLink, Search, Loader2 } from "lucide-react";
+
+const GOOGLE_MAPS_API_KEY = "AIzaSyAH-g4xwt6nXkCVlRC0eSYkM7-Q19_4gAo";
+
+const mapContainerStyle = {
+  width: "100%",
+  height: "100%",
+};
+
+// Center on South Africa
+const defaultCenter = {
+  lat: -28.4793,
+  lng: 24.6727,
+};
+
+const mapOptions: google.maps.MapOptions = {
+  disableDefaultUI: false,
+  zoomControl: true,
+  mapTypeControl: false,
+  streetViewControl: false,
+  fullscreenControl: true,
+  styles: [
+    {
+      featureType: "poi",
+      elementType: "labels",
+      stylers: [{ visibility: "off" }],
+    },
+  ],
+};
 
 export default function MapView() {
   const [selectedProvince, setSelectedProvince] = useState<string>('all');
   const [citySearch, setCitySearch] = useState('');
   const [suburbSearch, setSuburbSearch] = useState('');
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
+  const [hoveredListing, setHoveredListing] = useState<string | null>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const listingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+  });
 
   const filteredListings = useMemo(() => {
     return mockListings.filter(listing => {
@@ -43,6 +79,55 @@ export default function MapView() {
   };
 
   const hasActiveFilters = selectedProvince !== 'all' || citySearch || suburbSearch;
+
+  const onMapLoad = useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
+  }, []);
+
+  // Fit bounds to show all filtered listings
+  useEffect(() => {
+    if (!mapRef.current || filteredListings.length === 0) return;
+
+    const bounds = new google.maps.LatLngBounds();
+    filteredListings.forEach((listing) => {
+      if (listing.location.lat && listing.location.lng) {
+        bounds.extend({ lat: listing.location.lat, lng: listing.location.lng });
+      }
+    });
+
+    // Only fit bounds if we have valid coordinates
+    if (!bounds.isEmpty()) {
+      mapRef.current.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
+      
+      // Limit max zoom when fitting bounds
+      const listener = google.maps.event.addListener(mapRef.current, "idle", () => {
+        const zoom = mapRef.current?.getZoom();
+        if (zoom && zoom > 15) {
+          mapRef.current?.setZoom(15);
+        }
+        google.maps.event.removeListener(listener);
+      });
+    }
+  }, [filteredListings, isLoaded]);
+
+  // Pan to selected listing
+  const handleListingClick = (listingId: string) => {
+    setSelectedListing(listingId);
+    const listing = mockListings.find(l => l.id === listingId);
+    if (listing && mapRef.current && listing.location.lat && listing.location.lng) {
+      mapRef.current.panTo({ lat: listing.location.lat, lng: listing.location.lng });
+      mapRef.current.setZoom(14);
+    }
+  };
+
+  // Scroll to listing in sidebar when marker is clicked
+  const handleMarkerClick = (listingId: string) => {
+    setSelectedListing(listingId);
+    const listingElement = listingRefs.current[listingId];
+    if (listingElement) {
+      listingElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -125,48 +210,92 @@ export default function MapView() {
         <div className="flex-1 flex flex-col lg:flex-row">
           {/* Map Area */}
           <div className="flex-1 relative bg-secondary min-h-[300px] lg:min-h-0">
-            {/* Placeholder Map */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center p-8 max-w-md">
-                <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-christmas/10 flex items-center justify-center festive-glow">
-                  <MapPin className="h-12 w-12 text-christmas animate-glow" />
+            {loadError && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center p-8">
+                  <MapPin className="h-12 w-12 text-destructive mx-auto mb-4" />
+                  <p className="text-destructive">Error loading maps</p>
                 </div>
-                <h2 className="font-display text-xl font-semibold mb-2">
-                  Interactive Map Coming Soon
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  We're working on an interactive map to help you discover Christmas displays near you. 
-                  Use the filters above to find displays by location!
-                </p>
               </div>
-            </div>
+            )}
 
-            {/* Map Markers (Visual representation) */}
-            <div className="absolute inset-0 pointer-events-none">
-              {filteredListings.map((listing, index) => {
-                const left = 10 + (index * 15) % 80;
-                const top = 15 + (index * 20) % 70;
-                return (
-                  <button
-                    key={listing.id}
-                    className="absolute pointer-events-auto"
-                    style={{ left: `${left}%`, top: `${top}%` }}
-                    onClick={() => setSelectedListing(listing.id)}
+            {!isLoaded && !loadError && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center p-8">
+                  <Loader2 className="h-12 w-12 text-christmas mx-auto mb-4 animate-spin" />
+                  <p className="text-muted-foreground">Loading map...</p>
+                </div>
+              </div>
+            )}
+
+            {isLoaded && !loadError && (
+              <GoogleMap
+                mapContainerStyle={mapContainerStyle}
+                center={defaultCenter}
+                zoom={6}
+                options={mapOptions}
+                onLoad={onMapLoad}
+              >
+                {filteredListings.map((listing) => (
+                  listing.location.lat && listing.location.lng && (
+                    <MarkerF
+                      key={listing.id}
+                      position={{ lat: listing.location.lat, lng: listing.location.lng }}
+                      onClick={() => handleMarkerClick(listing.id)}
+                      icon={{
+                        url: selectedListing === listing.id || hoveredListing === listing.id
+                          ? "data:image/svg+xml," + encodeURIComponent(`
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+                                <circle cx="24" cy="24" r="20" fill="#dc2626" stroke="#fff" stroke-width="3"/>
+                                <text x="24" y="32" font-size="24" text-anchor="middle">🎄</text>
+                              </svg>
+                            `)
+                          : "data:image/svg+xml," + encodeURIComponent(`
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+                                <circle cx="20" cy="20" r="16" fill="#166534" stroke="#fff" stroke-width="2"/>
+                                <text x="20" y="27" font-size="18" text-anchor="middle">🎄</text>
+                              </svg>
+                            `),
+                        scaledSize: selectedListing === listing.id || hoveredListing === listing.id
+                          ? new google.maps.Size(48, 48)
+                          : new google.maps.Size(40, 40),
+                        anchor: selectedListing === listing.id || hoveredListing === listing.id
+                          ? new google.maps.Point(24, 24)
+                          : new google.maps.Point(20, 20),
+                      }}
+                      animation={selectedListing === listing.id ? google.maps.Animation.BOUNCE : undefined}
+                    />
+                  )
+                ))}
+
+                {/* Info Window for selected listing */}
+                {selected && selected.location.lat && selected.location.lng && (
+                  <InfoWindowF
+                    position={{ lat: selected.location.lat, lng: selected.location.lng }}
+                    onCloseClick={() => setSelectedListing(null)}
+                    options={{ pixelOffset: new google.maps.Size(0, -35) }}
                   >
-                    <div className={`
-                      w-10 h-10 rounded-full flex items-center justify-center
-                      transition-all duration-200 cursor-pointer
-                      ${selectedListing === listing.id 
-                        ? 'bg-christmas scale-125 shadow-glow' 
-                        : 'bg-card border border-border hover:bg-christmas/20'
-                      }
-                    `}>
-                      <span className="text-lg">🎄</span>
+                    <div className="p-2 max-w-[200px]">
+                      <img 
+                        src={selected.photos[0]} 
+                        alt={selected.title}
+                        className="w-full h-20 object-cover rounded mb-2"
+                      />
+                      <h3 className="font-semibold text-sm text-gray-900">{selected.title}</h3>
+                      <p className="text-xs text-gray-600 mb-2">
+                        {selected.location.suburb}, {selected.location.city}
+                      </p>
+                      <a 
+                        href={`/listing/${selected.id}`}
+                        className="text-xs text-blue-600 hover:underline"
+                      >
+                        View Details →
+                      </a>
                     </div>
-                  </button>
-                );
-              })}
-            </div>
+                  </InfoWindowF>
+                )}
+              </GoogleMap>
+            )}
           </div>
 
           {/* Sidebar List */}
@@ -192,6 +321,7 @@ export default function MapView() {
                 {filteredListings.map((listing) => (
                   <div 
                     key={listing.id}
+                    ref={(el) => { listingRefs.current[listing.id] = el; }}
                     className={`
                       p-4 cursor-pointer transition-colors
                       ${selectedListing === listing.id 
@@ -199,7 +329,9 @@ export default function MapView() {
                         : 'hover:bg-secondary'
                       }
                     `}
-                    onClick={() => setSelectedListing(listing.id)}
+                    onClick={() => handleListingClick(listing.id)}
+                    onMouseEnter={() => setHoveredListing(listing.id)}
+                    onMouseLeave={() => setHoveredListing(null)}
                   >
                     <div className="flex gap-3">
                       <img 
