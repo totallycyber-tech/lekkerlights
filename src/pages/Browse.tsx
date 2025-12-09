@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchFilters } from "@/components/SearchFilters";
@@ -8,6 +8,7 @@ import { mockListings } from "@/data/mockListings";
 import { LayoutGrid, Map, Sparkles, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useFavorites } from "@/hooks/use-favorites";
+import { usePopularity } from "@/hooks/use-popularity";
 
 export default function Browse() {
   const [filters, setFilters] = useState({
@@ -18,6 +19,12 @@ export default function Browse() {
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
+  const { isPopular, trackDirectionsClick, refreshFavoritesCount } = usePopularity();
+
+  // Refresh popularity counts when favorites change
+  useEffect(() => {
+    refreshFavoritesCount();
+  }, [favorites, refreshFavoritesCount]);
 
   const filteredListings = useMemo(() => {
     return mockListings.filter((listing) => {
@@ -131,6 +138,8 @@ export default function Browse() {
                   listing={listing}
                   isFavorite={isFavorite(listing.id)}
                   onToggleFavorite={toggleFavorite}
+                  isPopular={isPopular(listing.id)}
+                  onDirectionsClick={trackDirectionsClick}
                 />
               ))}
             </div>

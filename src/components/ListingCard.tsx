@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -10,9 +10,18 @@ interface ListingCardProps {
   className?: string;
   isFavorite?: boolean;
   onToggleFavorite?: (listingId: string) => void;
+  isPopular?: boolean;
+  onDirectionsClick?: (listingId: string) => void;
 }
 
-export function ListingCard({ listing, className, isFavorite = false, onToggleFavorite }: ListingCardProps) {
+export function ListingCard({ 
+  listing, 
+  className, 
+  isFavorite = false, 
+  onToggleFavorite,
+  isPopular = false,
+  onDirectionsClick,
+}: ListingCardProps) {
   const getDirectionsUrl = () => {
     const address = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}, ${listing.location.postalCode}`;
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
@@ -58,13 +67,14 @@ export function ListingCard({ listing, className, isFavorite = false, onToggleFa
           🎄 Christmas
         </Badge>
 
-        {/* Featured Badge */}
-        {listing.featured && (
+        {/* Popular Badge */}
+        {isPopular && (
           <Badge 
             variant="default"
-            className="absolute top-3 right-3 bg-primary/90"
+            className="absolute top-3 right-3 bg-amber-500/90 text-white"
           >
-            ⭐ Featured
+            <TrendingUp className="h-3 w-3 mr-1" />
+            Popular
           </Badge>
         )}
 
@@ -114,7 +124,10 @@ export function ListingCard({ listing, className, isFavorite = false, onToggleFa
           href={getDirectionsUrl()}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDirectionsClick?.(listing.id);
+          }}
           className="inline-flex items-center gap-1 text-sm text-christmas hover:text-christmas/80 transition-colors"
         >
           <ExternalLink className="h-4 w-4" />
