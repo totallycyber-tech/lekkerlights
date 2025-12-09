@@ -63,6 +63,8 @@ export default function CreateListing() {
   const [nameVisible, setNameVisible] = useState(true);
   const [emailVisible, setEmailVisible] = useState(true);
   const [phoneVisible, setPhoneVisible] = useState(true);
+  const [showComplexField, setShowComplexField] = useState(false);
+  const [showUnitField, setShowUnitField] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -292,28 +294,72 @@ export default function CreateListing() {
                   )}
                 </div>
 
-                {/* Complex/Estate Details */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="complexName">Complex/Estate Name</Label>
-                    <Input
-                      id="complexName"
-                      placeholder="e.g., Silver Lakes Estate"
-                      value={formData.complexName}
-                      onChange={(e) => handleChange('complexName', e.target.value)}
-                      className="bg-secondary"
+                {/* Complex/Estate Toggle */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="showComplex" className="text-sm font-medium cursor-pointer">
+                        Located in a complex or estate?
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Enable if your home is within a gated community, security estate, or apartment complex
+                      </p>
+                    </div>
+                    <Switch
+                      id="showComplex"
+                      checked={showComplexField}
+                      onCheckedChange={(checked) => {
+                        setShowComplexField(checked);
+                        if (!checked) handleChange('complexName', '');
+                      }}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="unitNo">Unit No</Label>
-                    <Input
-                      id="unitNo"
-                      placeholder="e.g., Unit 12"
-                      value={formData.unitNo}
-                      onChange={(e) => handleChange('unitNo', e.target.value)}
-                      className="bg-secondary"
+                  {showComplexField && (
+                    <div className="space-y-2 pl-4 border-l-2 border-christmas/30">
+                      <Label htmlFor="complexName">Complex/Estate Name</Label>
+                      <Input
+                        id="complexName"
+                        placeholder="e.g., Silver Lakes Estate"
+                        value={formData.complexName}
+                        onChange={(e) => handleChange('complexName', e.target.value)}
+                        className="bg-secondary"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Unit No Toggle */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="showUnit" className="text-sm font-medium cursor-pointer">
+                        Have a unit or flat number?
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Enable if visitors need a unit, flat, or house number to find you within the complex
+                      </p>
+                    </div>
+                    <Switch
+                      id="showUnit"
+                      checked={showUnitField}
+                      onCheckedChange={(checked) => {
+                        setShowUnitField(checked);
+                        if (!checked) handleChange('unitNo', '');
+                      }}
                     />
                   </div>
+                  {showUnitField && (
+                    <div className="space-y-2 pl-4 border-l-2 border-christmas/30">
+                      <Label htmlFor="unitNo">Unit / Flat / House Number</Label>
+                      <Input
+                        id="unitNo"
+                        placeholder="e.g., Unit 12, Flat 3A, House 45"
+                        value={formData.unitNo}
+                        onChange={(e) => handleChange('unitNo', e.target.value)}
+                        className="bg-secondary"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
