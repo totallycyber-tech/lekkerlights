@@ -3,9 +3,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchFilters, SearchFilters as SearchFiltersType } from "@/components/SearchFilters";
 import { ListingCard } from "@/components/ListingCard";
+import { ListingsMap } from "@/components/ListingsMap";
 import { Button } from "@/components/ui/button";
 import { mockListings, transformDbListing, Listing } from "@/data/mockListings";
-import { Sparkles, Heart, Loader2, MapPin, ExternalLink } from "lucide-react";
+import { Sparkles, Heart, Loader2, MapPin, ExternalLink, Map } from "lucide-react";
 import { useFavorites } from "@/hooks/use-favorites";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useListings } from "@/hooks/use-listings";
@@ -227,27 +228,38 @@ export default function Browse() {
                 ))}
               </div>
 
-              {/* Google Maps Link */}
-              {googleMapsUrl && (
-                <div className="mt-12 flex justify-center">
-                  <a
-                    href={googleMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group"
-                  >
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="gap-3 border-christmas/30 hover:border-christmas hover:bg-christmas/10 transition-all"
-                    >
-                      <MapPin className="h-5 w-5 text-christmas" />
-                      <span>View these on Google Maps</span>
-                      <ExternalLink className="h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
-                    </Button>
-                  </a>
+              {/* Embedded Map with Christmas Tree Markers */}
+              <div className="mt-12 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Map className="h-5 w-5 text-christmas" />
+                  <h2 className="font-display text-xl font-semibold">
+                    Map View
+                  </h2>
                 </div>
-              )}
+                <ListingsMap listings={filteredListings} />
+                
+                {/* Google Maps External Link */}
+                {googleMapsUrl && (
+                  <div className="flex justify-center pt-4">
+                    <a
+                      href={googleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group"
+                    >
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="gap-3 border-christmas/30 hover:border-christmas hover:bg-christmas/10 transition-all"
+                      >
+                        <MapPin className="h-5 w-5 text-christmas" />
+                        <span>Open in Google Maps</span>
+                        <ExternalLink className="h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+                      </Button>
+                    </a>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <div className="text-center py-16">
