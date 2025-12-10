@@ -32,6 +32,9 @@ const defaultCenter = {
 
 const defaultZoom = 5;
 
+// Libraries array must be static to prevent reloading
+const libraries: ("places")[] = ["places"];
+
 // Christmas tree marker SVG - regular
 const createTreeMarker = (isFavorite: boolean) => {
   const heartIcon = isFavorite 
@@ -85,20 +88,21 @@ const mapOptions: google.maps.MapOptions = {
   ],
 };
 
-export function ListingsMap({
+// Inner component that only renders when API key is available
+function ListingsMapInner({
+  apiKey,
   listings,
   favorites,
   onToggleFavorite,
   onDirectionsClick,
   reviewStats,
-}: ListingsMapProps) {
-  const { apiKey, isLoading: keyLoading, error: keyError } = useGoogleMapsKey();
+}: ListingsMapProps & { apiKey: string }) {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: apiKey || "",
-    libraries: ["places"],
+    googleMapsApiKey: apiKey,
+    libraries,
   });
 
   // Filter listings with valid coordinates
@@ -150,32 +154,21 @@ export function ListingsMap({
     setSelectedListing(null);
   };
 
-  if (keyLoading) {
-    return (
-      <div className="h-full flex items-center justify-center bg-muted/30 rounded-lg">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-christmas mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">Loading map...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (keyError || loadError) {
+  if (loadError) {
     return (
       <div className="h-full flex items-center justify-center bg-muted/30 rounded-lg">
         <div className="text-center p-6">
           <div className="text-4xl mb-4">🗺️</div>
           <h3 className="font-semibold mb-2">Unable to load map</h3>
           <p className="text-sm text-muted-foreground">
-            {keyError || "There was an error loading Google Maps. Please try again later."}
+            There was an error loading Google Maps. Please try again later.
           </p>
         </div>
       </div>
     );
   }
 
-  if (!isLoaded || !apiKey) {
+  if (!isLoaded) {
     return (
       <div className="h-full flex items-center justify-center bg-muted/30 rounded-lg">
         <Loader2 className="h-8 w-8 animate-spin text-christmas" />
@@ -231,4 +224,36 @@ export function ListingsMap({
       )}
     </GoogleMap>
   );
+}
+
+// Wrapper component that fetches the API key first
+export function ListingsMap(props: ListingsMapProps) {
+  const { apiKey, isLoading: keyLoading, error: keyError } = useGoogleMapsKey();
+
+  if (keyLoading) {
+    return (
+      <div className="h-full flex items-center justify-center bg-muted/30 rounded-lg">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-christmas mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">Loading map...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (keyError || !apiKey) {
+    return (
+      <div className="h-full flex items-center justify-center bg-muted/30 rounded-lg">
+        <div className="text-center p-6">
+          <div className="text-4xl mb-4">🗺️</div>
+          <h3 className="font-semibold mb-2">Unable to load map</h3>
+          <p className="text-sm text-muted-foreground">
+            {keyError || "Map configuration not available. Please try again later."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <ListingsMapInner {...props} apiKey={apiKey} />;
 }
