@@ -1,9 +1,9 @@
-import { useMemo, useState, useCallback, useEffect } from "react";
-import { GoogleMap, Marker, InfoWindow } from "@react-google-maps/api";
+import { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
 import { Listing } from "@/data/mockListings";
-import { MapInfoWindow } from "./MapInfoWindow";
 import { Loader2 } from "lucide-react";
+import { createRoot } from "react-dom/client";
+import { MapInfoWindow } from "./MapInfoWindow";
 
 interface ReviewStats {
   listing_id: string;
@@ -18,11 +18,6 @@ interface ListingsMapProps {
   onDirectionsClick: (id: string) => void;
   reviewStats: Record<string, ReviewStats> | null;
 }
-
-const mapContainerStyle = {
-  width: "100%",
-  height: "100%",
-};
 
 // South Africa center
 const defaultCenter = {
@@ -94,8 +89,24 @@ function ListingsMapInner({
   onDirectionsClick,
   reviewStats,
 }: ListingsMapProps & { apiKey: string }) {
-  const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
+  const infoWindowRootRef = useRef<ReturnType<typeof createRoot> | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
+
+  // Filter listings with valid coordinates
+  const listingsWithCoords = useMemo(() => {
+    return listings.filter(
+      (listing) =>
+        listing.location.lat !== undefined &&
+        listing.location.lng !== undefined &&
+        listing.location.lat !== null &&
+        listing.location.lng !== null
+    );
+  }, [listings]);
 
   // Load Google Maps script if not already loaded
   useEffect(() => {
@@ -126,23 +137,84 @@ function ListingsMapInner({
     script.onload = () => setIsLoaded(true);
     document.head.appendChild(script);
   }, [apiKey]);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
 
-  // Filter listings with valid coordinates
-  const listingsWithCoords = useMemo(() => {
-    return listings.filter(
-      (listing) =>
-        listing.location.lat !== undefined &&
-        listing.location.lng !== undefined &&
-        listing.location.lat !== null &&
-        listing.location.lng !== null
-    );
-  }, [listings]);
+  // Initialize map
+  useEffect(() => {
+    if (!isLoaded || !mapContainerRef.current || mapRef.current) return;
 
-  // Calculate bounds to fit all markers
-  const onLoad = useCallback((mapInstance: google.maps.Map) => {
-    setMap(mapInstance);
-    
+    mapRef.current = new google.maps.Map(mapContainerRef.current, {
+      center: defaultCenter,
+      zoom: defaultZoom,
+      ...mapOptions,
+    });
+
+    infoWindowRef.current = new google.maps.InfoWindow();
+  }, [isLoaded]);
+
+  // Update markers when listings change
+  useEffect(() => {
+    if (!isLoaded || !mapRef.current) return;
+
+    // Clear existing markers
+    markersRef.current.forEach((marker) => marker.setMap(null));
+    markersRef.current = [];
+
+    // Create new markers
+    listingsWithCoords.forEach((listing) => {
+      const marker = new google.maps.Marker({
+        position: {
+          lat: listing.location.lat!,
+          lng: listing.location.lng!,
+        },
+        map: mapRef.current,
+        icon: {
+          url: createTreeMarker(favorites.includes(listing.id)),
+          scaledSize: new google.maps.Size(40, 48),
+          anchor: new google.maps.Point(20, 48),
+        },
+        animation: google.maps.Animation.DROP,
+      });
+
+      marker.addListener("click", () => {
+        setSelectedListing(listing);
+        
+        if (infoWindowRef.current && mapRef.current) {
+          // Create a container for React content
+          const container = document.createElement("div");
+          
+          // Clean up previous root if exists
+          if (infoWindowRootRef.current) {
+            infoWindowRootRef.current.unmount();
+          }
+          
+          // Create new root and render
+          infoWindowRootRef.current = createRoot(container);
+          infoWindowRootRef.current.render(
+            <MapInfoWindow
+              listing={listing}
+              isFavorite={favorites.includes(listing.id)}
+              onToggleFavorite={onToggleFavorite}
+              onDirectionsClick={onDirectionsClick}
+              reviewStats={reviewStats?.[listing.id] || null}
+            />
+          );
+
+          infoWindowRef.current.setContent(container);
+          infoWindowRef.current.setPosition({
+            lat: listing.location.lat!,
+            lng: listing.location.lng!,
+          });
+          infoWindowRef.current.setOptions({
+            pixelOffset: new google.maps.Size(0, -48),
+          });
+          infoWindowRef.current.open(mapRef.current);
+        }
+      });
+
+      markersRef.current.push(marker);
+    });
+
+    // Fit bounds to show all markers
     if (listingsWithCoords.length > 0) {
       const bounds = new google.maps.LatLngBounds();
       listingsWithCoords.forEach((listing) => {
@@ -153,30 +225,26 @@ function ListingsMapInner({
           });
         }
       });
-      mapInstance.fitBounds(bounds);
+      mapRef.current.fitBounds(bounds);
       
       // Don't zoom in too much for single marker
-      google.maps.event.addListenerOnce(mapInstance, 'bounds_changed', () => {
-        const zoom = mapInstance.getZoom();
+      google.maps.event.addListenerOnce(mapRef.current, 'bounds_changed', () => {
+        const zoom = mapRef.current?.getZoom();
         if (zoom && zoom > 15) {
-          mapInstance.setZoom(15);
+          mapRef.current?.setZoom(15);
         }
       });
     }
-  }, [listingsWithCoords]);
+  }, [isLoaded, listingsWithCoords, favorites, onToggleFavorite, onDirectionsClick, reviewStats]);
 
-  const onUnmount = useCallback(() => {
-    setMap(null);
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (infoWindowRootRef.current) {
+        infoWindowRootRef.current.unmount();
+      }
+    };
   }, []);
-
-  const handleMarkerClick = (listing: Listing) => {
-    setSelectedListing(listing);
-  };
-
-  const handleInfoWindowClose = () => {
-    setSelectedListing(null);
-  };
-
 
   if (!isLoaded) {
     return (
@@ -187,52 +255,10 @@ function ListingsMapInner({
   }
 
   return (
-    <GoogleMap
-      mapContainerStyle={mapContainerStyle}
-      center={defaultCenter}
-      zoom={defaultZoom}
-      options={mapOptions}
-      onLoad={onLoad}
-      onUnmount={onUnmount}
-    >
-      {listingsWithCoords.map((listing) => (
-        <Marker
-          key={listing.id}
-          position={{
-            lat: listing.location.lat!,
-            lng: listing.location.lng!,
-          }}
-          icon={{
-            url: createTreeMarker(favorites.includes(listing.id)),
-            scaledSize: new google.maps.Size(40, 48),
-            anchor: new google.maps.Point(20, 48),
-          }}
-          onClick={() => handleMarkerClick(listing)}
-          animation={google.maps.Animation.DROP}
-        />
-      ))}
-
-      {selectedListing && selectedListing.location.lat && selectedListing.location.lng && (
-        <InfoWindow
-          position={{
-            lat: selectedListing.location.lat,
-            lng: selectedListing.location.lng,
-          }}
-          onCloseClick={handleInfoWindowClose}
-          options={{
-            pixelOffset: new google.maps.Size(0, -48),
-          }}
-        >
-          <MapInfoWindow
-            listing={selectedListing}
-            isFavorite={favorites.includes(selectedListing.id)}
-            onToggleFavorite={onToggleFavorite}
-            onDirectionsClick={onDirectionsClick}
-            reviewStats={reviewStats?.[selectedListing.id] || null}
-          />
-        </InfoWindow>
-      )}
-    </GoogleMap>
+    <div 
+      ref={mapContainerRef} 
+      className="w-full h-full rounded-lg overflow-hidden"
+    />
   );
 }
 
