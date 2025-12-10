@@ -5,7 +5,7 @@ export default function TermsOfService() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
-      <main className="flex-1 container mx-auto px-4 py-12">
+      <main className="flex-1 container mx-auto px-4 pt-24 pb-12">
         <article className="max-w-4xl mx-auto prose prose-invert">
           <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
             Lekker Lights - Terms of Service
