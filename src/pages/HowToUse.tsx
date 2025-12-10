@@ -645,6 +645,36 @@ export default function HowToUse() {
                   Privacy & Legal
                 </h3>
                 <Accordion type="single" collapsible className="space-y-2">
+                  <AccordionItem value="community-listings" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      Who can submit a listing?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      Anyone can submit a listing! You don't have to be the homeowner – if you've spotted an amazing Christmas 
+                      display while out and about, you're welcome to list it here to share with the community. We encourage 
+                      neighbours, friends, and passers-by to help grow our directory of festive displays. Just make sure the 
+                      information you provide is accurate and respectful of the homeowner's privacy.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="homeowner-removal" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      I'm a homeowner and want my property removed. What do I do?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      We respect your right to privacy. If your property has been listed without your consent and you'd like 
+                      it removed, you have several options:
+                      <ul className="list-disc list-inside mt-2 space-y-1">
+                        <li>Use the <strong>"Report Listing"</strong> button on the listing page and select "Privacy concern"</li>
+                        <li>If you have access to the email used to create the listing, you can{" "}
+                          <Link to="/resend-edit-link" className="text-primary hover:underline">request an edit link</Link>{" "}
+                          to remove it yourself</li>
+                        <li>Contact us directly using the Contact Us form</li>
+                      </ul>
+                      <p className="mt-2">We aim to process removal requests within 1-2 business days.</p>
+                    </AccordionContent>
+                  </AccordionItem>
+
                   <AccordionItem value="privacy-policy" className="border-b-0">
                     <AccordionTrigger className="hover:no-underline py-3">
                       Where can I find the Privacy Policy?

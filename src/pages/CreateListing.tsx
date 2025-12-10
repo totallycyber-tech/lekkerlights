@@ -391,6 +391,20 @@ export default function CreateListing() {
               <p className="text-muted-foreground">
                 Share your Christmas decorations with your community and help spread the festive joy!
               </p>
+              
+              {/* Community Disclaimer */}
+              <div className="bg-muted/50 rounded-lg border border-border p-4 text-sm">
+                <p className="text-muted-foreground leading-relaxed">
+                  <strong className="text-foreground">Important:</strong> Listings on Lekker Lights can be submitted by anyone – not just homeowners. 
+                  If you've spotted an amazing Christmas display, you're welcome to list it here to share with the community. 
+                  However, please ensure you provide accurate information and respect the privacy of homeowners.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mt-2">
+                  If you are a homeowner and would prefer your property not be listed, you can{" "}
+                  <Link to="/resend-edit-link" className="text-primary hover:underline">request an edit link</Link>{" "}
+                  to remove it, or use the "Report Listing" feature on any listing page to request removal.
+                </p>
+              </div>
             </div>
 
             {/* Form */}

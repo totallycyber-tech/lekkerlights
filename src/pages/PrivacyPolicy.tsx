@@ -11,13 +11,16 @@ export default function PrivacyPolicy() {
           <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
             Lekker Lights - Privacy Policy
           </h1>
-          <p className="text-muted-foreground mb-8">Last updated: 9 December 2025</p>
+          <p className="text-muted-foreground mb-8">Last updated: 10 December 2025</p>
 
           <section className="space-y-6">
             <div>
               <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">1. Introduction</h2>
               <p className="text-muted-foreground leading-relaxed">
                 Lekker Lights ("Lekker Lights", "we", "us", or "our") provides an online platform at https://lekkerlights.co.za ("Website") that allows people to list and discover festive light displays at homes and properties ("Service"). This Privacy Policy explains how we collect, use, store, and protect your personal information when you use our Website and related services.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                <strong>Important:</strong> Listings on Lekker Lights may be submitted by anyone who has spotted a Christmas light display – not necessarily the homeowner or resident. Community members, neighbours, friends, and passers-by are encouraged to share displays they discover. If you are a homeowner and wish to have your property removed from the Website, please see Section 11 below for information on how to request removal.
               </p>
               <p className="text-muted-foreground leading-relaxed mt-4">
                 By using the Service and submitting a listing, review, report, or contact form, you agree to the collection and use of information in accordance with this Privacy Policy.
@@ -313,7 +316,35 @@ export default function PrivacyPolicy() {
             </div>
 
             <div>
-              <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">11. Children's Privacy</h2>
+              <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">11. Community-Submitted Listings and Homeowner Rights</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                Lekker Lights operates as a community-driven platform. Listings may be submitted by anyone who discovers a Christmas light display, including neighbours, friends, family members, or members of the public. This means that a listing for your property may have been created by someone other than yourself.
+              </p>
+
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">11.1 Your Right to Request Removal</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                If you are a homeowner or lawful occupier and your property has been listed without your knowledge or consent, you have the right to request removal of the listing. You can do this by:
+              </p>
+              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
+                <li>Using the "Report Listing" feature on the listing page and selecting "Privacy concern" as the reason;</li>
+                <li>Contacting us directly at <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a> with the address and details of the property;</li>
+                <li>If you have access to the email address used to create the listing, requesting an edit link to remove it yourself.</li>
+              </ul>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                We take removal requests seriously and aim to process them within 1-2 business days. We may contact you to verify that you are the legitimate homeowner or occupier before taking action.
+              </p>
+
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">11.2 Information About Your Property</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                When a listing is created for a property, the following information may be publicly visible: the property address (or approximate location), photos of the exterior and light display, a description, operating hours, and visitor guidance. We do not knowingly collect or display personal information about residents unless voluntarily provided by the person who submitted the listing.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                If you believe that personal information about you has been included in a listing without your consent, please contact us to request its removal.
+              </p>
+            </div>
+
+            <div>
+              <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">12. Children's Privacy</h2>
               <p className="text-muted-foreground leading-relaxed">
                 The Service is intended for use by adults. You must be at least 18 years old to submit a listing. Children may browse the site with the supervision and consent of a parent or guardian.
               </p>
@@ -323,14 +354,14 @@ export default function PrivacyPolicy() {
             </div>
 
             <div>
-              <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">12. International Transfers</h2>
+              <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">13. International Transfers</h2>
               <p className="text-muted-foreground leading-relaxed">
                 Depending on where you are located and where our service providers are based, your information may be transferred to and processed in countries other than your own. We take steps to ensure that appropriate safeguards are in place to protect your personal information in accordance with applicable data protection laws.
               </p>
             </div>
 
             <div>
-              <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">13. Changes to This Privacy Policy</h2>
+              <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">14. Changes to This Privacy Policy</h2>
               <p className="text-muted-foreground leading-relaxed">
                 We may update this Privacy Policy from time to time. When we do, we will revise the "Last updated" date at the top of this page. If changes are material, we may provide additional notice, such as by email or through the Service.
               </p>
@@ -340,7 +371,7 @@ export default function PrivacyPolicy() {
             </div>
 
             <div>
-              <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">14. Contact Us</h2>
+              <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">15. Contact Us</h2>
               <p className="text-muted-foreground leading-relaxed">
                 If you have any questions or concerns about this Privacy Policy or our data practices, please contact us at:
               </p>
