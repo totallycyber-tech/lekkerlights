@@ -509,6 +509,19 @@ export default function HowToUse() {
                     </AccordionContent>
                   </AccordionItem>
 
+                  <AccordionItem value="map-view" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      How do I use Map View?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      On the Browse Displays page, click the "Map" button next to the "Grid" button to switch to Map View. 
+                      You'll see all displays as Christmas tree markers on an interactive map of South Africa. Click on any 
+                      marker to view the display details in a panel below the map – from there you can favourite, get directions, 
+                      or view the full listing. Use the "Refresh" button to reload the latest displays. All your filters 
+                      (province, suburb, tags) also apply to the map view.
+                    </AccordionContent>
+                  </AccordionItem>
+
                   <AccordionItem value="what-are-popular" className="border-b-0">
                     <AccordionTrigger className="hover:no-underline py-3">
                       What does the "Popular" badge mean?
