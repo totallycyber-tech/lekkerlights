@@ -11,7 +11,7 @@ export default function TermsOfService() {
           <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
             Lekker Lights - Terms of Service
           </h1>
-          <p className="text-muted-foreground mb-8">Last updated: 9 December 2025</p>
+          <p className="text-muted-foreground mb-8">Last updated: 10 December 2025</p>
 
           <section className="space-y-6">
             <div>
@@ -129,10 +129,37 @@ export default function TermsOfService() {
             <div>
               <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">8. Listing Rules and Responsibilities</h2>
 
-              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">8.1 Host Responsibilities</h3>
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">8.1 Community-Submitted Listings</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Lekker Lights allows anyone to submit listings for Christmas light displays they have discovered. This means that listings may be created by:
+              </p>
+              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
+                <li>The homeowner or resident of the property;</li>
+                <li>Family members, friends, or neighbours of the homeowner;</li>
+                <li>Members of the public who have spotted the display while passing by.</li>
+              </ul>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                We encourage the community to share festive displays, but we ask that all submissions are made in good faith, with accurate information, and with respect for the privacy and preferences of homeowners.
+              </p>
+
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">8.2 Homeowner Rights and Removal Requests</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                If you are a homeowner and discover that your property has been listed without your knowledge or consent, you have the right to request removal of the listing. You may:
+              </p>
+              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
+                <li>Use the "Report Listing" feature on the listing page and select "Privacy concern" or an appropriate reason;</li>
+                <li>Contact us directly at <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a> with details of the property;</li>
+                <li>If you have access to the email address associated with the listing, request an edit link to remove it yourself.</li>
+              </ul>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                We will promptly investigate all removal requests and take appropriate action. We aim to process removal requests within 1-2 business days.
+              </p>
+
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">8.3 Submitter Responsibilities</h3>
               <p className="text-muted-foreground leading-relaxed">If you submit a listing, you agree that:</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
-                <li>You are the owner of the property or have express permission from the owner or lawful occupier to list it.</li>
+                <li>If you are not the homeowner, you are submitting the listing in good faith to share a festive display with the community;</li>
+                <li>You have not been asked by the homeowner to refrain from listing their property;</li>
                 <li>The information you provide, including address, description, tags, parking information, visitor limits, access instructions, and viewing hours, is accurate and not misleading.</li>
                 <li>Your display and any gatherings or visits comply with applicable laws, regulations, and local bylaws (including safety, noise, and traffic regulations, estate/complex rules, and municipal bylaws).</li>
                 <li>You are responsible for managing any visitors, traffic, and parking associated with your listing.</li>

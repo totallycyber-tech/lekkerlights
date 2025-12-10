@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
@@ -128,6 +129,15 @@ export default function Browse() {
               </div>
               
             </div>
+          </div>
+
+          {/* Community Disclaimer */}
+          <div className="mb-6 bg-muted/50 rounded-lg border border-border px-4 py-3 text-sm">
+            <p className="text-muted-foreground">
+              <strong className="text-foreground">Note:</strong> Listings may be submitted by community members who have spotted displays, not necessarily the homeowners themselves. 
+              If you are a homeowner and wish to have your property removed, please use the "Report Listing" feature or{" "}
+              <Link to="/resend-edit-link" className="text-primary hover:underline">request an edit link</Link>.
+            </p>
           </div>
 
           {/* Filters */}
