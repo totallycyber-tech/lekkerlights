@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BackToTop } from "@/components/BackToTop";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { mockListings, transformDbListing } from "@/data/mockListings";
@@ -296,6 +297,7 @@ export default function ListingDetail() {
       </main>
 
       <Footer />
+      <BackToTop />
     </div>
   );
 }
