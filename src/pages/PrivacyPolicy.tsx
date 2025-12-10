@@ -327,11 +327,10 @@ export default function PrivacyPolicy() {
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Using the "Report Listing" feature on the listing page and selecting "Privacy concern" as the reason;</li>
-                <li>Contacting us directly at <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a> with the address and details of the property;</li>
-                <li>If you have access to the email address used to create the listing, requesting an edit link to remove it yourself.</li>
+                <li>Contacting us directly at <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a> with the address and details of the property.</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
-                We take removal requests seriously and aim to process them within 1-2 business days. We may contact you to verify that you are the legitimate homeowner or occupier before taking action.
+                The website developer will review all removal requests and take appropriate action. We aim to process requests within 1-2 business days. We may contact you to verify that you are the legitimate homeowner or occupier before taking action. Please note that only the website developer can remove listings created by others – homeowners cannot self-remove such listings.
               </p>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">11.2 Information About Your Property</h3>

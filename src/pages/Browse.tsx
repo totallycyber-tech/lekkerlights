@@ -135,8 +135,7 @@ export default function Browse() {
           <div className="mb-6 bg-muted/50 rounded-lg border border-border px-4 py-3 text-sm">
             <p className="text-muted-foreground">
               <strong className="text-foreground">Note:</strong> Listings may be submitted by community members who have spotted displays, not necessarily the homeowners themselves. 
-              If you are a homeowner and wish to have your property removed, please use the "Report Listing" feature or{" "}
-              <Link to="/resend-edit-link" className="text-primary hover:underline">request an edit link</Link>.
+              If you are a homeowner and wish to have your property removed, please use the "Report Listing" feature on the listing page.
             </p>
           </div>
 

@@ -663,15 +663,16 @@ export default function HowToUse() {
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground pb-4">
                       We respect your right to privacy. If your property has been listed without your consent and you'd like 
-                      it removed, you have several options:
+                      it removed, please:
                       <ul className="list-disc list-inside mt-2 space-y-1">
                         <li>Use the <strong>"Report Listing"</strong> button on the listing page and select "Privacy concern"</li>
-                        <li>If you have access to the email used to create the listing, you can{" "}
-                          <Link to="/resend-edit-link" className="text-primary hover:underline">request an edit link</Link>{" "}
-                          to remove it yourself</li>
-                        <li>Contact us directly using the Contact Us form</li>
+                        <li>Or contact us directly using the Contact Us form with details of your property</li>
                       </ul>
-                      <p className="mt-2">We aim to process removal requests within 1-2 business days.</p>
+                      <p className="mt-2">
+                        The website developer will review your request and remove the listing. We aim to process removal 
+                        requests within 1-2 business days. Please note that only the website developer can remove listings 
+                        created by others.
+                      </p>
                     </AccordionContent>
                   </AccordionItem>
 

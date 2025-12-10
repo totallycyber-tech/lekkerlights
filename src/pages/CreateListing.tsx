@@ -400,9 +400,8 @@ export default function CreateListing() {
                   However, please ensure you provide accurate information and respect the privacy of homeowners.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mt-2">
-                  If you are a homeowner and would prefer your property not be listed, you can{" "}
-                  <Link to="/resend-edit-link" className="text-primary hover:underline">request an edit link</Link>{" "}
-                  to remove it, or use the "Report Listing" feature on any listing page to request removal.
+                  If you are a homeowner and would prefer your property not be listed, please use the "Report Listing" feature 
+                  on the listing page. The website developer will review your request and remove the listing.
                 </p>
               </div>
             </div>
