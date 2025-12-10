@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BackToTop } from "@/components/BackToTop";
 import { SearchFilters, SearchFilters as SearchFiltersType } from "@/components/SearchFilters";
 import { ListingCard } from "@/components/ListingCard";
 import { ListingsMap } from "@/components/ListingsMap";
@@ -274,6 +275,7 @@ export default function Browse() {
       </main>
 
       <Footer />
+      <BackToTop />
     </div>
   );
 }

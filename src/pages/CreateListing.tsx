@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BackToTop } from "@/components/BackToTop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -976,6 +977,7 @@ export default function CreateListing() {
         phoneVisible={phoneVisible}
         selectedTags={selectedTags}
       />
+      <BackToTop />
     </div>
   );
 }
