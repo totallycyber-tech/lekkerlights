@@ -1,5 +1,5 @@
-import { useMemo, useState, useCallback } from "react";
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
+import { useMemo, useState, useCallback, useEffect } from "react";
+import { GoogleMap, Marker, InfoWindow } from "@react-google-maps/api";
 import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
 import { Listing } from "@/data/mockListings";
 import { MapInfoWindow } from "./MapInfoWindow";
@@ -31,9 +31,6 @@ const defaultCenter = {
 };
 
 const defaultZoom = 5;
-
-// Libraries array must be static to prevent reloading
-const libraries: ("places")[] = ["places"];
 
 // Christmas tree marker SVG - regular
 const createTreeMarker = (isFavorite: boolean) => {
@@ -88,7 +85,7 @@ const mapOptions: google.maps.MapOptions = {
   ],
 };
 
-// Inner component that only renders when API key is available
+// Inner component that only renders when Google Maps API is available
 function ListingsMapInner({
   apiKey,
   listings,
@@ -98,12 +95,38 @@ function ListingsMapInner({
   reviewStats,
 }: ListingsMapProps & { apiKey: string }) {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: apiKey,
-    libraries,
-  });
+  // Load Google Maps script if not already loaded
+  useEffect(() => {
+    if (!apiKey) return;
+    
+    if (window.google && window.google.maps) {
+      setIsLoaded(true);
+      return;
+    }
+
+    const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+    if (existingScript) {
+      // Script exists, wait for it to load
+      const checkLoaded = setInterval(() => {
+        if (window.google && window.google.maps) {
+          setIsLoaded(true);
+          clearInterval(checkLoaded);
+        }
+      }, 100);
+      return () => clearInterval(checkLoaded);
+    }
+
+    // Load script manually
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => setIsLoaded(true);
+    document.head.appendChild(script);
+  }, [apiKey]);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
 
   // Filter listings with valid coordinates
   const listingsWithCoords = useMemo(() => {
@@ -154,19 +177,6 @@ function ListingsMapInner({
     setSelectedListing(null);
   };
 
-  if (loadError) {
-    return (
-      <div className="h-full flex items-center justify-center bg-muted/30 rounded-lg">
-        <div className="text-center p-6">
-          <div className="text-4xl mb-4">🗺️</div>
-          <h3 className="font-semibold mb-2">Unable to load map</h3>
-          <p className="text-sm text-muted-foreground">
-            There was an error loading Google Maps. Please try again later.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   if (!isLoaded) {
     return (
