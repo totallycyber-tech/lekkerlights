@@ -148,11 +148,10 @@ export default function TermsOfService() {
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Use the "Report Listing" feature on the listing page and select "Privacy concern" or an appropriate reason;</li>
-                <li>Contact us directly at <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a> with details of the property;</li>
-                <li>If you have access to the email address associated with the listing, request an edit link to remove it yourself.</li>
+                <li>Contact us directly at <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a> with details of the property.</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
-                We will promptly investigate all removal requests and take appropriate action. We aim to process removal requests within 1-2 business days.
+                The website developer will review all removal requests and take appropriate action. We aim to process removal requests within 1-2 business days. Please note that only the website developer can remove listings – homeowners cannot self-remove listings created by others.
               </p>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">8.3 Submitter Responsibilities</h3>
