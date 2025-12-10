@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchFilters, SearchFilters as SearchFiltersType } from "@/components/SearchFilters";
@@ -6,11 +6,12 @@ import { ListingCard } from "@/components/ListingCard";
 import { ListingsMap } from "@/components/ListingsMap";
 import { Button } from "@/components/ui/button";
 import { mockListings, transformDbListing, Listing } from "@/data/mockListings";
-import { Sparkles, Heart, Loader2, LayoutGrid, Map } from "lucide-react";
+import { Sparkles, Heart, Loader2, LayoutGrid, Map, RefreshCw } from "lucide-react";
 import { useFavorites } from "@/hooks/use-favorites";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useListings } from "@/hooks/use-listings";
 import { useReviewStats } from "@/hooks/use-reviews";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Browse() {
   const [filters, setFilters] = useState<SearchFiltersType>({
@@ -24,7 +25,15 @@ export default function Browse() {
     const saved = localStorage.getItem("lekker-lights-view-mode");
     return (saved === "map" || saved === "grid") ? saved : "grid";
   });
+  const [mapKey, setMapKey] = useState(0);
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
+  const queryClient = useQueryClient();
+
+  // Refresh map handler
+  const handleRefreshMap = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['listings'] });
+    setMapKey(prev => prev + 1);
+  }, [queryClient]);
 
   // Persist view mode preference
   useEffect(() => {
@@ -161,6 +170,19 @@ export default function Browse() {
                 </Button>
               </div>
               
+              {/* Refresh Map Button - only shown in map view */}
+              {viewMode === "map" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefreshMap}
+                  className="gap-1.5"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  <span className="hidden sm:inline">Refresh</span>
+                </Button>
+              )}
+              
               {/* Favourites Filter */}
               <Button
                 variant={showFavoritesOnly ? 'default' : 'outline'}
@@ -182,6 +204,7 @@ export default function Browse() {
           ) : viewMode === "map" ? (
             <div className="h-[calc(100vh-320px)] min-h-[400px] rounded-lg overflow-hidden border border-border">
               <ListingsMap
+                key={mapKey}
                 listings={filteredListings}
                 favorites={favorites}
                 onToggleFavorite={toggleFavorite}
