@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { MapPin, Loader2 } from "lucide-react";
 import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
+import { loadGoogleMaps } from "@/lib/google-maps-loader";
 
 interface AddressComponents {
   streetNumber: string;
@@ -34,17 +35,9 @@ export function AddressAutocomplete({ onAddressSelect }: AddressAutocompleteProp
   useEffect(() => {
     if (!apiKey) return;
     
-    // Load Google Maps script if not already loaded
-    if (!window.google) {
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => setIsLoaded(true);
-      document.head.appendChild(script);
-    } else {
-      setIsLoaded(true);
-    }
+    loadGoogleMaps(apiKey)
+      .then(() => setIsLoaded(true))
+      .catch((err) => console.error("Failed to load Google Maps:", err));
   }, [apiKey]);
 
   // Initialize map when coordinates are set
