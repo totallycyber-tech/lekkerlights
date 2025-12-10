@@ -88,7 +88,7 @@ export default function ResendEditLink() {
                     we've sent the edit links to that address.
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Don't see the email? Please check your <strong>spam</strong>, <strong>junk</strong>, <strong>promotions</strong>, and other folders.
+                    Don't see the email? Please check your <strong>spam</strong>, <strong>junk</strong>, and other folders.
                   </p>
                   <div className="pt-4">
                     <Button
@@ -115,7 +115,7 @@ export default function ResendEditLink() {
                       Enter the email address you used when creating your listing and we'll send you the edit links.
                     </p>
                     <p className="text-sm text-muted-foreground/80 mt-2">
-                      <strong>Tip:</strong> Edit link emails sometimes land in spam, junk, or promotions folders – please check there too!
+                      <strong>Tip:</strong> Edit link emails sometimes land in spam or junk folders – please check there too!
                     </p>
                   </div>
 
