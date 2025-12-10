@@ -3,9 +3,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchFilters, SearchFilters as SearchFiltersType } from "@/components/SearchFilters";
 import { ListingCard } from "@/components/ListingCard";
+import { ListingsMap } from "@/components/ListingsMap";
 import { Button } from "@/components/ui/button";
 import { mockListings, transformDbListing, Listing } from "@/data/mockListings";
-import { Sparkles, Heart, Loader2 } from "lucide-react";
+import { Sparkles, Heart, Loader2, LayoutGrid, Map } from "lucide-react";
 import { useFavorites } from "@/hooks/use-favorites";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useListings } from "@/hooks/use-listings";
@@ -19,7 +20,16 @@ export default function Browse() {
     tags: [],
   });
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "map">(() => {
+    const saved = localStorage.getItem("lekker-lights-view-mode");
+    return (saved === "map" || saved === "grid") ? saved : "grid";
+  });
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
+
+  // Persist view mode preference
+  useEffect(() => {
+    localStorage.setItem("lekker-lights-view-mode", viewMode);
+  }, [viewMode]);
   const { isPopular, trackDirectionsClick, refreshFavoritesCount } = usePopularity();
   const { data: dbListings, isLoading, error } = useListings();
 
@@ -114,7 +124,7 @@ export default function Browse() {
           </div>
 
           {/* Results Header */}
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
               {isLoading ? (
                 <span className="flex items-center gap-2">
@@ -128,20 +138,56 @@ export default function Browse() {
                 </>
               )}
             </p>
-            <Button
-              variant={showFavoritesOnly ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-              className="gap-2"
-            >
-              <Heart className={`h-4 w-4 ${showFavoritesOnly ? 'fill-current' : ''}`} />
-              Favourites {favoritesCount > 0 && `(${favoritesCount})`}
-            </Button>
+            <div className="flex items-center gap-2">
+              {/* View Toggle */}
+              <div className="flex rounded-md border border-border overflow-hidden">
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="rounded-none border-0 gap-1.5 px-3"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  <span className="hidden sm:inline">Grid</span>
+                </Button>
+                <Button
+                  variant={viewMode === "map" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("map")}
+                  className="rounded-none border-0 gap-1.5 px-3"
+                >
+                  <Map className="h-4 w-4" />
+                  <span className="hidden sm:inline">Map</span>
+                </Button>
+              </div>
+              
+              {/* Favourites Filter */}
+              <Button
+                variant={showFavoritesOnly ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                className="gap-2"
+              >
+                <Heart className={`h-4 w-4 ${showFavoritesOnly ? 'fill-current' : ''}`} />
+                <span className="hidden sm:inline">Favourites</span>
+                {favoritesCount > 0 && `(${favoritesCount})`}
+              </Button>
+            </div>
           </div>
 
           {isLoading ? (
             <div className="flex justify-center py-16">
               <Loader2 className="h-8 w-8 animate-spin text-christmas" />
+            </div>
+          ) : viewMode === "map" ? (
+            <div className="h-[calc(100vh-320px)] min-h-[400px] rounded-lg overflow-hidden border border-border">
+              <ListingsMap
+                listings={filteredListings}
+                favorites={favorites}
+                onToggleFavorite={toggleFavorite}
+                onDirectionsClick={trackDirectionsClick}
+                reviewStats={reviewStats || null}
+              />
             </div>
           ) : filteredListings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
