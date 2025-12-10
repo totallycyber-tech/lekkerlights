@@ -29,7 +29,11 @@ import {
   CheckCircle2,
   Users,
   Navigation,
-  Filter
+  Filter,
+  Map,
+  MousePointerClick,
+  RefreshCw,
+  LayoutGrid
 } from "lucide-react";
 
 export default function HowToUse() {
@@ -114,10 +118,41 @@ export default function HowToUse() {
                   </div>
                 </div>
 
-                {/* Step 3 */}
+                {/* Step 3 - Map View */}
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">
                     3
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Use Map View</h3>
+                    <p className="text-muted-foreground mb-3">
+                      Switch between Grid View and Map View using the toggle buttons to explore displays in different ways:
+                    </p>
+                    <ul className="space-y-2 text-muted-foreground">
+                      <li className="flex items-center gap-2">
+                        <LayoutGrid className="h-4 w-4 text-primary" />
+                        <span><strong>Grid View</strong> – Browse displays as cards with photos and details</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Map className="h-4 w-4 text-primary" />
+                        <span><strong>Map View</strong> – See all displays on an interactive map of South Africa</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <MousePointerClick className="h-4 w-4 text-primary" />
+                        <span><strong>Click markers</strong> – Click on any Christmas tree marker to view the display details below the map</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <RefreshCw className="h-4 w-4 text-primary" />
+                        <span><strong>Refresh</strong> – Use the Refresh button to reload the latest displays on the map</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Step 4 */}
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">
+                    4
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">View Display Details</h3>
@@ -145,10 +180,10 @@ export default function HowToUse() {
                   </div>
                 </div>
 
-                {/* Step 4 */}
+                {/* Step 5 */}
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">
-                    4
+                    5
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Get Directions</h3>
@@ -158,10 +193,10 @@ export default function HowToUse() {
                   </div>
                 </div>
 
-                {/* Step 5 */}
+                {/* Step 6 */}
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">
-                    5
+                    6
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Save Your Favourites</h3>
@@ -170,15 +205,15 @@ export default function HowToUse() {
                     </p>
                     <p className="text-sm text-muted-foreground flex items-center gap-2">
                       <Heart className="h-4 w-4 text-christmas" />
-                      <span>Use the "Show Favourites Only" toggle on the Browse page to see only your saved displays.</span>
+                      <span>Use the "Favourites" toggle on the Browse page to see only your saved displays.</span>
                     </p>
                   </div>
                 </div>
 
-                {/* Step 6 */}
+                {/* Step 7 */}
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">
-                    6
+                    7
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Leave a Review</h3>
