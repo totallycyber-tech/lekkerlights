@@ -114,6 +114,11 @@ export default function ResendEditLink() {
                     <p className="text-muted-foreground mt-2">
                       Enter the email address you used when creating your listing and we'll send you the edit links.
                     </p>
+                    <div className="bg-muted/50 rounded-lg p-3 mt-3">
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Note:</strong> Edit links are valid for <strong>1 hour</strong> for security. If your link has expired, request a new one here.
+                      </p>
+                    </div>
                     <p className="text-sm text-muted-foreground/80 mt-2">
                       <strong>Tip:</strong> Edit link emails sometimes land in spam or junk folders – please check there too!
                     </p>

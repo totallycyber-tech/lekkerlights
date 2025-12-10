@@ -33,10 +33,10 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get token from secure table
+    // Get token from secure table including expires_at
     const { data: tokenRecord, error: tokenError } = await supabase
       .from("listing_edit_tokens")
-      .select("edit_token")
+      .select("edit_token, expires_at")
       .eq("listing_id", listingId)
       .single();
 
@@ -55,6 +55,24 @@ const handler = async (req: Request): Promise<Response> => {
         JSON.stringify({ success: false, error: "Invalid token" }),
         { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
+    }
+
+    // Check if token has expired
+    if (tokenRecord.expires_at) {
+      const expiresAt = new Date(tokenRecord.expires_at);
+      const now = new Date();
+      
+      if (now > expiresAt) {
+        console.log("Token expired for listing:", listingId, "Expired at:", expiresAt);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: "expired",
+            message: "This edit link has expired. Please request a new edit link."
+          }),
+          { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
     }
 
     console.log("Token verified successfully for listing:", listingId);

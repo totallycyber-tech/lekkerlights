@@ -113,37 +113,42 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Found ${listings.length} listing(s) for email`);
 
-    // Get tokens from secure table
-    const listingIds = listings.map(l => l.id);
-    const { data: tokens, error: tokenError } = await supabase
-      .from("listing_edit_tokens")
-      .select("listing_id, edit_token")
-      .in("listing_id", listingIds);
-
-    if (tokenError || !tokens) {
-      console.error("Token lookup error:", tokenError);
-      throw new Error("Failed to look up edit tokens");
-    }
-
-    // Create a map of listing_id -> edit_token
-    const tokenMap = new Map(tokens.map(t => [t.listing_id, t.edit_token]));
-
+    // Calculate new expiry time (1 hour from now)
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
     const siteUrl = Deno.env.get("SITE_URL") || "https://lekkerlights.co.za";
 
-    // Build HTML for all listings with escaped content
-    const listingsHtml = listings.map(listing => {
-      const editToken = tokenMap.get(listing.id);
-      if (!editToken) return ''; // Skip if no token found
-      const editLink = `${siteUrl}/edit-listing/${listing.id}?token=${editToken}`;
+    // Generate new tokens for each listing with fresh expiry
+    const listingsHtml: string[] = [];
+    
+    for (const listing of listings) {
+      // Generate a fresh token with new expiry
+      const newToken = crypto.randomUUID();
+      
+      // Update the token in the database
+      const { error: updateError } = await supabase
+        .from("listing_edit_tokens")
+        .update({ 
+          edit_token: newToken,
+          expires_at: expiresAt 
+        })
+        .eq("listing_id", listing.id);
+
+      if (updateError) {
+        console.error("Failed to update token for listing:", listing.id, updateError);
+        continue; // Skip this listing but continue with others
+      }
+
+      const editLink = `${siteUrl}/edit-listing/${listing.id}?token=${newToken}`;
       const safeTitle = escapeHtml(listing.title);
-      return `
+      
+      listingsHtml.push(`
         <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0;">
           <h3 style="margin: 0 0 8px; color: #111827;">${safeTitle}</h3>
           <a href="${editLink}" style="display: inline-block; background: #dc2626; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-size: 14px;">Edit This Listing</a>
           <p style="color: #666; font-size: 11px; margin: 12px 0 0; word-break: break-all;">Link: ${editLink}</p>
         </div>
-      `;
-    }).filter(Boolean).join("");
+      `);
+    }
 
     // Send email with all edit links
     const res = await fetch("https://api.resend.com/emails", {
@@ -163,12 +168,13 @@ const handler = async (req: Request): Promise<Response> => {
             <p>You requested your edit links for Lekker Lights. Here ${listings.length === 1 ? "is your listing" : "are your listings"}:</p>
             
             <div style="background: #fef3c7; padding: 12px 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+              <p style="margin: 0 0 8px; color: #92400e; font-weight: bold;">⏰ These links expire in 1 hour</p>
               <p style="margin: 0; color: #92400e; font-size: 14px;">
-                <strong>⚠️ Keep these links safe!</strong> Anyone with access to these links can edit or delete your listings.
+                For security, edit links are only valid for 1 hour. If they expire, simply request new ones using the "Lost Edit Link?" feature.
               </p>
             </div>
             
-            ${listingsHtml}
+            ${listingsHtml.join("")}
             
             <p style="color: #666; font-size: 12px; margin-top: 24px;">
               If you didn't request this email, you can safely ignore it. Your listings remain unchanged.

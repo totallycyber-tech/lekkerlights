@@ -18,16 +18,19 @@ export type Database = {
         Row: {
           created_at: string
           edit_token: string
+          expires_at: string | null
           listing_id: string
         }
         Insert: {
           created_at?: string
           edit_token?: string
+          expires_at?: string | null
           listing_id: string
         }
         Update: {
           created_at?: string
           edit_token?: string
+          expires_at?: string | null
           listing_id?: string
         }
         Relationships: [

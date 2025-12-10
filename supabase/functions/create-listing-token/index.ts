@@ -46,6 +46,9 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Calculate expiry time (1 hour from now)
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
     // Check if token already exists for this listing
     const { data: existingToken } = await supabase
       .from("listing_edit_tokens")
@@ -56,12 +59,33 @@ const handler = async (req: Request): Promise<Response> => {
     let editToken: string;
 
     if (existingToken) {
-      editToken = existingToken.edit_token;
+      // Update existing token with new value and fresh expiry
+      const newToken = crypto.randomUUID();
+      const { error: updateError } = await supabase
+        .from("listing_edit_tokens")
+        .update({ 
+          edit_token: newToken,
+          expires_at: expiresAt 
+        })
+        .eq("listing_id", listingId);
+
+      if (updateError) {
+        console.error("Failed to update token:", updateError);
+        return new Response(
+          JSON.stringify({ success: false, error: "Failed to create edit token" }),
+          { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      editToken = newToken;
     } else {
-      // Create new token
+      // Create new token with expiry
       const { data: newToken, error: insertError } = await supabase
         .from("listing_edit_tokens")
-        .insert({ listing_id: listingId })
+        .insert({ 
+          listing_id: listingId,
+          expires_at: expiresAt
+        })
         .select("edit_token")
         .single();
 
@@ -96,12 +120,18 @@ const handler = async (req: Request): Promise<Response> => {
             <h1 style="color: #dc2626;">🎄 Lekker Lights</h1>
             <h2>Your Listing is Live!</h2>
             <p>Thank you for listing "<strong>${safeTitle}</strong>" on Lekker Lights!</p>
-            <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 20px 0;">
-              <p style="color: #dc2626; font-weight: bold;">⚠️ SAVE THIS EMAIL</p>
-              <p>This email contains your secure edit link. Keep it safe!</p>
+            <div style="background: #fef3c7; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+              <p style="color: #92400e; font-weight: bold; margin: 0 0 8px;">⏰ This link expires in 1 hour</p>
+              <p style="color: #92400e; margin: 0; font-size: 14px;">
+                For security, this edit link is only valid for 1 hour. If it expires, you can request a new one using the "Lost Edit Link?" feature on our website.
+              </p>
             </div>
             <p><a href="${editLink}" style="display: inline-block; background: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Edit Your Listing</a></p>
             <p style="color: #666; font-size: 12px; margin-top: 20px;">Link: ${editLink}</p>
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+            <p style="color: #666; font-size: 12px;">
+              Need a new edit link? Visit <a href="${siteUrl}/resend-edit-link" style="color: #dc2626;">our website</a> and use the "Lost Edit Link?" feature.
+            </p>
           </div>
         `,
       }),
