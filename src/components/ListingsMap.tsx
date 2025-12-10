@@ -1,9 +1,8 @@
+/// <reference types="@types/google.maps" />
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
 import { Listing } from "@/data/mockListings";
 import { Loader2 } from "lucide-react";
-import { createRoot } from "react-dom/client";
-import { MapInfoWindow } from "./MapInfoWindow";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
 
 interface ReviewStats {
@@ -18,6 +17,8 @@ interface ListingsMapProps {
   onToggleFavorite: (id: string) => void;
   onDirectionsClick: (id: string) => void;
   reviewStats: Record<string, ReviewStats> | null;
+  onSelectListing?: (listing: Listing | null) => void;
+  selectedListingId?: string | null;
 }
 
 // South Africa center
@@ -89,14 +90,14 @@ function ListingsMapInner({
   onToggleFavorite,
   onDirectionsClick,
   reviewStats,
+  onSelectListing,
+  selectedListingId,
 }: ListingsMapProps & { apiKey: string }) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
-  const infoWindowRootRef = useRef<ReturnType<typeof createRoot> | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
 
   // Filter listings with valid coordinates
   const listingsWithCoords = useMemo(() => {
@@ -156,30 +157,16 @@ function ListingsMapInner({
       });
 
       marker.addListener("click", () => {
-        setSelectedListing(listing);
+        // Notify parent component about the selection
+        onSelectListing?.(listing);
         
+        // Show simple tooltip with just the title
         if (infoWindowRef.current && mapRef.current) {
-          // Create a container for React content
-          const container = document.createElement("div");
-          
-          // Clean up previous root if exists
-          if (infoWindowRootRef.current) {
-            infoWindowRootRef.current.unmount();
-          }
-          
-          // Create new root and render
-          infoWindowRootRef.current = createRoot(container);
-          infoWindowRootRef.current.render(
-            <MapInfoWindow
-              listing={listing}
-              isFavorite={favorites.includes(listing.id)}
-              onToggleFavorite={onToggleFavorite}
-              onDirectionsClick={onDirectionsClick}
-              reviewStats={reviewStats?.[listing.id] || null}
-            />
-          );
-
-          infoWindowRef.current.setContent(container);
+          infoWindowRef.current.setContent(`
+            <div style="padding: 8px 12px; font-weight: 500; font-size: 14px;">
+              ${listing.title}
+            </div>
+          `);
           infoWindowRef.current.setPosition({
             lat: listing.location.lat!,
             lng: listing.location.lng!,
@@ -215,16 +202,8 @@ function ListingsMapInner({
         }
       });
     }
-  }, [isLoaded, listingsWithCoords, favorites, onToggleFavorite, onDirectionsClick, reviewStats]);
+  }, [isLoaded, listingsWithCoords, favorites, onSelectListing]);
 
-  // Cleanup
-  useEffect(() => {
-    return () => {
-      if (infoWindowRootRef.current) {
-        infoWindowRootRef.current.unmount();
-      }
-    };
-  }, []);
 
   if (!isLoaded) {
     return (
