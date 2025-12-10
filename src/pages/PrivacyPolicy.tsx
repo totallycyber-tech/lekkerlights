@@ -118,7 +118,7 @@ export default function PrivacyPolicy() {
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.3 Cookies and Similar Technologies</h3>
               <p className="text-muted-foreground leading-relaxed">We use cookies and similar technologies to:</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
-                <li>Remember your basic preferences (such as search filters)</li>
+                <li>Remember your basic preferences (such as search filters, view mode preference between Grid View and Map View, and favourites)</li>
                 <li>Understand how the Service is used</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-2">
@@ -129,7 +129,7 @@ export default function PrivacyPolicy() {
               <p className="text-muted-foreground leading-relaxed">
                 Our Service uses Google Maps Platform services, including Maps, Places, and Geocoding, to allow users to search for and geolocate addresses and to display maps and markers.
               </p>
-              <p className="text-muted-foreground leading-relaxed mt-2">When you use map-related features:</p>
+              <p className="text-muted-foreground leading-relaxed mt-2">When you use map-related features (including the interactive Map View on the Browse Displays page, clicking on markers to view listing details, or using the Refresh button to reload map data):</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Google may collect information such as your IP address, device details, and search queries.</li>
                 <li>Google processes this information according to its own Privacy Policy and Terms of Service.</li>

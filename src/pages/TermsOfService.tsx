@@ -23,7 +23,10 @@ export default function TermsOfService() {
             <div>
               <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">2. Description of the Service</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Lekker Lights allows property owners or residents ("Hosts") to list their festive light displays and allows visitors ("Visitors") to search for, view, rate, review, and report these displays. The Service displays listings on a map and in search results based on information submitted by Hosts, and it may show ratings and reviews submitted by Visitors.
+                Lekker Lights allows property owners or residents ("Hosts") to list their festive light displays and allows visitors ("Visitors") to search for, view, rate, review, and report these displays. The Service displays listings in a Grid View and on an interactive Map View based on information submitted by Hosts. Visitors can click on map markers to view listing details, use the Refresh button to reload the latest data, and filter displays by location and tags. The Service may show ratings and reviews submitted by Visitors.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                We also provide a How to Use page with step-by-step guides and a Frequently Asked Questions (FAQ) section to help Hosts and Visitors understand how to use the Service effectively.
               </p>
             </div>
 
