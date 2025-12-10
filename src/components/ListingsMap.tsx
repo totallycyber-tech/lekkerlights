@@ -1,9 +1,10 @@
-import { useMemo, useState, useCallback, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useGoogleMapsKey } from "@/hooks/use-google-maps-key";
 import { Listing } from "@/data/mockListings";
 import { Loader2 } from "lucide-react";
 import { createRoot } from "react-dom/client";
 import { MapInfoWindow } from "./MapInfoWindow";
+import { loadGoogleMaps } from "@/lib/google-maps-loader";
 
 interface ReviewStats {
   listing_id: string;
@@ -108,34 +109,13 @@ function ListingsMapInner({
     );
   }, [listings]);
 
-  // Load Google Maps script if not already loaded
+  // Load Google Maps using centralized loader
   useEffect(() => {
     if (!apiKey) return;
     
-    if (window.google && window.google.maps) {
-      setIsLoaded(true);
-      return;
-    }
-
-    const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
-    if (existingScript) {
-      // Script exists, wait for it to load
-      const checkLoaded = setInterval(() => {
-        if (window.google && window.google.maps) {
-          setIsLoaded(true);
-          clearInterval(checkLoaded);
-        }
-      }, 100);
-      return () => clearInterval(checkLoaded);
-    }
-
-    // Load script manually
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => setIsLoaded(true);
-    document.head.appendChild(script);
+    loadGoogleMaps(apiKey)
+      .then(() => setIsLoaded(true))
+      .catch((err) => console.error("Failed to load Google Maps:", err));
   }, [apiKey]);
 
   // Initialize map
