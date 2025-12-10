@@ -159,23 +159,6 @@ function ListingsMapInner({
       marker.addListener("click", () => {
         // Notify parent component about the selection
         onSelectListing?.(listing);
-        
-        // Show simple tooltip with just the title
-        if (infoWindowRef.current && mapRef.current) {
-          infoWindowRef.current.setContent(`
-            <div style="padding: 8px 12px; font-weight: 500; font-size: 14px;">
-              ${listing.title}
-            </div>
-          `);
-          infoWindowRef.current.setPosition({
-            lat: listing.location.lat!,
-            lng: listing.location.lng!,
-          });
-          infoWindowRef.current.setOptions({
-            pixelOffset: new google.maps.Size(0, -48),
-          });
-          infoWindowRef.current.open(mapRef.current);
-        }
       });
 
       markersRef.current.push(marker);
