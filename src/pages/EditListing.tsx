@@ -113,12 +113,23 @@ export default function EditListing() {
         });
 
         if (verifyResponse.error || !verifyResponse.data?.success) {
+          // Check if the error is due to expiry
+          const isExpired = verifyResponse.data?.error === "expired";
+          
           toast({
-            title: "Unauthorized",
-            description: "This edit link is invalid or the listing no longer exists.",
+            title: isExpired ? "Link Expired" : "Unauthorized",
+            description: isExpired 
+              ? "This edit link has expired. Please request a new edit link using the 'Lost Edit Link?' feature."
+              : "This edit link is invalid or the listing no longer exists.",
             variant: "destructive",
           });
-          navigate('/');
+          
+          // Redirect to resend edit link page if expired
+          if (isExpired) {
+            navigate('/resend-edit-link');
+          } else {
+            navigate('/');
+          }
           return;
         }
 

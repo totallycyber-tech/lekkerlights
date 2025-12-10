@@ -571,9 +571,23 @@ export default function HowToUse() {
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground pb-4">
                       When you publish your listing, we send a secure edit link to your email address. Click this link 
-                      anytime to update your listing details, photos, operating hours, or any other information. 
-                      Keep this email safe! If you lose the edit link, you can{" "}
+                      to update your listing details, photos, operating hours, or any other information. 
+                      <strong> Edit links are valid for 1 hour only</strong> for security purposes. If your link has expired 
+                      or you've lost it, you can{" "}
                       <Link to="/resend-edit-link" className="text-primary hover:underline">request a new one here</Link>.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="edit-link-expiry" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      Why did my edit link expire?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      For security reasons, edit links are only valid for <strong>1 hour</strong> after they are generated. 
+                      This prevents unauthorized access if someone else gains access to your email. When you need to make 
+                      changes to your listing, simply{" "}
+                      <Link to="/resend-edit-link" className="text-primary hover:underline">request a new edit link</Link>{" "}
+                      – a fresh link will be sent to your email immediately and will be valid for another hour.
                     </AccordionContent>
                   </AccordionItem>
 
