@@ -4,9 +4,10 @@ import { Footer } from "@/components/Footer";
 import { SearchFilters, SearchFilters as SearchFiltersType } from "@/components/SearchFilters";
 import { ListingCard } from "@/components/ListingCard";
 import { ListingsMap } from "@/components/ListingsMap";
+import { MapListingDetail } from "@/components/MapListingDetail";
 import { Button } from "@/components/ui/button";
 import { mockListings, transformDbListing, Listing } from "@/data/mockListings";
-import { Sparkles, Heart, Loader2, LayoutGrid, Map, RefreshCw } from "lucide-react";
+import { Sparkles, Heart, Loader2, LayoutGrid, Map, RefreshCw, MousePointerClick } from "lucide-react";
 import { useFavorites } from "@/hooks/use-favorites";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useListings } from "@/hooks/use-listings";
@@ -26,6 +27,7 @@ export default function Browse() {
     return (saved === "map" || saved === "grid") ? saved : "grid";
   });
   const [mapKey, setMapKey] = useState(0);
+  const [selectedMapListing, setSelectedMapListing] = useState<Listing | null>(null);
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
   const queryClient = useQueryClient();
 
@@ -202,15 +204,39 @@ export default function Browse() {
               <Loader2 className="h-8 w-8 animate-spin text-christmas" />
             </div>
           ) : viewMode === "map" ? (
-            <div className="h-[calc(100vh-320px)] min-h-[400px] rounded-lg overflow-hidden border border-border">
-              <ListingsMap
-                key={mapKey}
-                listings={filteredListings}
-                favorites={favorites}
-                onToggleFavorite={toggleFavorite}
-                onDirectionsClick={trackDirectionsClick}
-                reviewStats={reviewStats || null}
-              />
+            <div className="space-y-4">
+              {/* Map Instructions */}
+              <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-lg px-4 py-3 border border-border">
+                <MousePointerClick className="h-4 w-4 text-christmas shrink-0" />
+                <span>Click on any marker to view display details below the map</span>
+              </div>
+              
+              {/* Map */}
+              <div className="h-[calc(100vh-400px)] min-h-[350px] rounded-lg overflow-hidden border border-border">
+                <ListingsMap
+                  key={mapKey}
+                  listings={filteredListings}
+                  favorites={favorites}
+                  onToggleFavorite={toggleFavorite}
+                  onDirectionsClick={trackDirectionsClick}
+                  reviewStats={reviewStats || null}
+                  onSelectListing={setSelectedMapListing}
+                  selectedListingId={selectedMapListing?.id}
+                />
+              </div>
+              
+              {/* Selected Listing Detail Panel */}
+              {selectedMapListing && (
+                <MapListingDetail
+                  listing={selectedMapListing}
+                  isFavorite={isFavorite(selectedMapListing.id)}
+                  isPopular={isPopular(selectedMapListing.id)}
+                  onToggleFavorite={toggleFavorite}
+                  onDirectionsClick={trackDirectionsClick}
+                  onClose={() => setSelectedMapListing(null)}
+                  reviewStats={reviewStats?.[selectedMapListing.id] || null}
+                />
+              )}
             </div>
           ) : filteredListings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
