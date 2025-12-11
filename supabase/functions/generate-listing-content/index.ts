@@ -22,7 +22,7 @@ serve(async (req) => {
     let userPrompt = '';
 
     if (type === 'title') {
-      systemPrompt = `You are a creative assistant helping homeowners name their Christmas light displays. Generate catchy, festive, and memorable display titles. Keep titles concise (3-6 words). Do not use generic names. Be creative and unique.`;
+      systemPrompt = `You are a creative assistant helping South African homeowners name their Christmas light displays. Generate catchy, festive, and memorable display titles suitable for residential homes and suburban neighbourhoods. Traditional winter Christmas imagery (snowmen, sleighs, etc.) is welcome in titles as these are common decorations. Keep titles concise (3-6 words). Do not use generic names. Be creative and unique.`;
       
       const tagContext = tags?.length > 0 
         ? `The display features: ${tags.join(', ')}.` 
@@ -31,11 +31,11 @@ serve(async (req) => {
         ? `Description of the display: "${existingDescription}"` 
         : '';
       
-      userPrompt = `Generate a single creative title for a Christmas light display. ${tagContext} ${descContext}
+      userPrompt = `Generate a single creative title for a Christmas light display at a South African residential home. ${tagContext} ${descContext}
 
 Return ONLY the title text, nothing else. No quotes, no explanation.`;
     } else if (type === 'description') {
-      systemPrompt = `You are a creative assistant helping homeowners write descriptions for their Christmas light displays. Write engaging, warm, and inviting descriptions that make visitors excited to see the display. Keep descriptions between 2-4 sentences.`;
+      systemPrompt = `You are a creative assistant helping South African homeowners write descriptions for their Christmas light displays. Write engaging, warm, and inviting descriptions for residential homes in suburban neighbourhoods. Christmas in South Africa is during summer, so visitors enjoy displays during warm evenings - but traditional winter-themed decorations like snowmen and sleighs are still popular features. Keep descriptions between 2-4 sentences. Make visitors excited to drive by or walk through the display.`;
       
       const tagContext = tags?.length > 0 
         ? `The display features: ${tags.join(', ')}.` 
@@ -44,7 +44,7 @@ Return ONLY the title text, nothing else. No quotes, no explanation.`;
         ? `The display is called: "${existingTitle}"` 
         : '';
       
-      userPrompt = `Write a short, engaging description for a Christmas light display. ${titleContext} ${tagContext}
+      userPrompt = `Write a short, engaging description for a residential Christmas light display in a South African neighbourhood. ${titleContext} ${tagContext}
 
 Return ONLY the description text, nothing else. No quotes around it, no explanation. 2-4 sentences maximum.`;
     } else {
