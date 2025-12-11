@@ -109,6 +109,7 @@ export default function CreateListing() {
     setUploadProgress('Creating listings...');
 
     try {
+      // Filter youtube URLs for each listing
       const listingsData = listings.map(l => ({
         title: l.title,
         description: l.description,
@@ -118,9 +119,10 @@ export default function CreateListing() {
         city: l.city,
         province: l.province,
         postalCode: l.postalCode,
-        complexName: l.complexName || undefined,
-        unitNo: l.unitNo || undefined,
+        complexName: l.showComplexField ? (l.complexName || undefined) : undefined,
+        unitNo: l.showUnitField ? (l.unitNo || undefined) : undefined,
         tags: l.tags,
+        youtubeUrls: l.youtubeUrls?.filter((url: string) => url.trim()) || [],
         operatingHours: DAYS_OF_WEEK.some(day => l.operatingHours[day]?.enabled) 
           ? l.operatingHours 
           : { other: l.operatingHoursOther },
@@ -129,6 +131,7 @@ export default function CreateListing() {
         gateAccessInfo: l.gateAccessInfo || undefined,
       }));
 
+      // Create listings first
       const { data, error } = await supabase.functions.invoke('create-batch-listings', {
         body: {
           listings: listingsData,
@@ -142,6 +145,45 @@ export default function CreateListing() {
       });
 
       if (error) throw error;
+
+      // Upload images for each listing
+      const createdListings = data?.listings || [];
+      let uploadedCount = 0;
+      const totalWithImages = listings.filter(l => l.coverPhoto || l.additionalImages?.length > 0).length;
+      
+      for (let i = 0; i < listings.length; i++) {
+        const listing = listings[i];
+        const createdListing = createdListings[i];
+        
+        if (!createdListing?.id) continue;
+        
+        // Combine cover photo + additional images
+        const allImages: File[] = [];
+        if (listing.coverPhoto) allImages.push(listing.coverPhoto);
+        if (listing.additionalImages?.length > 0) allImages.push(...listing.additionalImages);
+        
+        if (allImages.length > 0) {
+          uploadedCount++;
+          setUploadProgress(`Uploading photos for listing ${uploadedCount}/${totalWithImages}...`);
+          
+          try {
+            const imageUrls = await uploadListingImages(allImages, createdListing.id);
+            
+            // Update listing with image URLs via edge function
+            await supabase.functions.invoke('update-listing', {
+              body: {
+                listingId: createdListing.id,
+                updates: { image_urls: imageUrls },
+                // No edit token needed - we just created this listing
+                skipTokenVerification: true,
+              },
+            });
+          } catch (uploadError) {
+            console.error(`Failed to upload images for listing ${i + 1}:`, uploadError);
+            // Continue with other listings even if one fails
+          }
+        }
+      }
 
       toast({
         title: "Listings published!",

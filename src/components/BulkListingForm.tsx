@@ -11,12 +11,18 @@ import {
   ChevronUp, 
   MapPin,
   Wand2,
-  Loader2
+  Loader2,
+  Youtube,
+  X,
+  Sparkles
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { TagSelector } from "@/components/TagSelector";
+import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
+import { ImageUploader } from "@/components/ImageUploader";
+import { YouTubePreview } from "@/components/YouTubePreview";
 import { supabase } from "@/integrations/supabase/client";
 
 const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const;
@@ -34,7 +40,7 @@ const defaultOperatingHours: OperatingHours = DAYS_OF_WEEK.reduce((acc, day) => 
   return acc;
 }, {} as OperatingHours);
 
-interface ListingEntry {
+export interface ListingEntry {
   id: string;
   title: string;
   description: string;
@@ -46,6 +52,8 @@ interface ListingEntry {
   postalCode: string;
   complexName: string;
   unitNo: string;
+  showComplexField: boolean;
+  showUnitField: boolean;
   tags: string[];
   operatingHours: OperatingHours;
   operatingHoursOther: string;
@@ -53,9 +61,12 @@ interface ListingEntry {
   maxVisitors: string;
   gateAccessInfo: string;
   addressSelected: boolean;
+  coverPhoto: File | null;
+  additionalImages: File[];
+  youtubeUrls: string[];
 }
 
-const createEmptyListing = (): ListingEntry => ({
+export const createEmptyListing = (): ListingEntry => ({
   id: crypto.randomUUID(),
   title: '',
   description: '',
@@ -67,6 +78,8 @@ const createEmptyListing = (): ListingEntry => ({
   postalCode: '',
   complexName: '',
   unitNo: '',
+  showComplexField: false,
+  showUnitField: false,
   tags: [],
   operatingHours: { ...defaultOperatingHours },
   operatingHoursOther: '',
@@ -74,6 +87,9 @@ const createEmptyListing = (): ListingEntry => ({
   maxVisitors: '',
   gateAccessInfo: '',
   addressSelected: false,
+  coverPhoto: null,
+  additionalImages: [],
+  youtubeUrls: [''],
 });
 
 interface BulkListingFormProps {
@@ -181,6 +197,48 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
     }
   };
 
+  const toggleDay = (listingId: string, day: string) => {
+    const listing = listings.find(l => l.id === listingId);
+    if (!listing) return;
+    
+    const newHours = {
+      ...listing.operatingHours,
+      [day]: { ...listing.operatingHours[day], enabled: !listing.operatingHours[day].enabled }
+    };
+    updateListing(listingId, 'operatingHours', newHours);
+  };
+
+  const updateDayTime = (listingId: string, day: string, field: 'startTime' | 'endTime', value: string) => {
+    const listing = listings.find(l => l.id === listingId);
+    if (!listing) return;
+    
+    const newHours = {
+      ...listing.operatingHours,
+      [day]: { ...listing.operatingHours[day], [field]: value }
+    };
+    updateListing(listingId, 'operatingHours', newHours);
+  };
+
+  const addYoutubeUrl = (listingId: string) => {
+    const listing = listings.find(l => l.id === listingId);
+    if (!listing || listing.youtubeUrls.length >= 3) return;
+    updateListing(listingId, 'youtubeUrls', [...listing.youtubeUrls, '']);
+  };
+
+  const removeYoutubeUrl = (listingId: string, index: number) => {
+    const listing = listings.find(l => l.id === listingId);
+    if (!listing) return;
+    updateListing(listingId, 'youtubeUrls', listing.youtubeUrls.filter((_, i) => i !== index));
+  };
+
+  const updateYoutubeUrl = (listingId: string, index: number, value: string) => {
+    const listing = listings.find(l => l.id === listingId);
+    if (!listing) return;
+    const updated = [...listing.youtubeUrls];
+    updated[index] = value;
+    updateListing(listingId, 'youtubeUrls', updated);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -233,6 +291,8 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
       phoneVisible,
     });
   };
+
+  const anyDayEnabled = (listing: ListingEntry) => DAYS_OF_WEEK.some(day => listing.operatingHours[day]?.enabled);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -302,7 +362,7 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
             </button>
 
             {expandedListing === listing.id && (
-              <div className="p-4 pt-0 border-t border-border space-y-4">
+              <div className="p-4 pt-0 border-t border-border space-y-6">
                 {/* Title */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -372,6 +432,131 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
                   )}
                 </div>
 
+                {/* Complex/Estate Toggle */}
+                <div className="space-y-3 bg-secondary/50 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>Located in a complex or estate?</Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Enable if the property is within a gated community, estate, or complex
+                      </p>
+                    </div>
+                    <Switch
+                      checked={listing.showComplexField}
+                      onCheckedChange={(checked) => updateListing(listing.id, 'showComplexField', checked)}
+                    />
+                  </div>
+                  {listing.showComplexField && (
+                    <Input
+                      value={listing.complexName}
+                      onChange={(e) => updateListing(listing.id, 'complexName', e.target.value)}
+                      placeholder="e.g., Greenview Estate"
+                      className="bg-background"
+                    />
+                  )}
+                </div>
+
+                {/* Unit/Flat Toggle */}
+                <div className="space-y-3 bg-secondary/50 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>Have a unit or flat number?</Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Enable if the property has a specific unit, flat, or apartment number
+                      </p>
+                    </div>
+                    <Switch
+                      checked={listing.showUnitField}
+                      onCheckedChange={(checked) => updateListing(listing.id, 'showUnitField', checked)}
+                    />
+                  </div>
+                  {listing.showUnitField && (
+                    <Input
+                      value={listing.unitNo}
+                      onChange={(e) => updateListing(listing.id, 'unitNo', e.target.value)}
+                      placeholder="e.g., Unit 5B"
+                      className="bg-background"
+                    />
+                  )}
+                </div>
+
+                {/* Cover Photo */}
+                <div className="space-y-3">
+                  <Label>Cover Photo</Label>
+                  <p className="text-xs text-muted-foreground -mt-1">
+                    This will be displayed on listing cards
+                  </p>
+                  <CoverPhotoUploader
+                    image={listing.coverPhoto}
+                    onImageChange={(file) => updateListing(listing.id, 'coverPhoto', file)}
+                  />
+                </div>
+
+                {/* Additional Photos */}
+                <div className="space-y-3">
+                  <Label>Additional Photos</Label>
+                  <p className="text-xs text-muted-foreground -mt-1">
+                    Up to 9 additional photos
+                  </p>
+                  <ImageUploader
+                    images={listing.additionalImages}
+                    onImagesChange={(images) => updateListing(listing.id, 'additionalImages', images)}
+                    maxImages={9}
+                  />
+                </div>
+
+                {/* YouTube URLs */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>YouTube Videos</Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Add up to 3 YouTube video links
+                      </p>
+                    </div>
+                    {listing.youtubeUrls.length < 3 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addYoutubeUrl(listing.id)}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add
+                      </Button>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    {listing.youtubeUrls.map((url, urlIndex) => (
+                      <div key={urlIndex} className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Youtube className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            value={url}
+                            onChange={(e) => updateYoutubeUrl(listing.id, urlIndex, e.target.value)}
+                            placeholder="https://youtube.com/watch?v=..."
+                            className="bg-secondary pl-10"
+                          />
+                        </div>
+                        {listing.youtubeUrls.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeYoutubeUrl(listing.id, urlIndex)}
+                            className="h-10 w-10 text-destructive"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {listing.youtubeUrls.some(url => url.trim()) && (
+                    <YouTubePreview urls={listing.youtubeUrls.filter(url => url.trim())} />
+                  )}
+                </div>
+
                 {/* Tags */}
                 <div className="space-y-2">
                   <Label>Tags</Label>
@@ -382,24 +567,88 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
                   />
                 </div>
 
-                {/* Visit Guidance */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Parking Info</Label>
-                    <Textarea
-                      value={listing.parkingInfo}
-                      onChange={(e) => updateListing(listing.id, 'parkingInfo', e.target.value)}
-                      placeholder="Where can visitors park?"
-                      className="bg-secondary min-h-[60px]"
-                    />
+                {/* Operating Hours */}
+                <div className="space-y-4">
+                  <Label>Operating Hours</Label>
+                  <div className="space-y-3">
+                    {DAYS_OF_WEEK.map((day) => (
+                      <div key={day} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                        <div className="flex items-center gap-2 min-w-[140px]">
+                          <Switch
+                            checked={listing.operatingHours[day]?.enabled || false}
+                            onCheckedChange={() => toggleDay(listing.id, day)}
+                          />
+                          <span className="text-sm font-medium">{day}</span>
+                        </div>
+                        {listing.operatingHours[day]?.enabled && (
+                          <div className="flex items-center gap-2 ml-8 sm:ml-0">
+                            <Input
+                              type="time"
+                              value={listing.operatingHours[day]?.startTime || '18:00'}
+                              onChange={(e) => updateDayTime(listing.id, day, 'startTime', e.target.value)}
+                              className="w-28 bg-secondary"
+                            />
+                            <span className="text-sm text-muted-foreground">to</span>
+                            <Input
+                              type="time"
+                              value={listing.operatingHours[day]?.endTime || '22:00'}
+                              onChange={(e) => updateDayTime(listing.id, day, 'endTime', e.target.value)}
+                              className="w-28 bg-secondary"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
+                  
+                  {/* Other operating hours option */}
+                  {!anyDayEnabled(listing) && (
+                    <div className="space-y-2 mt-4">
+                      <Label className="text-sm">Other / Custom Hours</Label>
+                      <Textarea
+                        value={listing.operatingHoursOther}
+                        onChange={(e) => updateListing(listing.id, 'operatingHoursOther', e.target.value)}
+                        placeholder="e.g., 'Weekends only, weather permitting' or 'By appointment'"
+                        className="bg-secondary min-h-[60px]"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Visit Guidance */}
+                <div className="space-y-4">
+                  <Label className="text-base font-semibold">Visit Guidance</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm">Parking Info</Label>
+                      <Textarea
+                        value={listing.parkingInfo}
+                        onChange={(e) => updateListing(listing.id, 'parkingInfo', e.target.value)}
+                        placeholder="Where can visitors park?"
+                        className="bg-secondary min-h-[60px]"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm">Gate Access</Label>
+                      <Textarea
+                        value={listing.gateAccessInfo}
+                        onChange={(e) => updateListing(listing.id, 'gateAccessInfo', e.target.value)}
+                        placeholder="Security or access requirements..."
+                        className="bg-secondary min-h-[60px]"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Max Visitors */}
                   <div className="space-y-2">
-                    <Label>Gate Access</Label>
-                    <Textarea
-                      value={listing.gateAccessInfo}
-                      onChange={(e) => updateListing(listing.id, 'gateAccessInfo', e.target.value)}
-                      placeholder="Security or access requirements..."
-                      className="bg-secondary min-h-[60px]"
+                    <Label className="text-sm">Maximum Visitors at a Time</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={listing.maxVisitors}
+                      onChange={(e) => updateListing(listing.id, 'maxVisitors', e.target.value)}
+                      placeholder="e.g., 20 (leave empty if no limit)"
+                      className="bg-secondary max-w-xs"
                     />
                   </div>
                 </div>
@@ -498,7 +747,10 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
             Publishing {listings.length} Listing(s)...
           </>
         ) : (
-          `Publish ${listings.length} Listing${listings.length > 1 ? 's' : ''}`
+          <>
+            <Sparkles className="h-5 w-5 mr-2" />
+            Publish {listings.length} Listing(s)
+          </>
         )}
       </Button>
     </form>
