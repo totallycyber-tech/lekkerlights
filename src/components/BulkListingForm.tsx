@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,7 +15,8 @@ import {
   Loader2,
   Youtube,
   X,
-  Sparkles
+  Sparkles,
+  AlertCircle
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -61,6 +63,8 @@ export interface ListingEntry {
   maxVisitors: string;
   gateAccessInfo: string;
   addressSelected: boolean;
+  duplicateAddressError: string | null;
+  isCheckingDuplicate: boolean;
   coverPhoto: File | null;
   additionalImages: File[];
   youtubeUrls: string[];
@@ -87,6 +91,8 @@ export const createEmptyListing = (): ListingEntry => ({
   maxVisitors: '',
   gateAccessInfo: '',
   addressSelected: false,
+  duplicateAddressError: null,
+  isCheckingDuplicate: false,
   coverPhoto: null,
   additionalImages: [],
   youtubeUrls: [''],
@@ -144,7 +150,7 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
     ));
   };
 
-  const handleAddressSelect = useCallback((id: string, components: {
+  const handleAddressSelect = useCallback(async (id: string, components: {
     streetNumber: string;
     streetName: string;
     suburb: string;
@@ -152,13 +158,46 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
     province: string;
     postalCode: string;
   }) => {
+    // First update the address fields
     setListings(prev => prev.map(l => 
       l.id === id ? { 
         ...l, 
         ...components,
-        addressSelected: true 
+        addressSelected: true,
+        duplicateAddressError: null,
+        isCheckingDuplicate: true
       } : l
     ));
+    
+    // Then check for duplicate address in database
+    try {
+      const { data: existingListings, error } = await supabase
+        .from('listings_public')
+        .select('id, street_number, street_name, suburb, city')
+        .ilike('street_number', components.streetNumber.trim())
+        .ilike('street_name', components.streetName.trim())
+        .ilike('suburb', components.suburb.trim())
+        .ilike('city', components.city.trim());
+      
+      if (!error && existingListings && existingListings.length > 0) {
+        setListings(prev => prev.map(l => 
+          l.id === id ? { 
+            ...l, 
+            duplicateAddressError: 'This address is already listed. If this is your listing, you can request an edit link.',
+            isCheckingDuplicate: false
+          } : l
+        ));
+      } else {
+        setListings(prev => prev.map(l => 
+          l.id === id ? { ...l, isCheckingDuplicate: false } : l
+        ));
+      }
+    } catch (err) {
+      console.error('Error checking for duplicate:', err);
+      setListings(prev => prev.map(l => 
+        l.id === id ? { ...l, isCheckingDuplicate: false } : l
+      ));
+    }
   }, []);
 
   const generateWithAI = async (listingId: string, type: 'title' | 'description') => {
@@ -277,6 +316,16 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
       }
       if (!l.addressSelected || !l.streetName || !l.city) {
         toast({ title: "Missing address", description: `Listing ${i + 1} needs an address.`, variant: "destructive" });
+        setExpandedListing(l.id);
+        return;
+      }
+      if (l.duplicateAddressError) {
+        toast({ title: "Duplicate address", description: `Listing ${i + 1} has an address that's already listed.`, variant: "destructive" });
+        setExpandedListing(l.id);
+        return;
+      }
+      if (l.isCheckingDuplicate) {
+        toast({ title: "Please wait", description: `Listing ${i + 1} is still checking address availability.`, variant: "destructive" });
         setExpandedListing(l.id);
         return;
       }
@@ -425,7 +474,27 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
                   <AddressAutocomplete 
                     onAddressSelect={(components) => handleAddressSelect(listing.id, components)} 
                   />
-                  {listing.addressSelected && (
+                  {listing.isCheckingDuplicate && (
+                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Checking if address is available...
+                    </p>
+                  )}
+                  {listing.duplicateAddressError && (
+                    <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                      <p className="text-sm text-destructive flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                        {listing.duplicateAddressError}
+                      </p>
+                      <Link 
+                        to="/resend-edit-link" 
+                        className="text-sm text-primary hover:underline mt-1 inline-block"
+                      >
+                        Request an edit link →
+                      </Link>
+                    </div>
+                  )}
+                  {listing.addressSelected && !listing.duplicateAddressError && (
                     <p className="text-sm text-muted-foreground">
                       ✓ {listing.streetNumber} {listing.streetName}, {listing.suburb}, {listing.city}
                     </p>
