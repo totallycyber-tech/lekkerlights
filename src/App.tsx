@@ -8,6 +8,7 @@ import Browse from "./pages/Browse";
 import ListingDetail from "./pages/ListingDetail";
 import CreateListing from "./pages/CreateListing";
 import EditListing from "./pages/EditListing";
+import EditBatchListings from "./pages/EditBatchListings";
 import ResendEditLink from "./pages/ResendEditLink";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/listing/:id" element={<ListingDetail />} />
           <Route path="/create" element={<CreateListing />} />
           <Route path="/edit-listing/:id" element={<EditListing />} />
+          <Route path="/edit-batch/:batchId" element={<EditBatchListings />} />
           <Route path="/resend-edit-link" element={<ResendEditLink />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
