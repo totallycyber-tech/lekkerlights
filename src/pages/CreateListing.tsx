@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { provinces } from "@/data/mockListings";
-import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Eye, Wand2, Loader2, Layers } from "lucide-react";
+import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Eye, Wand2, Loader2, Layers, AlertCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
@@ -75,6 +75,8 @@ export default function CreateListing() {
   const [showUnitField, setShowUnitField] = useState(false);
   const [addressSelected, setAddressSelected] = useState(false);
   const [addressError, setAddressError] = useState(false);
+  const [duplicateAddressError, setDuplicateAddressError] = useState<string | null>(null);
+  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
@@ -145,6 +147,11 @@ export default function CreateListing() {
       });
 
       if (error) throw error;
+      
+      // Check for application-level errors from edge function
+      if (data && !data.success) {
+        throw new Error(data.error || 'Failed to create listings');
+      }
 
       // Upload images for each listing
       const createdListings = data?.listings || [];
@@ -222,7 +229,7 @@ export default function CreateListing() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleAddressSelect = useCallback((components: {
+  const handleAddressSelect = useCallback(async (components: {
     streetNumber: string;
     streetName: string;
     suburb: string;
@@ -241,6 +248,30 @@ export default function CreateListing() {
     }));
     setAddressSelected(true);
     setAddressError(false);
+    setDuplicateAddressError(null);
+    
+    // Check for duplicate address in database
+    setIsCheckingDuplicate(true);
+    try {
+      const { data: existingListings, error } = await supabase
+        .from('listings_public')
+        .select('id, street_number, street_name, suburb, city')
+        .ilike('street_number', components.streetNumber.trim())
+        .ilike('street_name', components.streetName.trim())
+        .ilike('suburb', components.suburb.trim())
+        .ilike('city', components.city.trim());
+      
+      if (!error && existingListings && existingListings.length > 0) {
+        setDuplicateAddressError(
+          `This address is already listed. If this is your listing, you can request an edit link.`
+        );
+      }
+    } catch (err) {
+      console.error('Error checking for duplicate:', err);
+      // Fail silently - will be caught at submission
+    } finally {
+      setIsCheckingDuplicate(false);
+    }
   }, []);
 
   const addYoutubeUrl = () => {
@@ -632,7 +663,27 @@ export default function CreateListing() {
                       Please select an address from the suggestions
                     </p>
                   )}
-                  {formData.streetNumber && formData.streetName && (
+                  {isCheckingDuplicate && (
+                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Checking if address is available...
+                    </p>
+                  )}
+                  {duplicateAddressError && (
+                    <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                      <p className="text-sm text-destructive flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                        {duplicateAddressError}
+                      </p>
+                      <Link 
+                        to="/resend-edit-link" 
+                        className="text-sm text-primary hover:underline mt-1 inline-block"
+                      >
+                        Request an edit link →
+                      </Link>
+                    </div>
+                  )}
+                  {formData.streetNumber && formData.streetName && !duplicateAddressError && (
                     <p className="text-sm text-muted-foreground mt-2">
                       <Check className="h-4 w-4 inline mr-1 text-christmas-secondary" />
                       {formData.streetNumber} {formData.streetName}, {formData.suburb}, {formData.city}, {formData.province} {formData.postalCode}
@@ -1049,7 +1100,7 @@ export default function CreateListing() {
                     variant="hero"
                     size="lg"
                     className="flex-1"
-                    disabled={isSubmitting || !agreedToTerms}
+                    disabled={isSubmitting || !agreedToTerms || !!duplicateAddressError || isCheckingDuplicate}
                   >
                     {isSubmitting ? (
                       <>
