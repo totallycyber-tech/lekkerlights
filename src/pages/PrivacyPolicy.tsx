@@ -70,6 +70,12 @@ export default function PrivacyPolicy() {
               <p className="text-muted-foreground leading-relaxed mt-4">
                 We use your email address to send you a secure, unique edit link so that you can edit or delete your listing without creating an account or password. You are responsible for keeping this email and link safe and not sharing it with others you do not trust.
               </p>
+              
+              <h4 className="font-display text-lg font-medium text-foreground mt-4 mb-2">Bulk Listings</h4>
+              <p className="text-muted-foreground leading-relaxed">
+                When submitting bulk listings (up to 10 at a time), the same contact information is shared across all listings in the batch. You will receive a single edit link that provides access to edit or delete all listings submitted together. The same data collection and visibility preferences apply to each listing in the batch.
+              </p>
+              
               <p className="text-muted-foreground leading-relaxed mt-4 italic">
                 Please note that photos and videos may include personal information (for example, images of people, vehicles, or neighbouring properties). You are responsible for ensuring you have the necessary consent before uploading such content.
               </p>

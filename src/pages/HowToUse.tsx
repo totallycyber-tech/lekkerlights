@@ -251,6 +251,11 @@ export default function HowToUse() {
                     <p className="text-muted-foreground mb-3">
                       Click on <strong>"List Your Display"</strong> in the navigation menu or the button on the homepage to begin creating your listing.
                     </p>
+                    <div className="bg-christmas/10 rounded-lg p-3 mb-3">
+                      <p className="text-sm text-christmas font-medium">
+                        💡 <strong>Bulk Listings:</strong> Spotted multiple displays? Switch to "Bulk Listings" mode to submit up to 10 at once with a single edit link!
+                      </p>
+                    </div>
                     <div className="flex items-center gap-2 text-sm text-christmas">
                       <Plus className="h-4 w-4" />
                       <Link to="/create" className="hover:underline">Create a Listing →</Link>

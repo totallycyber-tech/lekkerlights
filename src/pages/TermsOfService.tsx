@@ -86,7 +86,24 @@ export default function TermsOfService() {
               <p className="text-muted-foreground leading-relaxed mt-4">
                 without needing to create a user account or password.
               </p>
-              <p className="text-muted-foreground leading-relaxed mt-4">You agree that:</p>
+              
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">6.1 Bulk Listings</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                You may submit up to 10 listings at once using the "Bulk Listings" feature. When doing so:
+              </p>
+              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
+                <li>A single edit link will be sent to your email address.</li>
+                <li>This link grants access to edit or delete all listings submitted in that batch.</li>
+                <li>You are responsible for ensuring all listings comply with these Terms.</li>
+                <li>Misuse of bulk listing (e.g., spam, duplicate addresses, false information) may result in removal of all listings in the batch.</li>
+                <li>The same contact information is shared across all listings in the batch.</li>
+              </ul>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                Bulk submissions are encouraged for community members who want to share multiple displays they've discovered in their neighbourhood.
+              </p>
+              
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">6.2 Edit Link Security</h3>
+              <p className="text-muted-foreground leading-relaxed">You agree that:</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>You are responsible for keeping the edit link and the associated email secure.</li>
                 <li>Anyone with access to the email and edit link may be able to modify or hide your listing.</li>
