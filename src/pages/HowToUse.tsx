@@ -648,8 +648,20 @@ export default function HowToUse() {
                     <AccordionContent className="text-muted-foreground pb-4">
                       Yes! Use the "Bulk Listings" mode on the{" "}
                       <Link to="/create" className="text-primary hover:underline">Create Listing page</Link> to submit up to 10 
-                      displays at once. All listings share the same contact information, and you'll receive a single edit link 
-                      to manage all of them together. This is great if you've spotted multiple displays in your neighbourhood!
+                      displays at once. Each listing in your batch can have its own:
+                      <ul className="list-disc list-inside mt-2 space-y-1">
+                        <li>Title, description, and address</li>
+                        <li>Cover photo and up to 9 additional photos</li>
+                        <li>Up to 3 YouTube video URLs</li>
+                        <li>Operating hours (day-by-day schedule or custom text)</li>
+                        <li>Tags and display features</li>
+                        <li>Visit guidance (parking, max visitors, gate access)</li>
+                        <li>Complex/estate and unit number details</li>
+                      </ul>
+                      <p className="mt-2">
+                        All listings share the same contact information, and you'll receive a single edit link 
+                        to manage all of them together. This is great if you've spotted multiple displays in your neighbourhood!
+                      </p>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>

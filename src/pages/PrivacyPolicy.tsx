@@ -73,7 +73,7 @@ export default function PrivacyPolicy() {
               
               <h4 className="font-display text-lg font-medium text-foreground mt-4 mb-2">Bulk Listings</h4>
               <p className="text-muted-foreground leading-relaxed">
-                When submitting bulk listings (up to 10 at a time), the same contact information is shared across all listings in the batch. You will receive a single edit link that provides access to edit or delete all listings submitted together. The same data collection and visibility preferences apply to each listing in the batch.
+                When submitting bulk listings (up to 10 at a time), the same contact information is shared across all listings in the batch. Each listing can have its own photos, YouTube videos, operating hours, tags, and visit guidance details. You will receive a single edit link that provides access to edit or delete all listings submitted together. The same data collection and visibility preferences apply to each listing in the batch.
               </p>
               
               <p className="text-muted-foreground leading-relaxed mt-4 italic">

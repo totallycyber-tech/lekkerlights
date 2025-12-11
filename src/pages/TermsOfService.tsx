@@ -89,7 +89,19 @@ export default function TermsOfService() {
               
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">6.1 Bulk Listings</h3>
               <p className="text-muted-foreground leading-relaxed">
-                You may submit up to 10 listings at once using the "Bulk Listings" feature. When doing so:
+                You may submit up to 10 listings at once using the "Bulk Listings" feature. Each listing in your batch can include:
+              </p>
+              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
+                <li>Individual title, description, and address details</li>
+                <li>Cover photo and up to 9 additional photos per listing</li>
+                <li>Up to 3 YouTube video URLs per listing</li>
+                <li>Operating hours (day-by-day schedule or custom text)</li>
+                <li>Tags and display features</li>
+                <li>Visit guidance (parking info, max visitors, gate access)</li>
+                <li>Complex/estate name and unit number (if applicable)</li>
+              </ul>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                When submitting bulk listings:
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>A single edit link will be sent to your email address.</li>
