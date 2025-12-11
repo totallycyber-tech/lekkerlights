@@ -44,3 +44,12 @@ verify_jwt = false
 
 [functions.geocode-address]
 verify_jwt = false
+
+[functions.create-batch-listings]
+verify_jwt = false
+
+[functions.verify-batch-token]
+verify_jwt = false
+
+[functions.resend-batch-edit-link]
+verify_jwt = false

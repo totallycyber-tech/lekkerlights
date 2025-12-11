@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      batch_edit_tokens: {
+        Row: {
+          batch_id: string
+          created_at: string
+          edit_token: string
+          email: string
+          expires_at: string | null
+          id: string
+        }
+        Insert: {
+          batch_id?: string
+          created_at?: string
+          edit_token?: string
+          email: string
+          expires_at?: string | null
+          id?: string
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string
+          edit_token?: string
+          email?: string
+          expires_at?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       listing_edit_tokens: {
         Row: {
           created_at: string
@@ -52,6 +79,7 @@ export type Database = {
       }
       listings: {
         Row: {
+          batch_id: string | null
           city: string
           complex_name: string | null
           contact_email: string | null
@@ -84,6 +112,7 @@ export type Database = {
           youtube_urls: string[] | null
         }
         Insert: {
+          batch_id?: string | null
           city: string
           complex_name?: string | null
           contact_email?: string | null
@@ -116,6 +145,7 @@ export type Database = {
           youtube_urls?: string[] | null
         }
         Update: {
+          batch_id?: string | null
           city?: string
           complex_name?: string | null
           contact_email?: string | null

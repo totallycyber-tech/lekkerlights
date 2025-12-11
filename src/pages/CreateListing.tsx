@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { provinces } from "@/data/mockListings";
-import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Eye, Wand2, Loader2 } from "lucide-react";
+import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Eye, Wand2, Loader2, Layers } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
@@ -28,6 +28,7 @@ import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
 import { TagSelector } from "@/components/TagSelector";
 import { YouTubePreview } from "@/components/YouTubePreview";
 import { ListingPreview } from "@/components/ListingPreview";
+import { BulkListingForm } from "@/components/BulkListingForm";
 
 const DAYS_OF_WEEK = [
   'Monday',
@@ -52,9 +53,12 @@ const defaultOperatingHours: OperatingHours = DAYS_OF_WEEK.reduce((acc, day) => 
   return acc;
 }, {} as OperatingHours);
 
+type ListingMode = "single" | "bulk";
+
 export default function CreateListing() {
   const navigate = useNavigate();
   const createListing = useCreateListing();
+  const [mode, setMode] = useState<ListingMode>("single");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string>('');
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
@@ -92,6 +96,71 @@ export default function CreateListing() {
     maxVisitors: '',
     gateAccessInfo: '',
   });
+
+  const handleBulkSubmit = async (listings: any[], sharedData: {
+    contactEmail: string;
+    contactName: string;
+    contactPhone: string;
+    nameVisible: boolean;
+    emailVisible: boolean;
+    phoneVisible: boolean;
+  }) => {
+    setIsSubmitting(true);
+    setUploadProgress('Creating listings...');
+
+    try {
+      const listingsData = listings.map(l => ({
+        title: l.title,
+        description: l.description,
+        streetNumber: l.streetNumber,
+        streetName: l.streetName,
+        suburb: l.suburb,
+        city: l.city,
+        province: l.province,
+        postalCode: l.postalCode,
+        complexName: l.complexName || undefined,
+        unitNo: l.unitNo || undefined,
+        tags: l.tags,
+        operatingHours: DAYS_OF_WEEK.some(day => l.operatingHours[day]?.enabled) 
+          ? l.operatingHours 
+          : { other: l.operatingHoursOther },
+        parkingInfo: l.parkingInfo || undefined,
+        maxVisitors: l.maxVisitors ? parseInt(l.maxVisitors) : undefined,
+        gateAccessInfo: l.gateAccessInfo || undefined,
+      }));
+
+      const { data, error } = await supabase.functions.invoke('create-batch-listings', {
+        body: {
+          listings: listingsData,
+          contactEmail: sharedData.contactEmail,
+          contactName: sharedData.contactName || undefined,
+          contactPhone: sharedData.contactPhone || undefined,
+          nameVisible: sharedData.nameVisible,
+          emailVisible: sharedData.emailVisible,
+          phoneVisible: sharedData.phoneVisible,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Listings published!",
+        description: `${listings.length} displays are now live. Check your email for the edit link.`,
+      });
+
+      navigate('/browse');
+    } catch (error: any) {
+      console.error('Error creating bulk listings:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to publish listings. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+      setUploadProgress('');
+    }
+  };
 
   const toggleDay = (day: string) => {
     setOperatingHours(prev => ({
@@ -404,9 +473,36 @@ export default function CreateListing() {
                   on the listing page. The website developer will review your request and remove the listing.
                 </p>
               </div>
+
+              {/* Mode Toggle */}
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={mode === "single" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setMode("single")}
+                  className={cn(mode === "single" && "bg-christmas hover:bg-christmas/90")}
+                >
+                  Single Listing
+                </Button>
+                <Button
+                  type="button"
+                  variant={mode === "bulk" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setMode("bulk")}
+                  className={cn(mode === "bulk" && "bg-christmas hover:bg-christmas/90")}
+                >
+                  <Layers className="h-4 w-4 mr-1" />
+                  Bulk Listings (up to 10)
+                </Button>
+              </div>
             </div>
 
-            {/* Form */}
+            {/* Bulk Mode */}
+            {mode === "bulk" ? (
+              <BulkListingForm onSubmit={handleBulkSubmit} isSubmitting={isSubmitting} />
+            ) : (
+            /* Single Mode Form */
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Basic Info */}
               <div className="bg-card rounded-xl border border-border p-6 space-y-6">
@@ -966,6 +1062,7 @@ export default function CreateListing() {
                 </div>
               </div>
             </form>
+            )}
           </div>
         </div>
       </main>

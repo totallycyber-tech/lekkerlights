@@ -5,15 +5,19 @@ import { BackToTop } from "@/components/BackToTop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, ArrowLeft, Send, CheckCircle, Loader2 } from "lucide-react";
+import { Mail, ArrowLeft, Send, CheckCircle, Loader2, Layers } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+
+type LinkType = "single" | "bulk";
 
 export default function ResendEditLink() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [linkType, setLinkType] = useState<LinkType>("single");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +44,8 @@ export default function ResendEditLink() {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.functions.invoke("resend-edit-link", {
+      const functionName = linkType === "bulk" ? "resend-batch-edit-link" : "resend-edit-link";
+      const { error } = await supabase.functions.invoke(functionName, {
         body: { email: email.trim().toLowerCase() },
       });
 
@@ -84,7 +89,7 @@ export default function ResendEditLink() {
                     Check Your Email
                   </h1>
                   <p className="text-muted-foreground">
-                    If any listings are associated with <strong className="text-foreground">{email}</strong>, 
+                    If any {linkType === "bulk" ? "bulk listings" : "listings"} are associated with <strong className="text-foreground">{email}</strong>, 
                     we've sent the edit links to that address.
                   </p>
                   <p className="text-sm text-muted-foreground">
@@ -122,6 +127,44 @@ export default function ResendEditLink() {
                     <p className="text-sm text-muted-foreground/80 mt-2">
                       <strong>Tip:</strong> Edit link emails sometimes land in spam or junk folders – please check there too!
                     </p>
+                  </div>
+
+                  {/* Link Type Toggle */}
+                  <div className="mb-6">
+                    <Label className="text-sm font-medium mb-3 block">What type of listing?</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setLinkType("single")}
+                        className={cn(
+                          "p-3 rounded-lg border text-sm font-medium transition-colors",
+                          linkType === "single"
+                            ? "bg-christmas/10 border-christmas text-christmas"
+                            : "bg-secondary border-border text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <Mail className="h-4 w-4 mx-auto mb-1" />
+                        Single Listing
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setLinkType("bulk")}
+                        className={cn(
+                          "p-3 rounded-lg border text-sm font-medium transition-colors",
+                          linkType === "bulk"
+                            ? "bg-christmas/10 border-christmas text-christmas"
+                            : "bg-secondary border-border text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <Layers className="h-4 w-4 mx-auto mb-1" />
+                        Bulk Listings
+                      </button>
+                    </div>
+                    {linkType === "bulk" && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Select this if you submitted multiple listings at once.
+                      </p>
+                    )}
                   </div>
 
                   <form onSubmit={handleSubmit} className="space-y-4">

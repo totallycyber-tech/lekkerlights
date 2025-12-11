@@ -635,6 +635,18 @@ export default function HowToUse() {
                       <Link to="/resend-edit-link" className="text-primary hover:underline">request a new edit link</Link>.
                     </AccordionContent>
                   </AccordionItem>
+
+                  <AccordionItem value="bulk-listings" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      Can I submit multiple listings at once?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      Yes! Use the "Bulk Listings" mode on the{" "}
+                      <Link to="/create" className="text-primary hover:underline">Create Listing page</Link> to submit up to 10 
+                      displays at once. All listings share the same contact information, and you'll receive a single edit link 
+                      to manage all of them together. This is great if you've spotted multiple displays in your neighbourhood!
+                    </AccordionContent>
+                  </AccordionItem>
                 </Accordion>
               </div>
 
