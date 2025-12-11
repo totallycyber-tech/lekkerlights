@@ -294,7 +294,7 @@ export default function HowToUse() {
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Enter Your Address</h3>
                     <p className="text-muted-foreground mb-3">
-                      Start typing your address in the search field and select from the autocomplete suggestions. The address fields will be populated automatically. If you live in a complex or estate, enable the optional fields to add those details.
+                      Start typing your address in the search field and select from the autocomplete suggestions. The address fields will be populated automatically. <strong>The system will automatically check if this address is already listed</strong> – if so, you'll see a notification with a link to request an edit link if it's your listing. If you live in a complex or estate, enable the optional fields to add those details.
                     </p>
                     <p className="text-sm text-muted-foreground flex items-center gap-2">
                       <MapPin className="h-4 w-4 text-christmas" />
@@ -634,9 +634,7 @@ export default function HowToUse() {
                       Can I list the same address twice?
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground pb-4">
-                      No, each address can only have one listing. If you try to create a listing for an address that's 
-                      already registered, you'll see an error message. If it's your listing and you need to make changes, 
-                      use your edit link or{" "}
+                      No, each address can only have one listing. When you select an address, the system <strong>immediately checks if it already exists</strong> in our database. If the address is already listed, you'll see an error message right away with a link to request an edit link. This saves you time by letting you know upfront rather than after filling out the entire form. If it's your listing and you need to make changes, use your edit link or{" "}
                       <Link to="/resend-edit-link" className="text-primary hover:underline">request a new edit link</Link>.
                     </AccordionContent>
                   </AccordionItem>
