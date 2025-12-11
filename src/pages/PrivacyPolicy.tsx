@@ -125,6 +125,11 @@ export default function PrivacyPolicy() {
                 This information is used for security, analytics, and to improve the Service.
               </p>
 
+              <h4 className="font-display text-lg font-medium text-foreground mt-4 mb-2">Address Validation</h4>
+              <p className="text-muted-foreground leading-relaxed">
+                When you enter an address while creating a listing, we automatically query our database to check if that address already exists. This is done to prevent duplicate listings and provide you with immediate feedback. No additional personal information is collected during this validation process beyond the address components you've entered.
+              </p>
+
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.3 Cookies and Similar Technologies</h3>
               <p className="text-muted-foreground leading-relaxed">We use cookies and similar technologies to:</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">

@@ -122,6 +122,16 @@ export default function TermsOfService() {
                 <li>Lekker Lights is not responsible for any unauthorised changes to your listing made by someone who has gained access to your email account or edit link.</li>
                 <li>If you lose access to your email or edit link, we may, at our discretion, require additional verification before making changes or may be unable to restore access.</li>
               </ul>
+
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">6.3 Duplicate Address Prevention</h3>
+              <p className="text-muted-foreground leading-relaxed">To maintain accurate and unique listings:</p>
+              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
+                <li>Each physical address can only have one active listing on the platform.</li>
+                <li>When creating a listing, the system automatically checks if the address is already registered.</li>
+                <li>If a duplicate is detected, you will be notified immediately and will not be able to submit a new listing for that address.</li>
+                <li>If the existing listing is yours and you need to make changes, you can request an edit link.</li>
+                <li>Attempting to circumvent this restriction (e.g., by altering address formatting) may result in removal of your listing.</li>
+              </ul>
             </div>
 
             <div>
