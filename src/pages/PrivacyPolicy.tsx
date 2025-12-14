@@ -11,7 +11,7 @@ export default function PrivacyPolicy() {
           <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
             Lekker Lights - Privacy Policy
           </h1>
-          <p className="text-muted-foreground mb-8">Last updated: 10 December 2025</p>
+          <p className="text-muted-foreground mb-8">Last updated: 14 December 2025</p>
 
           <section className="space-y-6">
             <div>
@@ -54,7 +54,7 @@ export default function PrivacyPolicy() {
                 <li>Contact phone number</li>
                 <li>Whether your name and/or contact details should be visible to the public or kept private</li>
                 <li>Property address (street number, street name, suburb, city, province, postal code)</li>
-                <li>Listing title and description</li>
+                <li>Listing title and description (optional – you can choose whether to include these via toggle switches)</li>
                 <li>Dates and hours during which the display is available for public viewing</li>
                 <li>Parking information (for example, where visitors may park, restrictions on street parking, etc.)</li>
                 <li>Visitor limits or guidance (such as maximum visitors at a time, "no buses", or group-size preferences)</li>
@@ -150,7 +150,7 @@ export default function PrivacyPolicy() {
                 <li>Google processes this information according to its own Privacy Policy and Terms of Service.</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
-                We may also use third-party services (including AI-based tools) to help moderate reviews, images, tags, and other user-generated content for spam, harmful content, or policy violations.
+                We may also use third-party services (including AI-based tools) to help moderate reviews, images, tags, and other user-generated content for spam, harmful content, or policy violations. We also offer optional AI-powered content generation to help you create listing titles and descriptions – this feature uses AI models to generate suggestions based on your display's tags and existing information.
               </p>
               <p className="text-muted-foreground leading-relaxed mt-2">
                 We encourage you to review relevant third-party privacy policies to understand how they handle your information.

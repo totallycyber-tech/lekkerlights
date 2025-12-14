@@ -163,7 +163,7 @@ export default function HowToUse() {
                     <ul className="space-y-2 text-muted-foreground">
                       <li className="flex items-center gap-2">
                         <Camera className="h-4 w-4 text-primary" />
-                        <span>Photos and videos of the display</span>
+                        <span>Photos and videos – <strong>click any photo to view it enlarged</strong>, then use arrows to browse through all photos</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-primary" />
@@ -269,20 +269,23 @@ export default function HowToUse() {
                     2
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Add Basic Information</h3>
+                    <h3 className="font-semibold text-lg mb-2">Add Basic Information (Optional)</h3>
                     <p className="text-muted-foreground mb-3">
-                      Fill in the essential details about your display:
+                      You can optionally add a title and description for your display:
                     </p>
                     <ul className="space-y-2 text-muted-foreground">
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 text-christmas" />
-                        <span><strong>Title</strong> – A catchy name for your display (or use AI to generate one)</span>
+                        <span><strong>Title</strong> – Enable the toggle to add a catchy name (or use AI to generate one)</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 text-christmas" />
-                        <span><strong>Description</strong> – Tell visitors what makes your display special (or use AI to help)</span>
+                        <span><strong>Description</strong> – Enable the toggle to describe what makes your display special (or use AI to help)</span>
                       </li>
                     </ul>
+                    <p className="text-sm text-muted-foreground mt-2 italic">
+                      💡 Both fields are optional – if you skip them, visitors will see your location instead.
+                    </p>
                   </div>
                 </div>
 
@@ -492,6 +495,18 @@ export default function HowToUse() {
                   For Visitors
                 </h3>
                 <Accordion type="single" collapsible className="space-y-2">
+                  <AccordionItem value="view-photos" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      How do I view photos in full size?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      When viewing a listing's detail page, click on any photo in the gallery to open it in a full-size 
+                      lightbox view. Use the left and right arrow buttons (or keyboard arrows) to navigate between photos. 
+                      Press Escape or click outside the photo to close the lightbox. This makes it easy to see all the 
+                      beautiful details of each Christmas display!
+                    </AccordionContent>
+                  </AccordionItem>
+
                   <AccordionItem value="save-favourites" className="border-b-0">
                     <AccordionTrigger className="hover:no-underline py-3">
                       How do I save my favourite displays?
@@ -576,7 +591,9 @@ export default function HowToUse() {
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground pb-4">
                       When you publish your listing, we send a secure edit link to your email address. Click this link 
-                      to update your listing details, photos, operating hours, or any other information. 
+                      to update your listing details, photos, operating hours, or any other information. You can also 
+                      <strong> add or remove a title and description</strong> using the toggle switches, and use the 
+                      <strong> AI generation buttons</strong> to create new content if needed.
                       <strong> Edit links are valid for 1 hour only</strong> for security purposes. If your link has expired 
                       or you've lost it, you can{" "}
                       <Link to="/resend-edit-link" className="text-primary hover:underline">request a new one here</Link>.
@@ -614,7 +631,8 @@ export default function HowToUse() {
                     <AccordionContent className="text-muted-foreground pb-4">
                       Photos must be in JPEG, PNG, WebP, or GIF format and no larger than 5MB each. You can upload 
                       one cover photo (the main image on your listing card) and up to 9 additional photos. For best 
-                      results, use landscape-oriented photos taken in the evening when your lights are on!
+                      results, use landscape-oriented photos taken in the evening when your lights are on! Visitors 
+                      can click on any photo to view it full-size and browse through your gallery using navigation arrows.
                     </AccordionContent>
                   </AccordionItem>
 
@@ -648,7 +666,8 @@ export default function HowToUse() {
                       <Link to="/create" className="text-primary hover:underline">Create Listing page</Link> to submit up to 10 
                       displays at once. Each listing in your batch can have its own:
                       <ul className="list-disc list-inside mt-2 space-y-1">
-                        <li>Title, description, and address</li>
+                        <li>Title and description (optional – enable via toggle, with AI generation available)</li>
+                        <li>Address details</li>
                         <li>Cover photo and up to 9 additional photos</li>
                         <li>Up to 3 YouTube video URLs</li>
                         <li>Operating hours (day-by-day schedule or custom text)</li>
@@ -660,6 +679,19 @@ export default function HowToUse() {
                         All listings share the same contact information, and you'll receive a single edit link 
                         to manage all of them together. This is great if you've spotted multiple displays in your neighbourhood!
                       </p>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="title-description-optional" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      Do I need to add a title and description?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      No, both title and description are completely optional! When creating or editing a listing, you'll see 
+                      toggle switches to enable these fields. If you don't add them, visitors will simply see the location 
+                      information (suburb and city) on your listing card. If you do want to add them, you can type your own 
+                      or use the <strong>"Generate with AI"</strong> button to create suggestions automatically based on your 
+                      display's tags.
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
@@ -758,7 +790,7 @@ export default function HowToUse() {
                       What data is stored?
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground pb-4">
-                      For display listings, we store the information you provide: title, description, address, 
+                      For display listings, we store the information you provide: title and description (if enabled), address, 
                       photos, operating hours, tags, and contact details. For visitors, favourites are stored 
                       locally in your browser – we don't track or store your browsing activity on our servers. 
                       Reviews are stored with ratings and comments only. See our{" "}
