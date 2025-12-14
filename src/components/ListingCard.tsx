@@ -140,22 +140,33 @@ export function ListingCard({
 
       {/* Content */}
       <div className="p-4 space-y-3">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-display font-semibold text-lg group-hover:text-christmas transition-colors line-clamp-1">
-            {listing.title}
-          </h3>
-          {reviewStats && reviewStats.review_count > 0 && (
-            <div className="flex items-center gap-1 shrink-0" aria-label={`Rating: ${reviewStats.average_rating} out of 5 from ${reviewStats.review_count} reviews`}>
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" aria-hidden="true" />
-              <span className="text-sm font-medium">{reviewStats.average_rating}</span>
-              <span className="text-xs text-muted-foreground">({reviewStats.review_count})</span>
-            </div>
-          )}
-        </div>
+        {listing.title && (
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-display font-semibold text-lg group-hover:text-christmas transition-colors line-clamp-1">
+              {listing.title}
+            </h3>
+            {reviewStats && reviewStats.review_count > 0 && (
+              <div className="flex items-center gap-1 shrink-0" aria-label={`Rating: ${reviewStats.average_rating} out of 5 from ${reviewStats.review_count} reviews`}>
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" aria-hidden="true" />
+                <span className="text-sm font-medium">{reviewStats.average_rating}</span>
+                <span className="text-xs text-muted-foreground">({reviewStats.review_count})</span>
+              </div>
+            )}
+          </div>
+        )}
+        {!listing.title && reviewStats && reviewStats.review_count > 0 && (
+          <div className="flex items-center gap-1" aria-label={`Rating: ${reviewStats.average_rating} out of 5 from ${reviewStats.review_count} reviews`}>
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" aria-hidden="true" />
+            <span className="text-sm font-medium">{reviewStats.average_rating}</span>
+            <span className="text-xs text-muted-foreground">({reviewStats.review_count})</span>
+          </div>
+        )}
         
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {listing.description}
-        </p>
+        {listing.description && (
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {listing.description}
+          </p>
+        )}
 
         {/* Location */}
         <div className="flex items-start gap-2 text-sm">

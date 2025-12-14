@@ -93,23 +93,34 @@ export function MapListingDetail({
           {/* Content */}
           <div className="flex-1 min-w-0 space-y-2">
             {/* Title and Rating */}
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="font-display font-semibold text-lg line-clamp-1">
-                {listing.title}
-              </h3>
-              {reviewStats && reviewStats.review_count > 0 && (
-                <div className="flex items-center gap-1 shrink-0">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="text-sm font-medium">{reviewStats.average_rating}</span>
-                  <span className="text-xs text-muted-foreground">({reviewStats.review_count})</span>
-                </div>
-              )}
-            </div>
+            {listing.title && (
+              <div className="flex items-start justify-between gap-2">
+                <h3 className="font-display font-semibold text-lg line-clamp-1">
+                  {listing.title}
+                </h3>
+                {reviewStats && reviewStats.review_count > 0 && (
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span className="text-sm font-medium">{reviewStats.average_rating}</span>
+                    <span className="text-xs text-muted-foreground">({reviewStats.review_count})</span>
+                  </div>
+                )}
+              </div>
+            )}
+            {!listing.title && reviewStats && reviewStats.review_count > 0 && (
+              <div className="flex items-center gap-1">
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                <span className="text-sm font-medium">{reviewStats.average_rating}</span>
+                <span className="text-xs text-muted-foreground">({reviewStats.review_count})</span>
+              </div>
+            )}
 
             {/* Description */}
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {listing.description}
-            </p>
+            {listing.description && (
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {listing.description}
+              </p>
+            )}
 
             {/* Location and Hours */}
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">

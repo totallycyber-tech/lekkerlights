@@ -4,8 +4,8 @@ import type { Json } from '@/integrations/supabase/types';
 
 export interface Listing {
   id: string;
-  title: string;
-  description: string;
+  title: string | null;
+  description: string | null;
   complex_name: string | null;
   unit_no: string | null;
   street_number: string;
@@ -49,8 +49,8 @@ function toListingFromDb(row: any): Listing {
 }
 
 export interface ListingInsert {
-  title: string;
-  description: string;
+  title?: string | null;
+  description?: string | null;
   complex_name?: string | null;
   unit_no?: string | null;
   street_number: string;

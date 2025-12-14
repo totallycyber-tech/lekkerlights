@@ -86,7 +86,7 @@ export type Database = {
           contact_name: string | null
           contact_phone: string | null
           created_at: string
-          description: string
+          description: string | null
           directions_clicks: number | null
           email_visible: boolean
           favorites_count: number | null
@@ -106,7 +106,7 @@ export type Database = {
           street_number: string
           suburb: string
           tags: string[] | null
-          title: string
+          title: string | null
           unit_no: string | null
           updated_at: string
           youtube_urls: string[] | null
@@ -119,7 +119,7 @@ export type Database = {
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
-          description: string
+          description?: string | null
           directions_clicks?: number | null
           email_visible?: boolean
           favorites_count?: number | null
@@ -139,7 +139,7 @@ export type Database = {
           street_number: string
           suburb: string
           tags?: string[] | null
-          title: string
+          title?: string | null
           unit_no?: string | null
           updated_at?: string
           youtube_urls?: string[] | null
@@ -152,7 +152,7 @@ export type Database = {
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
-          description?: string
+          description?: string | null
           directions_clicks?: number | null
           email_visible?: boolean
           favorites_count?: number | null
@@ -172,7 +172,7 @@ export type Database = {
           street_number?: string
           suburb?: string
           tags?: string[] | null
-          title?: string
+          title?: string | null
           unit_no?: string | null
           updated_at?: string
           youtube_urls?: string[] | null

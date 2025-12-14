@@ -65,13 +65,15 @@ export function MapInfoWindow({
       {/* Content */}
       <div className="space-y-2">
         {/* Title */}
-        <Link 
-          to={`/listing/${listing.id}`}
-          className="block font-semibold text-base hover:text-christmas transition-colors line-clamp-1"
-          style={{ color: '#1a1a1a' }}
-        >
-          {listing.title}
-        </Link>
+        {listing.title && (
+          <Link 
+            to={`/listing/${listing.id}`}
+            className="block font-semibold text-base hover:text-christmas transition-colors line-clamp-1"
+            style={{ color: '#1a1a1a' }}
+          >
+            {listing.title}
+          </Link>
+        )}
 
         {/* Location */}
         <div className="flex items-center gap-1.5 text-xs" style={{ color: '#666' }}>

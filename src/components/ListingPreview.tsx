@@ -100,12 +100,21 @@ export function ListingPreview({
         <div className="space-y-6 mt-4">
           {/* Title & Description */}
           <div>
-            <h2 className="font-display text-2xl font-bold mb-2">
-              {data.title || 'Your Listing Title'}
-            </h2>
-            <p className="text-muted-foreground">
-              {data.description || 'Your listing description will appear here...'}
-            </p>
+            {data.title && (
+              <h2 className="font-display text-2xl font-bold mb-2">
+                {data.title}
+              </h2>
+            )}
+            {data.description && (
+              <p className="text-muted-foreground">
+                {data.description}
+              </p>
+            )}
+            {!data.title && !data.description && (
+              <p className="text-muted-foreground italic">
+                No title or description provided. Location details will be shown to visitors.
+              </p>
+            )}
           </div>
 
           {/* Tags */}
