@@ -30,7 +30,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Geocoding address for listing ${listingId}: ${address}`);
 
-    const googleMapsApiKey = Deno.env.get("GOOGLE_MAPS_API_KEY");
+    // Use server-side API key without HTTP referer restrictions for geocoding
+    const googleMapsApiKey = Deno.env.get("GOOGLE_MAPS_SERVER_API_KEY");
     if (!googleMapsApiKey) {
       console.error("Google Maps API key not configured");
       return new Response(
