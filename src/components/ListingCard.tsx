@@ -77,7 +77,7 @@ export function ListingCard({
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden">
         <img 
-          src={listing.photos[0] || defaultCoverPhoto} 
+          src={(listing.photos[0] && listing.photos[0] !== '') ? listing.photos[0] : defaultCoverPhoto} 
           alt={`Christmas light display: ${listing.title} in ${listing.location.suburb}, ${listing.location.city}`}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />

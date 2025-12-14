@@ -73,7 +73,7 @@ export function ListingPreview({
   };
 
   const hours = formatOperatingHours();
-  const displayPhoto = coverPhoto || defaultCoverPhoto;
+  const displayPhoto = (coverPhoto && coverPhoto !== '') ? coverPhoto : defaultCoverPhoto;
   const hasContact = (emailVisible && data.contactEmail) || (phoneVisible && data.contactPhone);
 
   return (
