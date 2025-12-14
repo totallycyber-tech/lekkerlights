@@ -831,6 +831,9 @@ export default function EditListing() {
                       <p className="text-xs text-muted-foreground mt-1">
                         Upload a new cover photo to replace the current one
                       </p>
+                      <p className="text-xs text-christmas mt-1 font-medium">
+                        📸 Upload high quality photos taken in the evening when lights are on for best results!
+                      </p>
                     </div>
                     <CoverPhotoUploader 
                       image={coverPhoto}
@@ -845,6 +848,9 @@ export default function EditListing() {
                       <Label className="text-sm font-medium">Additional Photos</Label>
                       <p className="text-xs text-muted-foreground mt-1">
                         Add more photos to your gallery
+                      </p>
+                      <p className="text-xs text-christmas mt-1 font-medium">
+                        📸 Use high quality photos for the best viewing experience!
                       </p>
                     </div>
                     <ImageUploader 
@@ -873,6 +879,16 @@ export default function EditListing() {
                           Add More
                         </Button>
                       )}
+                    </div>
+                    <div className="bg-secondary/50 rounded-lg p-3">
+                      <p className="text-xs text-christmas font-medium mb-1">
+                        🎬 How to add videos:
+                      </p>
+                      <ol className="text-xs text-muted-foreground list-decimal list-inside space-y-1">
+                        <li>Record a high quality video of your display at night</li>
+                        <li>Upload your video to <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">YouTube.com</a></li>
+                        <li>Copy the video's sharing link and paste it below</li>
+                      </ol>
                     </div>
                     {youtubeUrls.map((url, index) => (
                       <div key={index} className="flex gap-2">

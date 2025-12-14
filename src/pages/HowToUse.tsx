@@ -317,17 +317,24 @@ export default function HowToUse() {
                       Showcase your display with photos and videos:
                     </p>
                     <ul className="space-y-2 text-muted-foreground">
-                      <li className="flex items-center gap-2">
-                        <Camera className="h-4 w-4 text-christmas" />
-                        <span><strong>Cover Photo</strong> – The main image that appears on your listing card</span>
+                      <li className="flex items-start gap-2">
+                        <Camera className="h-4 w-4 text-christmas mt-0.5 flex-shrink-0" />
+                        <span><strong>Cover Photo</strong> – The main image that appears on your listing card. <span className="text-christmas font-medium">Upload high quality photos taken in the evening when your lights are on!</span></span>
                       </li>
-                      <li className="flex items-center gap-2">
-                        <Camera className="h-4 w-4 text-christmas" />
-                        <span><strong>Additional Photos</strong> – Up to 9 more photos to show different angles</span>
+                      <li className="flex items-start gap-2">
+                        <Camera className="h-4 w-4 text-christmas mt-0.5 flex-shrink-0" />
+                        <span><strong>Additional Photos</strong> – Up to 9 more high quality photos to show different angles</span>
                       </li>
-                      <li className="flex items-center gap-2">
-                        <Eye className="h-4 w-4 text-christmas" />
-                        <span><strong>YouTube Videos</strong> – Add up to 3 YouTube video URLs</span>
+                      <li className="flex items-start gap-2">
+                        <Eye className="h-4 w-4 text-christmas mt-0.5 flex-shrink-0" />
+                        <div>
+                          <span><strong>YouTube Videos</strong> – To add videos:</span>
+                          <ol className="list-decimal list-inside mt-1 ml-2 text-sm">
+                            <li>Record a high quality video of your display at night</li>
+                            <li>Upload your video separately to <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">YouTube.com</a></li>
+                            <li>Copy the sharing link and paste it in the form (up to 3 videos)</li>
+                          </ol>
+                        </div>
                       </li>
                     </ul>
                   </div>
@@ -630,9 +637,25 @@ export default function HowToUse() {
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground pb-4">
                       Photos must be in JPEG, PNG, WebP, or GIF format and no larger than 5MB each. You can upload 
-                      one cover photo (the main image on your listing card) and up to 9 additional photos. For best 
-                      results, use landscape-oriented photos taken in the evening when your lights are on! Visitors 
+                      one cover photo (the main image on your listing card) and up to 9 additional photos. 
+                      <strong className="text-christmas"> For best results, upload high quality photos taken in the evening when your lights are on!</strong> Visitors 
                       can click on any photo to view it full-size and browse through your gallery using navigation arrows.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="video-requirements" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      How do I add videos to my listing?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      To add videos to your listing:
+                      <ol className="list-decimal list-inside mt-2 space-y-1">
+                        <li><strong>Record a high quality video</strong> of your display at night when the lights are on</li>
+                        <li><strong>Upload your video to <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">YouTube.com</a></strong> – you'll need a free YouTube account</li>
+                        <li><strong>Copy the sharing link</strong> from YouTube (click Share button on your video)</li>
+                        <li><strong>Paste the link</strong> in the YouTube Videos section of your listing form</li>
+                      </ol>
+                      <p className="mt-2">You can add up to 3 YouTube video URLs per listing. Videos are embedded directly in your listing page so visitors can watch without leaving the site.</p>
                     </AccordionContent>
                   </AccordionItem>
 
