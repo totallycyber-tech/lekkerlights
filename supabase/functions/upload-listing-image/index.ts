@@ -224,21 +224,74 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Verify access - check if it's an edit token or batch token
     if (editToken) {
+      // First try to verify as a regular edit token
       const { data: tokenRecord, error: tokenError } = await supabase
         .from("listing_edit_tokens")
-        .select("edit_token")
+        .select("edit_token, expires_at")
         .eq("listing_id", listingId)
         .single();
 
-      if (tokenError || !tokenRecord || tokenRecord.edit_token !== editToken) {
-        console.log("Invalid edit token for listing:", listingId);
-        return new Response(
-          JSON.stringify({ success: false, error: "Invalid edit token" }),
-          { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
-        );
+      if (tokenRecord && tokenRecord.edit_token === editToken) {
+        // Valid edit token - check expiry
+        if (tokenRecord.expires_at) {
+          const expiresAt = new Date(tokenRecord.expires_at);
+          if (new Date() > expiresAt) {
+            console.log("Edit token expired for listing:", listingId);
+            return new Response(
+              JSON.stringify({ success: false, error: "Token has expired" }),
+              { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+            );
+          }
+        }
+        console.log("Edit token verified for listing:", listingId);
+      } else {
+        // Try to verify as a batch token
+        const { data: listingData, error: listingError } = await supabase
+          .from("listings")
+          .select("batch_id")
+          .eq("id", listingId)
+          .single();
+
+        if (listingError || !listingData?.batch_id) {
+          console.log("Invalid token - not a valid edit token or batch listing:", listingId);
+          return new Response(
+            JSON.stringify({ success: false, error: "Invalid edit token" }),
+            { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+          );
+        }
+
+        // Verify batch token
+        const { data: batchTokenRecord, error: batchTokenError } = await supabase
+          .from("batch_edit_tokens")
+          .select("edit_token, expires_at")
+          .eq("batch_id", listingData.batch_id)
+          .single();
+
+        if (batchTokenError || !batchTokenRecord || batchTokenRecord.edit_token !== editToken) {
+          console.log("Invalid batch token for listing:", listingId);
+          return new Response(
+            JSON.stringify({ success: false, error: "Invalid edit token" }),
+            { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+          );
+        }
+
+        // Check if batch token has expired
+        if (batchTokenRecord.expires_at) {
+          const expiresAt = new Date(batchTokenRecord.expires_at);
+          if (new Date() > expiresAt) {
+            console.log("Batch token expired for listing:", listingId);
+            return new Response(
+              JSON.stringify({ success: false, error: "Token has expired" }),
+              { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+            );
+          }
+        }
+        console.log("Batch token verified for listing:", listingId);
       }
     } else {
+      // No token provided - verify listing exists (for initial creation)
       const { data: listing, error: listingError } = await supabase
         .from("listings")
         .select("id")

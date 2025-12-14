@@ -41,7 +41,8 @@ function cleanupRateLimitMap() {
 
 interface DeleteImageRequest {
   listingId: string;
-  editToken: string;
+  editToken?: string;
+  batchToken?: string;
   imagePath: string;
 }
 
@@ -75,11 +76,11 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { listingId, editToken, imagePath }: DeleteImageRequest = await req.json();
+    const { listingId, editToken, batchToken, imagePath }: DeleteImageRequest = await req.json();
 
     // Validate required fields
-    if (!listingId || !editToken || !imagePath) {
-      console.log("Missing required fields:", { listingId: !!listingId, editToken: !!editToken, imagePath: !!imagePath });
+    if (!listingId || (!editToken && !batchToken) || !imagePath) {
+      console.log("Missing required fields:", { listingId: !!listingId, editToken: !!editToken, batchToken: !!batchToken, imagePath: !!imagePath });
       return new Response(
         JSON.stringify({ success: false, error: "Missing required fields" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
@@ -95,33 +96,90 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Verifying edit token for listing: ${listingId} (IP: ${clientIP})`);
+    console.log(`Verifying token for listing: ${listingId} (IP: ${clientIP})`);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Verify edit token
-    const { data: tokenRecord, error: tokenError } = await supabase
-      .from("listing_edit_tokens")
-      .select("edit_token")
-      .eq("listing_id", listingId)
-      .single();
+    // Verify token - either batch token or edit token
+    if (batchToken) {
+      // Get the listing's batch_id first
+      const { data: listingData, error: listingError } = await supabase
+        .from("listings")
+        .select("batch_id")
+        .eq("id", listingId)
+        .single();
 
-    if (tokenError || !tokenRecord) {
-      console.log("Token not found for listing:", listingId);
-      return new Response(
-        JSON.stringify({ success: false, error: "Invalid token" }),
-        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
+      if (listingError || !listingData?.batch_id) {
+        console.log("Listing not found or not part of batch:", listingId);
+        return new Response(
+          JSON.stringify({ success: false, error: "Invalid token" }),
+          { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
 
-    if (tokenRecord.edit_token !== editToken) {
-      console.log("Token mismatch for listing:", listingId);
-      return new Response(
-        JSON.stringify({ success: false, error: "Invalid token" }),
-        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
+      // Verify batch token
+      const { data: batchTokenRecord, error: batchTokenError } = await supabase
+        .from("batch_edit_tokens")
+        .select("edit_token, expires_at")
+        .eq("batch_id", listingData.batch_id)
+        .single();
+
+      if (batchTokenError || !batchTokenRecord || batchTokenRecord.edit_token !== batchToken) {
+        console.log("Invalid batch token for listing:", listingId);
+        return new Response(
+          JSON.stringify({ success: false, error: "Invalid token" }),
+          { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      // Check if batch token has expired
+      if (batchTokenRecord.expires_at) {
+        const expiresAt = new Date(batchTokenRecord.expires_at);
+        if (new Date() > expiresAt) {
+          console.log("Batch token expired for listing:", listingId);
+          return new Response(
+            JSON.stringify({ success: false, error: "Token has expired" }),
+            { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+          );
+        }
+      }
+    } else if (editToken) {
+      // Verify edit token
+      const { data: tokenRecord, error: tokenError } = await supabase
+        .from("listing_edit_tokens")
+        .select("edit_token, expires_at")
+        .eq("listing_id", listingId)
+        .single();
+
+      if (tokenError || !tokenRecord) {
+        console.log("Token not found for listing:", listingId);
+        return new Response(
+          JSON.stringify({ success: false, error: "Invalid token" }),
+          { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      if (tokenRecord.edit_token !== editToken) {
+        console.log("Token mismatch for listing:", listingId);
+        return new Response(
+          JSON.stringify({ success: false, error: "Invalid token" }),
+          { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      // Check if token has expired
+      if (tokenRecord.expires_at) {
+        const expiresAt = new Date(tokenRecord.expires_at);
+        if (new Date() > expiresAt) {
+          console.log("Token expired for listing:", listingId);
+          return new Response(
+            JSON.stringify({ success: false, error: "Token has expired" }),
+            { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+          );
+        }
+      }
     }
 
     console.log(`Token verified, deleting image: ${imagePath}`);
