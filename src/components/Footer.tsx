@@ -72,7 +72,7 @@ export function Footer() {
               className="text-primary hover:underline"
             >
               Chintan Patel
-            </a>.
+            </a>, a resident of Benoni, South Africa.
           </p>
           <nav className="flex gap-6">
             <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
