@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -13,16 +14,22 @@ import { toast } from "@/hooks/use-toast";
 import { useListing } from "@/hooks/use-listings";
 import { ListingReviews } from "@/components/ListingReviews";
 import { ReportListingDialog } from "@/components/ReportListingDialog";
+import { PhotoLightbox } from "@/components/PhotoLightbox";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 export default function ListingDetail() {
   const { id } = useParams();
   const { data: dbListing, isLoading, error } = useListing(id || '');
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   
   // Try to find in database first, then fall back to mock
   const listing = dbListing 
     ? transformDbListing(dbListing as any)
     : mockListings.find(l => l.id === id);
+  
+  // Get additional photos (exclude cover photo placeholder)
+  const additionalPhotos = listing?.photos.slice(1).filter(p => p && p !== '') || [];
 
   if (isLoading) {
     return (
@@ -249,25 +256,39 @@ export default function ListingDetail() {
               )}
 
               {/* Photo Gallery */}
-              {listing.photos.length > 1 && (
+              {additionalPhotos.length > 0 && (
                 <div className="border-t border-border pt-6 mb-8">
                   <h3 className="font-display font-semibold mb-4">More Photos</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {listing.photos.slice(1).map((photo, index) => (
-                      <div 
+                    {additionalPhotos.map((photo, index) => (
+                      <button 
                         key={index}
-                        className="aspect-video rounded-lg overflow-hidden"
+                        className="aspect-video rounded-lg overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-christmas focus:ring-offset-2"
+                        onClick={() => {
+                          setLightboxIndex(index);
+                          setLightboxOpen(true);
+                        }}
+                        aria-label={`View ${listing.title} - Photo ${index + 2} in full size`}
                       >
                         <img 
                           src={photo} 
                           alt={`${listing.title} - Photo ${index + 2}`}
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                         />
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
               )}
+
+              {/* Photo Lightbox */}
+              <PhotoLightbox
+                photos={additionalPhotos}
+                initialIndex={lightboxIndex}
+                isOpen={lightboxOpen}
+                onClose={() => setLightboxOpen(false)}
+                altPrefix={listing.title}
+              />
 
               {/* Report Button */}
               <div className="border-t border-border pt-6 flex justify-end">
