@@ -42,7 +42,8 @@ import {
   Trash2,
   User,
   Mail,
-  Phone
+  Phone,
+  Wand2
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -128,6 +129,8 @@ interface ListingMediaState {
   showUnitField: boolean;
   showTitleField: boolean;
   showDescriptionField: boolean;
+  isGeneratingTitle: boolean;
+  isGeneratingDescription: boolean;
 }
 
 function parseOperatingHours(hours: Record<string, any> | undefined): { operatingHours: OperatingHours; operatingHoursOther: string } {
@@ -235,6 +238,8 @@ export default function EditBatchListings() {
         showUnitField: !!listing.unit_no,
         showTitleField: !!listing.title,
         showDescriptionField: !!listing.description,
+        isGeneratingTitle: false,
+        isGeneratingDescription: false,
       };
     });
     setMediaState(initialMediaState);
@@ -387,6 +392,47 @@ export default function EditBatchListings() {
       postalCode: components.postalCode,
     });
   }, []);
+
+  const generateWithAI = async (listingId: string, type: 'title' | 'description') => {
+    const state = mediaState[listingId];
+    if (!state) return;
+
+    const loadingKey = type === 'title' ? 'isGeneratingTitle' : 'isGeneratingDescription';
+    updateMediaState(listingId, { [loadingKey]: true });
+
+    try {
+      const listing = listings.find(l => l.id === listingId);
+      const editedData = editedListings[listingId] || {};
+      
+      const { data, error } = await supabase.functions.invoke('generate-listing-content', {
+        body: {
+          type,
+          tags: state.selectedTags,
+          existingTitle: (editedData.title as string) || listing?.title || '',
+          existingDescription: (editedData.description as string) || listing?.description || '',
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.text) {
+        handleFieldChange(listingId, type, data.text);
+        toast({
+          title: `${type === 'title' ? 'Title' : 'Description'} generated!`,
+          description: "Feel free to edit it to make it your own.",
+        });
+      }
+    } catch (error) {
+      console.error(`Error generating ${type}:`, error);
+      toast({
+        title: "Generation failed",
+        description: "Could not generate content. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      updateMediaState(listingId, { [loadingKey]: false });
+    }
+  };
 
   // Delete listing
   const handleDeleteListing = async (listingId: string) => {
@@ -841,7 +887,24 @@ export default function EditBatchListings() {
                                 </div>
                                 {state.showTitleField && (
                                   <div className="space-y-2">
-                                    <Label className="text-xs">Title</Label>
+                                    <div className="flex items-center justify-between">
+                                      <Label className="text-xs">Title</Label>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => generateWithAI(listing.id, 'title')}
+                                        disabled={state.isGeneratingTitle}
+                                        className="h-7 text-xs text-muted-foreground hover:text-christmas"
+                                      >
+                                        {state.isGeneratingTitle ? (
+                                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                        ) : (
+                                          <Wand2 className="h-3 w-3 mr-1" />
+                                        )}
+                                        Generate with AI
+                                      </Button>
+                                    </div>
                                     <Input
                                       value={(getFieldValue(listing, 'title') as string) || ''}
                                       onChange={(e) => handleFieldChange(listing.id, 'title', e.target.value)}
@@ -871,7 +934,24 @@ export default function EditBatchListings() {
                                 </div>
                                 {state.showDescriptionField && (
                                   <div className="space-y-2">
-                                    <Label className="text-xs">Description</Label>
+                                    <div className="flex items-center justify-between">
+                                      <Label className="text-xs">Description</Label>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => generateWithAI(listing.id, 'description')}
+                                        disabled={state.isGeneratingDescription}
+                                        className="h-7 text-xs text-muted-foreground hover:text-christmas"
+                                      >
+                                        {state.isGeneratingDescription ? (
+                                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                        ) : (
+                                          <Wand2 className="h-3 w-3 mr-1" />
+                                        )}
+                                        Generate with AI
+                                      </Button>
+                                    </div>
                                     <Textarea
                                       value={(getFieldValue(listing, 'description') as string) || ''}
                                       onChange={(e) => handleFieldChange(listing.id, 'description', e.target.value)}

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Trash2, EyeOff, Loader2 } from "lucide-react";
+import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Trash2, EyeOff, Loader2, Wand2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
@@ -76,6 +76,8 @@ export default function EditListing() {
   const [showUnitField, setShowUnitField] = useState(false);
   const [showTitleField, setShowTitleField] = useState(false);
   const [showDescriptionField, setShowDescriptionField] = useState(false);
+  const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [originalAddress, setOriginalAddress] = useState({
     streetNumber: '',
     streetName: '',
@@ -261,6 +263,41 @@ export default function EditListing() {
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const generateWithAI = async (type: 'title' | 'description') => {
+    const setLoading = type === 'title' ? setIsGeneratingTitle : setIsGeneratingDescription;
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-listing-content', {
+        body: {
+          type,
+          tags: selectedTags,
+          existingTitle: formData.title,
+          existingDescription: formData.description,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.text) {
+        handleChange(type, data.text);
+        toast({
+          title: `${type === 'title' ? 'Title' : 'Description'} generated!`,
+          description: "Feel free to edit it to make it your own.",
+        });
+      }
+    } catch (error) {
+      console.error(`Error generating ${type}:`, error);
+      toast({
+        title: "Generation failed",
+        description: "Could not generate content. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAddressSelect = useCallback((components: {
@@ -580,7 +617,24 @@ export default function EditListing() {
                     </div>
                     {showTitleField && (
                       <div className="space-y-2 pl-4 border-l-2 border-christmas/30">
-                        <Label htmlFor="title">Display Title</Label>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="title">Display Title</Label>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => generateWithAI('title')}
+                            disabled={isGeneratingTitle}
+                            className="h-8 text-xs text-muted-foreground hover:text-christmas"
+                          >
+                            {isGeneratingTitle ? (
+                              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                            ) : (
+                              <Wand2 className="h-3 w-3 mr-1" />
+                            )}
+                            Generate with AI
+                          </Button>
+                        </div>
                         <Input
                           id="title"
                           placeholder="e.g., Winter Wonderland Display"
@@ -614,7 +668,24 @@ export default function EditListing() {
                     </div>
                     {showDescriptionField && (
                       <div className="space-y-2 pl-4 border-l-2 border-christmas/30">
-                        <Label htmlFor="description">Description</Label>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="description">Description</Label>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => generateWithAI('description')}
+                            disabled={isGeneratingDescription}
+                            className="h-8 text-xs text-muted-foreground hover:text-christmas"
+                          >
+                            {isGeneratingDescription ? (
+                              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                            ) : (
+                              <Wand2 className="h-3 w-3 mr-1" />
+                            )}
+                            Generate with AI
+                          </Button>
+                        </div>
                         <Textarea
                           id="description"
                           placeholder="Tell visitors what makes your Christmas display special..."
