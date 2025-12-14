@@ -75,10 +75,11 @@ export default function ListingDetail() {
   };
 
   const handleShare = async () => {
+    const shareTitle = listing.title || `Christmas Display in ${listing.location.suburb}`;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: listing.title,
+          title: shareTitle,
           text: `Check out this amazing Christmas display!`,
           url: window.location.href,
         });
@@ -116,7 +117,9 @@ export default function ListingDetail() {
         <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
           <img 
             src={(listing.photos[0] && listing.photos[0] !== '') ? listing.photos[0] : defaultCoverPhoto} 
-            alt={isExampleListing ? `Example listing preview: ${listing.title}` : listing.title}
+            alt={isExampleListing 
+              ? `Example listing preview: ${listing.title || 'Christmas Display'}` 
+              : (listing.title || `Christmas Display in ${listing.location.suburb}`)}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30" />
@@ -173,16 +176,20 @@ export default function ListingDetail() {
                   <Badge variant="christmas" className="mb-2">
                     🎄 Christmas
                   </Badge>
-                  <h1 className="font-display text-2xl sm:text-3xl font-bold">
-                    {listing.title}
-                  </h1>
+                  {listing.title && (
+                    <h1 className="font-display text-2xl sm:text-3xl font-bold">
+                      {listing.title}
+                    </h1>
+                  )}
                 </div>
               </div>
 
               {/* Description */}
-              <p className="text-muted-foreground text-lg leading-relaxed mb-8">
-                {listing.description}
-              </p>
+              {listing.description && (
+                <p className="text-muted-foreground text-lg leading-relaxed mb-8">
+                  {listing.description}
+                </p>
+              )}
 
               {/* Details Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

@@ -8,8 +8,8 @@ const corsHeaders = {
 };
 
 interface ListingData {
-  title: string;
-  description: string;
+  title?: string | null;
+  description?: string | null;
   streetNumber: string;
   streetName: string;
   suburb: string;
@@ -123,8 +123,8 @@ const handler = async (req: Request): Promise<Response> => {
       const { data: newListing, error: insertError } = await supabase
         .from("listings")
         .insert({
-          title: listing.title,
-          description: listing.description,
+          title: listing.title || null,
+          description: listing.description || null,
           street_number: listing.streetNumber,
           street_name: listing.streetName,
           suburb: listing.suburb,
@@ -154,12 +154,12 @@ const handler = async (req: Request): Promise<Response> => {
       if (insertError || !newListing) {
         console.error("Failed to create listing:", insertError);
         return new Response(
-          JSON.stringify({ success: false, error: `Failed to create listing: ${listing.title}` }),
+          JSON.stringify({ success: false, error: `Failed to create listing: ${listing.title || listing.streetNumber + ' ' + listing.streetName}` }),
           { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
         );
       }
 
-      createdListings.push({ id: newListing.id, title: newListing.title });
+      createdListings.push({ id: newListing.id, title: newListing.title || `${listing.streetNumber} ${listing.streetName}` });
 
       // Geocode the address
       try {

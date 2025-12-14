@@ -73,6 +73,8 @@ export default function CreateListing() {
   const [phoneVisible, setPhoneVisible] = useState(true);
   const [showComplexField, setShowComplexField] = useState(false);
   const [showUnitField, setShowUnitField] = useState(false);
+  const [showTitleField, setShowTitleField] = useState(false);
+  const [showDescriptionField, setShowDescriptionField] = useState(false);
   const [addressSelected, setAddressSelected] = useState(false);
   const [addressError, setAddressError] = useState(false);
   const [duplicateAddressError, setDuplicateAddressError] = useState<string | null>(null);
@@ -113,8 +115,8 @@ export default function CreateListing() {
     try {
       // Filter youtube URLs for each listing
       const listingsData = listings.map(l => ({
-        title: l.title,
-        description: l.description,
+        title: l.showTitleField ? l.title : null,
+        description: l.showDescriptionField ? l.description : null,
         streetNumber: l.streetNumber,
         streetName: l.streetName,
         suburb: l.suburb,
@@ -397,8 +399,8 @@ export default function CreateListing() {
       // First create the listing to get an ID
       setUploadProgress('Creating listing...');
       const listing = await createListing.mutateAsync({
-        title: formData.title,
-        description: formData.description,
+        title: showTitleField ? formData.title : null,
+        description: showDescriptionField ? formData.description : null,
         complex_name: formData.complexName || null,
         unit_no: formData.unitNo || null,
         street_number: formData.streetNumber,
@@ -582,62 +584,106 @@ export default function CreateListing() {
                 <h2 className="font-display text-lg font-semibold">Basic Information</h2>
                 
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="title">Display Title *</Label>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => generateWithAI('title')}
-                        disabled={isGeneratingTitle}
-                        className="h-8 text-xs text-muted-foreground hover:text-christmas"
-                      >
-                        {isGeneratingTitle ? (
-                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                        ) : (
-                          <Wand2 className="h-3 w-3 mr-1" />
-                        )}
-                        Generate with AI
-                      </Button>
+                  {/* Title Toggle */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="showTitle" className="text-sm font-medium cursor-pointer">
+                          Add a display title?
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Enable to give your display a custom title
+                        </p>
+                      </div>
+                      <Switch
+                        id="showTitle"
+                        checked={showTitleField}
+                        onCheckedChange={(checked) => {
+                          setShowTitleField(checked);
+                          if (!checked) handleChange('title', '');
+                        }}
+                      />
                     </div>
-                    <Input
-                      id="title"
-                      placeholder="e.g., Winter Wonderland Display"
-                      value={formData.title}
-                      onChange={(e) => handleChange('title', e.target.value)}
-                      className="bg-secondary"
-                      required
-                    />
+                    {showTitleField && (
+                      <div className="space-y-2 pl-4 border-l-2 border-christmas/30">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="title">Display Title</Label>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => generateWithAI('title')}
+                            disabled={isGeneratingTitle}
+                            className="h-8 text-xs text-muted-foreground hover:text-christmas"
+                          >
+                            {isGeneratingTitle ? (
+                              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                            ) : (
+                              <Wand2 className="h-3 w-3 mr-1" />
+                            )}
+                            Generate with AI
+                          </Button>
+                        </div>
+                        <Input
+                          id="title"
+                          placeholder="e.g., Winter Wonderland Display"
+                          value={formData.title}
+                          onChange={(e) => handleChange('title', e.target.value)}
+                          className="bg-secondary"
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="description">Description *</Label>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => generateWithAI('description')}
-                        disabled={isGeneratingDescription}
-                        className="h-8 text-xs text-muted-foreground hover:text-christmas"
-                      >
-                        {isGeneratingDescription ? (
-                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                        ) : (
-                          <Wand2 className="h-3 w-3 mr-1" />
-                        )}
-                        Generate with AI
-                      </Button>
+                  {/* Description Toggle */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="showDescription" className="text-sm font-medium cursor-pointer">
+                          Add a description?
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Enable to describe your display to visitors
+                        </p>
+                      </div>
+                      <Switch
+                        id="showDescription"
+                        checked={showDescriptionField}
+                        onCheckedChange={(checked) => {
+                          setShowDescriptionField(checked);
+                          if (!checked) handleChange('description', '');
+                        }}
+                      />
                     </div>
-                    <Textarea
-                      id="description"
-                      placeholder="Tell visitors what makes your Christmas display special..."
-                      value={formData.description}
-                      onChange={(e) => handleChange('description', e.target.value)}
-                      className="bg-secondary min-h-[120px]"
-                      required
-                    />
+                    {showDescriptionField && (
+                      <div className="space-y-2 pl-4 border-l-2 border-christmas/30">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="description">Description</Label>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => generateWithAI('description')}
+                            disabled={isGeneratingDescription}
+                            className="h-8 text-xs text-muted-foreground hover:text-christmas"
+                          >
+                            {isGeneratingDescription ? (
+                              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                            ) : (
+                              <Wand2 className="h-3 w-3 mr-1" />
+                            )}
+                            Generate with AI
+                          </Button>
+                        </div>
+                        <Textarea
+                          id="description"
+                          placeholder="Tell visitors what makes your Christmas display special..."
+                          value={formData.description}
+                          onChange={(e) => handleChange('description', e.target.value)}
+                          className="bg-secondary min-h-[120px]"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

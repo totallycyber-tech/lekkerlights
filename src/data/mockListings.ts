@@ -1,7 +1,7 @@
 export interface Listing {
   id: string;
-  title: string;
-  description: string;
+  title: string | null;
+  description: string | null;
   location: {
     streetNumber: string;
     streetName: string;
@@ -30,8 +30,8 @@ export interface Listing {
 // Input type for transformDbListing that's compatible with both useListings and direct DB queries
 type DbListingInput = {
   id: string;
-  title: string;
-  description: string;
+  title: string | null;
+  description: string | null;
   street_number: string;
   street_name: string;
   suburb: string;

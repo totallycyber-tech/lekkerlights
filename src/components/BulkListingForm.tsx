@@ -46,6 +46,8 @@ export interface ListingEntry {
   id: string;
   title: string;
   description: string;
+  showTitleField: boolean;
+  showDescriptionField: boolean;
   streetNumber: string;
   streetName: string;
   suburb: string;
@@ -74,6 +76,8 @@ export const createEmptyListing = (): ListingEntry => ({
   id: crypto.randomUUID(),
   title: '',
   description: '',
+  showTitleField: false,
+  showDescriptionField: false,
   streetNumber: '',
   streetName: '',
   suburb: '',
@@ -304,13 +308,13 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
     // Validate all listings
     for (let i = 0; i < listings.length; i++) {
       const l = listings[i];
-      if (!l.title.trim()) {
-        toast({ title: "Missing title", description: `Listing ${i + 1} needs a title.`, variant: "destructive" });
+      if (l.showTitleField && !l.title.trim()) {
+        toast({ title: "Missing title", description: `Listing ${i + 1} has title enabled but no title provided.`, variant: "destructive" });
         setExpandedListing(l.id);
         return;
       }
-      if (!l.description.trim()) {
-        toast({ title: "Missing description", description: `Listing ${i + 1} needs a description.`, variant: "destructive" });
+      if (l.showDescriptionField && !l.description.trim()) {
+        toast({ title: "Missing description", description: `Listing ${i + 1} has description enabled but no description provided.`, variant: "destructive" });
         setExpandedListing(l.id);
         return;
       }
@@ -412,60 +416,98 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
 
             {expandedListing === listing.id && (
               <div className="p-4 pt-0 border-t border-border space-y-6">
-                {/* Title */}
-                <div className="space-y-2">
+                {/* Title Toggle */}
+                <div className="space-y-3 bg-secondary/50 rounded-lg p-4">
                   <div className="flex items-center justify-between">
-                    <Label>Title *</Label>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => generateWithAI(listing.id, 'title')}
-                      disabled={generatingFor?.id === listing.id && generatingFor?.type === 'title'}
-                      className="h-8 text-xs"
-                    >
-                      {generatingFor?.id === listing.id && generatingFor?.type === 'title' ? (
-                        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                      ) : (
-                        <Wand2 className="h-3 w-3 mr-1" />
-                      )}
-                      Generate
-                    </Button>
+                    <div>
+                      <Label>Add a display title?</Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Enable to give this display a custom title
+                      </p>
+                    </div>
+                    <Switch
+                      checked={listing.showTitleField}
+                      onCheckedChange={(checked) => {
+                        updateListing(listing.id, 'showTitleField', checked);
+                        if (!checked) updateListing(listing.id, 'title', '');
+                      }}
+                    />
                   </div>
-                  <Input
-                    value={listing.title}
-                    onChange={(e) => updateListing(listing.id, 'title', e.target.value)}
-                    placeholder="e.g., Winter Wonderland Display"
-                    className="bg-secondary"
-                  />
+                  {listing.showTitleField && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs">Title</Label>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => generateWithAI(listing.id, 'title')}
+                          disabled={generatingFor?.id === listing.id && generatingFor?.type === 'title'}
+                          className="h-8 text-xs"
+                        >
+                          {generatingFor?.id === listing.id && generatingFor?.type === 'title' ? (
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          ) : (
+                            <Wand2 className="h-3 w-3 mr-1" />
+                          )}
+                          Generate
+                        </Button>
+                      </div>
+                      <Input
+                        value={listing.title}
+                        onChange={(e) => updateListing(listing.id, 'title', e.target.value)}
+                        placeholder="e.g., Winter Wonderland Display"
+                        className="bg-background"
+                      />
+                    </div>
+                  )}
                 </div>
 
-                {/* Description */}
-                <div className="space-y-2">
+                {/* Description Toggle */}
+                <div className="space-y-3 bg-secondary/50 rounded-lg p-4">
                   <div className="flex items-center justify-between">
-                    <Label>Description *</Label>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => generateWithAI(listing.id, 'description')}
-                      disabled={generatingFor?.id === listing.id && generatingFor?.type === 'description'}
-                      className="h-8 text-xs"
-                    >
-                      {generatingFor?.id === listing.id && generatingFor?.type === 'description' ? (
-                        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                      ) : (
-                        <Wand2 className="h-3 w-3 mr-1" />
-                      )}
-                      Generate
-                    </Button>
+                    <div>
+                      <Label>Add a description?</Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Enable to describe this display to visitors
+                      </p>
+                    </div>
+                    <Switch
+                      checked={listing.showDescriptionField}
+                      onCheckedChange={(checked) => {
+                        updateListing(listing.id, 'showDescriptionField', checked);
+                        if (!checked) updateListing(listing.id, 'description', '');
+                      }}
+                    />
                   </div>
-                  <Textarea
-                    value={listing.description}
-                    onChange={(e) => updateListing(listing.id, 'description', e.target.value)}
-                    placeholder="Describe this display..."
-                    className="bg-secondary min-h-[80px]"
-                  />
+                  {listing.showDescriptionField && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs">Description</Label>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => generateWithAI(listing.id, 'description')}
+                          disabled={generatingFor?.id === listing.id && generatingFor?.type === 'description'}
+                          className="h-8 text-xs"
+                        >
+                          {generatingFor?.id === listing.id && generatingFor?.type === 'description' ? (
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          ) : (
+                            <Wand2 className="h-3 w-3 mr-1" />
+                          )}
+                          Generate
+                        </Button>
+                      </div>
+                      <Textarea
+                        value={listing.description}
+                        onChange={(e) => updateListing(listing.id, 'description', e.target.value)}
+                        placeholder="Describe this display..."
+                        className="bg-background min-h-[80px]"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Address */}
