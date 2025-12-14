@@ -74,6 +74,8 @@ export default function EditListing() {
   const [phoneVisible, setPhoneVisible] = useState(true);
   const [showComplexField, setShowComplexField] = useState(false);
   const [showUnitField, setShowUnitField] = useState(false);
+  const [showTitleField, setShowTitleField] = useState(false);
+  const [showDescriptionField, setShowDescriptionField] = useState(false);
   const [originalAddress, setOriginalAddress] = useState({
     streetNumber: '',
     streetName: '',
@@ -191,6 +193,8 @@ export default function EditListing() {
         setNameVisible(listing.name_visible ?? true);
         setEmailVisible(listing.email_visible ?? true);
         setPhoneVisible(listing.phone_visible ?? true);
+        setShowTitleField(!!listing.title);
+        setShowDescriptionField(!!listing.description);
         setShowComplexField(!!listing.complex_name);
         setShowUnitField(!!listing.unit_no);
         setExistingImageUrls(listing.image_urls || []);
@@ -383,8 +387,8 @@ export default function EditListing() {
           listingId: id,
           editToken: token,
           updates: {
-            title: formData.title,
-            description: formData.description,
+            title: showTitleField ? formData.title : null,
+            description: showDescriptionField ? formData.description : null,
             complex_name: formData.complexName || null,
             unit_no: formData.unitNo || null,
             street_number: formData.streetNumber,
@@ -554,28 +558,72 @@ export default function EditListing() {
                 <h2 className="font-display text-lg font-semibold">Basic Information</h2>
                 
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Display Title *</Label>
-                    <Input
-                      id="title"
-                      placeholder="e.g., Winter Wonderland Display"
-                      value={formData.title}
-                      onChange={(e) => handleChange('title', e.target.value)}
-                      className="bg-secondary"
-                      required
-                    />
+                  {/* Title Toggle */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="showTitle" className="text-sm font-medium cursor-pointer">
+                          Add a display title?
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Enable to give your display a custom title
+                        </p>
+                      </div>
+                      <Switch
+                        id="showTitle"
+                        checked={showTitleField}
+                        onCheckedChange={(checked) => {
+                          setShowTitleField(checked);
+                          if (!checked) handleChange('title', '');
+                        }}
+                      />
+                    </div>
+                    {showTitleField && (
+                      <div className="space-y-2 pl-4 border-l-2 border-christmas/30">
+                        <Label htmlFor="title">Display Title</Label>
+                        <Input
+                          id="title"
+                          placeholder="e.g., Winter Wonderland Display"
+                          value={formData.title}
+                          onChange={(e) => handleChange('title', e.target.value)}
+                          className="bg-secondary"
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description *</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Tell visitors what makes your Christmas display special..."
-                      value={formData.description}
-                      onChange={(e) => handleChange('description', e.target.value)}
-                      className="bg-secondary min-h-[120px]"
-                      required
-                    />
+                  {/* Description Toggle */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="showDescription" className="text-sm font-medium cursor-pointer">
+                          Add a description?
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Enable to describe your display to visitors
+                        </p>
+                      </div>
+                      <Switch
+                        id="showDescription"
+                        checked={showDescriptionField}
+                        onCheckedChange={(checked) => {
+                          setShowDescriptionField(checked);
+                          if (!checked) handleChange('description', '');
+                        }}
+                      />
+                    </div>
+                    {showDescriptionField && (
+                      <div className="space-y-2 pl-4 border-l-2 border-christmas/30">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                          id="description"
+                          placeholder="Tell visitors what makes your Christmas display special..."
+                          value={formData.description}
+                          onChange={(e) => handleChange('description', e.target.value)}
+                          className="bg-secondary min-h-[120px]"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -126,6 +126,8 @@ interface ListingMediaState {
   unitNo: string;
   showComplexField: boolean;
   showUnitField: boolean;
+  showTitleField: boolean;
+  showDescriptionField: boolean;
 }
 
 function parseOperatingHours(hours: Record<string, any> | undefined): { operatingHours: OperatingHours; operatingHoursOther: string } {
@@ -231,6 +233,8 @@ export default function EditBatchListings() {
         unitNo: listing.unit_no || '',
         showComplexField: !!listing.complex_name,
         showUnitField: !!listing.unit_no,
+        showTitleField: !!listing.title,
+        showDescriptionField: !!listing.description,
       };
     });
     setMediaState(initialMediaState);
@@ -550,6 +554,9 @@ export default function EditBatchListings() {
         // Prepare updates
         const updates: Record<string, unknown> = {
           ...changes,
+          // Handle optional title/description based on toggle state
+          title: state?.showTitleField ? (changes.title ?? listing.title) : null,
+          description: state?.showDescriptionField ? (changes.description ?? listing.description) : null,
           image_urls: updatedImageUrls,
           youtube_urls: state?.youtubeUrls.filter(url => url.trim() !== '') || [],
           tags: state?.selectedTags || [],
@@ -815,22 +822,64 @@ export default function EditBatchListings() {
                           <div className="p-4 pt-0 border-t border-border space-y-6">
                             {/* Basic Info */}
                             <div className="space-y-4">
-                              <div className="space-y-2">
-                                <Label>Title</Label>
-                                <Input
-                                  value={(getFieldValue(listing, 'title') as string) || ''}
-                                  onChange={(e) => handleFieldChange(listing.id, 'title', e.target.value)}
-                                  className="bg-secondary"
-                                />
+                              {/* Title Toggle */}
+                              <div className="space-y-3 bg-secondary/50 rounded-lg p-4">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <Label>Add a display title?</Label>
+                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                      Enable to give this display a custom title
+                                    </p>
+                                  </div>
+                                  <Switch
+                                    checked={state.showTitleField}
+                                    onCheckedChange={(checked) => {
+                                      updateMediaState(listing.id, { showTitleField: checked });
+                                      if (!checked) handleFieldChange(listing.id, 'title', '');
+                                    }}
+                                  />
+                                </div>
+                                {state.showTitleField && (
+                                  <div className="space-y-2">
+                                    <Label className="text-xs">Title</Label>
+                                    <Input
+                                      value={(getFieldValue(listing, 'title') as string) || ''}
+                                      onChange={(e) => handleFieldChange(listing.id, 'title', e.target.value)}
+                                      className="bg-background"
+                                      placeholder="e.g., Winter Wonderland Display"
+                                    />
+                                  </div>
+                                )}
                               </div>
 
-                              <div className="space-y-2">
-                                <Label>Description</Label>
-                                <Textarea
-                                  value={(getFieldValue(listing, 'description') as string) || ''}
-                                  onChange={(e) => handleFieldChange(listing.id, 'description', e.target.value)}
-                                  className="bg-secondary min-h-[100px]"
-                                />
+                              {/* Description Toggle */}
+                              <div className="space-y-3 bg-secondary/50 rounded-lg p-4">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <Label>Add a description?</Label>
+                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                      Enable to describe this display to visitors
+                                    </p>
+                                  </div>
+                                  <Switch
+                                    checked={state.showDescriptionField}
+                                    onCheckedChange={(checked) => {
+                                      updateMediaState(listing.id, { showDescriptionField: checked });
+                                      if (!checked) handleFieldChange(listing.id, 'description', '');
+                                    }}
+                                  />
+                                </div>
+                                {state.showDescriptionField && (
+                                  <div className="space-y-2">
+                                    <Label className="text-xs">Description</Label>
+                                    <Textarea
+                                      value={(getFieldValue(listing, 'description') as string) || ''}
+                                      onChange={(e) => handleFieldChange(listing.id, 'description', e.target.value)}
+                                      className="bg-background min-h-[100px]"
+                                      placeholder="Describe this display..."
+                                    />
+                                  </div>
+                                )}
                               </div>
                             </div>
 
