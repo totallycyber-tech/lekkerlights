@@ -818,8 +818,11 @@ export default function CreateListing() {
                       <p className="text-xs text-muted-foreground mt-1">
                         This image will be displayed on listing cards in the Browse page. If not provided, a default festive image will be used.
                       </p>
-                      <p className="text-xs text-christmas mt-1">
-                        Recommended size: 1200 × 800 pixels (3:2 aspect ratio) for best display quality
+                      <p className="text-xs text-christmas mt-1 font-medium">
+                        📸 Upload high quality photos taken in the evening when lights are on for best results!
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Recommended size: 1200 × 800 pixels (3:2 aspect ratio)
                       </p>
                     </div>
                     <CoverPhotoUploader 
@@ -834,9 +837,12 @@ export default function CreateListing() {
                     <div>
                       <Label className="text-sm font-medium">Additional Photos</Label>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Add more photos to showcase your display (optional)
+                        Add more photos to showcase your display from different angles (optional)
                       </p>
-                      <p className="text-xs text-christmas mt-1">
+                      <p className="text-xs text-christmas mt-1 font-medium">
+                        📸 Use high quality photos for the best viewing experience!
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
                         Recommended size: 1600 × 1200 pixels or larger for gallery viewing
                       </p>
                     </div>
@@ -867,7 +873,17 @@ export default function CreateListing() {
                         </Button>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <div className="bg-secondary/50 rounded-lg p-3 mb-3">
+                      <p className="text-xs text-christmas font-medium mb-1">
+                        🎬 How to add videos:
+                      </p>
+                      <ol className="text-xs text-muted-foreground list-decimal list-inside space-y-1">
+                        <li>Record a high quality video of your display at night</li>
+                        <li>Upload your video to <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">YouTube.com</a></li>
+                        <li>Copy the video's sharing link and paste it below</li>
+                      </ol>
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-2">
                       Add YouTube video URLs to showcase your display (up to 3)
                     </p>
                     {youtubeUrls.map((url, index) => (

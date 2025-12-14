@@ -130,7 +130,10 @@ export function ImageUploader({
           <p className="mb-2 text-sm text-foreground">
             <span className="font-semibold">Click to upload</span> or drag and drop
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-christmas font-medium">
+            Upload high quality photos taken in the evening when lights are on
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
             JPEG, PNG, WebP or GIF (max {maxSizeMB}MB each)
           </p>
           <p className="text-xs text-muted-foreground mt-1">

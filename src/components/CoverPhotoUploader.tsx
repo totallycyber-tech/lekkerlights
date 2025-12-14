@@ -125,6 +125,9 @@ export function CoverPhotoUploader({
         <p className="text-xs text-muted-foreground">
           This will be displayed on listing cards
         </p>
+        <p className="text-xs text-christmas mt-1 font-medium">
+          Upload high quality photos taken in the evening when lights are on
+        </p>
         <p className="text-xs text-muted-foreground mt-1">
           JPEG, PNG, WebP or GIF (max {maxSizeMB}MB)
         </p>

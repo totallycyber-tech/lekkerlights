@@ -597,6 +597,9 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
                   <p className="text-xs text-muted-foreground -mt-1">
                     This will be displayed on listing cards
                   </p>
+                  <p className="text-xs text-christmas font-medium">
+                    📸 Upload high quality photos taken in the evening when lights are on for best results!
+                  </p>
                   <CoverPhotoUploader
                     image={listing.coverPhoto}
                     onImageChange={(file) => updateListing(listing.id, 'coverPhoto', file)}
@@ -608,6 +611,9 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
                   <Label>Additional Photos</Label>
                   <p className="text-xs text-muted-foreground -mt-1">
                     Up to 9 additional photos
+                  </p>
+                  <p className="text-xs text-christmas font-medium">
+                    📸 Use high quality photos for the best viewing experience!
                   </p>
                   <ImageUploader
                     images={listing.additionalImages}
@@ -636,6 +642,16 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
                         Add
                       </Button>
                     )}
+                  </div>
+                  <div className="bg-secondary/30 rounded-lg p-3">
+                    <p className="text-xs text-christmas font-medium mb-1">
+                      🎬 How to add videos:
+                    </p>
+                    <ol className="text-xs text-muted-foreground list-decimal list-inside space-y-1">
+                      <li>Record a high quality video of your display at night</li>
+                      <li>Upload your video to <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">YouTube.com</a></li>
+                      <li>Copy the video's sharing link and paste it below</li>
+                    </ol>
                   </div>
                   <div className="space-y-2">
                     {listing.youtubeUrls.map((url, urlIndex) => (

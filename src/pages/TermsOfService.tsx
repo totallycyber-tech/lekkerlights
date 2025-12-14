@@ -66,8 +66,8 @@ export default function TermsOfService() {
                 <li>Visitor limits or guidance (such as maximum visitors at a time or "no buses")</li>
                 <li>Access instructions and gate/complex rules (such as security gate procedures, ID or licence requirements, dial-in codes, or calling ahead)</li>
                 <li>Tags that describe your display (for example, KidFriendly, Walkthrough, Synced)</li>
-                <li>Photos and other images you upload directly to the Service</li>
-                <li>Links to external videos (for example, YouTube)</li>
+                <li>Photos and other images you upload directly to the Service (high quality photos taken in the evening when lights are on are recommended)</li>
+                <li>Links to external videos (for example, YouTube) – videos must be uploaded to YouTube first, then the sharing link pasted into your listing</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
                 You acknowledge that your listing details (including all information you choose to display publicly, such as address or approximate location, description, dates/hours, tags, and images) may be displayed publicly on the Website and on maps so that Visitors can find and visit your display. Some contact details or your name may also be displayed publicly if you choose that visibility option.
