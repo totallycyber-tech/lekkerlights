@@ -493,8 +493,12 @@ export default function EditBatchListings() {
           }
         }
 
-        // Build updated image URLs
-        let updatedImageUrls = [...(state?.existingImages || [])];
+        // Build updated image URLs - separate cover from additional
+        const existingCover = (state?.existingImages || [])[0] || null;
+        const existingAdditional = (state?.existingImages || []).slice(1);
+        
+        let coverUrl: string | null = null;
+        let additionalUrls: string[] = [...existingAdditional];
 
         if (state?.newCoverPhoto || (state?.newAdditionalImages.length || 0) > 0) {
           const newImages: File[] = [];
@@ -505,9 +509,13 @@ export default function EditBatchListings() {
             try {
               const newUrls = await uploadListingImages(newImages, listing.id, token!);
               if (state.newCoverPhoto) {
-                updatedImageUrls = [newUrls[0], ...updatedImageUrls, ...newUrls.slice(1)];
+                // New cover photo uploaded - use it as cover
+                coverUrl = newUrls[0];
+                additionalUrls = [...existingAdditional, ...newUrls.slice(1)];
               } else {
-                updatedImageUrls = [...updatedImageUrls, ...newUrls];
+                // No new cover - keep existing cover (or null if removed)
+                coverUrl = existingCover;
+                additionalUrls = [...existingAdditional, ...newUrls];
               }
             } catch (err) {
               console.error('Error uploading images:', err);
@@ -516,8 +524,22 @@ export default function EditBatchListings() {
                 description: `Failed to upload some images for listing "${listing.title}"`,
                 variant: "destructive",
               });
+              coverUrl = existingCover;
             }
+          } else {
+            coverUrl = existingCover;
           }
+        } else {
+          coverUrl = existingCover;
+        }
+
+        // Build final image array: cover first (or empty string for default), then additional
+        let updatedImageUrls: string[];
+        if (coverUrl) {
+          updatedImageUrls = [coverUrl, ...additionalUrls];
+        } else {
+          // No cover - use empty string as placeholder to indicate "use default"
+          updatedImageUrls = additionalUrls.length > 0 ? ['', ...additionalUrls] : [];
         }
 
         // Build operating hours
@@ -890,30 +912,35 @@ export default function EditBatchListings() {
                             </div>
 
                             {/* Current Photos */}
-                            {state.existingImages.length > 0 && (
+                            {state.existingImages.filter(url => url !== '').length > 0 && (
                               <div className="space-y-3">
                                 <div>
                                   <Label className="text-sm font-medium">Current Photos</Label>
                                   <p className="text-xs text-muted-foreground mt-1">Click X to remove a photo</p>
                                 </div>
                                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                                  {state.existingImages.map((url, imgIndex) => (
-                                    <div key={imgIndex} className="relative aspect-square rounded-lg overflow-hidden group">
-                                      <img src={url} alt={`Photo ${imgIndex + 1}`} className="w-full h-full object-cover" />
-                                      <button
-                                        type="button"
-                                        onClick={() => handleRemoveExistingImage(listing.id, imgIndex)}
-                                        className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                      >
-                                        <X className="h-3 w-3" />
-                                      </button>
-                                      {imgIndex === 0 && (
-                                        <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-christmas text-white text-[10px] rounded">
-                                          Cover
-                                        </span>
-                                      )}
-                                    </div>
-                                  ))}
+                                  {state.existingImages.filter(url => url !== '').map((url, displayIndex) => {
+                                    // Find actual index in original array for removal
+                                    const actualIndex = state.existingImages.indexOf(url);
+                                    const isCover = actualIndex === 0;
+                                    return (
+                                      <div key={actualIndex} className="relative aspect-square rounded-lg overflow-hidden group">
+                                        <img src={url} alt={`Photo ${displayIndex + 1}`} className="w-full h-full object-cover" />
+                                        <button
+                                          type="button"
+                                          onClick={() => handleRemoveExistingImage(listing.id, actualIndex)}
+                                          className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                          <X className="h-3 w-3" />
+                                        </button>
+                                        {isCover && (
+                                          <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-christmas text-white text-[10px] rounded">
+                                            Cover
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
                                 </div>
                               </div>
                             )}

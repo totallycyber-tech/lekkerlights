@@ -72,7 +72,7 @@ export function MapListingDetail({
           {/* Image */}
           <div className="relative w-full md:w-48 h-36 md:h-32 shrink-0 rounded-lg overflow-hidden">
             <img 
-              src={listing.photos[0] || defaultCoverPhoto} 
+              src={(listing.photos[0] && listing.photos[0] !== '') ? listing.photos[0] : defaultCoverPhoto} 
               alt={`Christmas light display: ${listing.title}`}
               className="w-full h-full object-cover"
             />

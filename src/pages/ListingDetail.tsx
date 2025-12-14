@@ -108,7 +108,7 @@ export default function ListingDetail() {
         {/* Hero Image Gallery */}
         <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
           <img 
-            src={listing.photos[0] || defaultCoverPhoto} 
+            src={(listing.photos[0] && listing.photos[0] !== '') ? listing.photos[0] : defaultCoverPhoto} 
             alt={isExampleListing ? `Example listing preview: ${listing.title}` : listing.title}
             className="w-full h-full object-cover"
           />

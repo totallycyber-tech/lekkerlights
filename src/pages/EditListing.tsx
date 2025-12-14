@@ -336,20 +336,45 @@ export default function EditListing() {
       const filteredYoutubeUrls = youtubeUrls.filter(url => url.trim() !== '');
 
       // Upload new images if any
-      let allImageUrls = [...existingImageUrls];
       const newImages: File[] = [];
       if (coverPhoto) newImages.push(coverPhoto);
       newImages.push(...additionalImages);
 
+      // Determine the cover photo URL
+      let coverUrl: string | null = null;
+      let additionalUrls: string[] = [];
+
+      // Check if existing cover was removed (index 0 not in existingImageUrls but was originally there)
+      const existingCover = existingImageUrls.length > 0 ? existingImageUrls[0] : null;
+      const existingAdditional = existingImageUrls.slice(1);
+
       if (newImages.length > 0) {
         const { uploadListingImages } = await import('@/hooks/use-listings');
         const newUrls = await uploadListingImages(newImages, id!, token!);
-        // If cover photo was uploaded, prepend it
+        
         if (coverPhoto) {
-          allImageUrls = [newUrls[0], ...existingImageUrls, ...newUrls.slice(1)];
+          // New cover photo uploaded - use it as cover
+          coverUrl = newUrls[0];
+          additionalUrls = [...existingAdditional, ...newUrls.slice(1)];
         } else {
-          allImageUrls = [...existingImageUrls, ...newUrls];
+          // No new cover - keep existing cover (or null if removed)
+          coverUrl = existingCover;
+          additionalUrls = [...existingAdditional, ...newUrls];
         }
+      } else {
+        // No new uploads
+        coverUrl = existingCover;
+        additionalUrls = existingAdditional;
+      }
+
+      // Build final image array: cover first (or empty string for default), then additional
+      let allImageUrls: string[];
+      if (coverUrl) {
+        allImageUrls = [coverUrl, ...additionalUrls];
+      } else {
+        // No cover - use empty string as placeholder to indicate "use default"
+        // Only add the placeholder if there are additional images, otherwise empty array uses default
+        allImageUrls = additionalUrls.length > 0 ? ['', ...additionalUrls] : [];
       }
 
       // Use secure edge function instead of direct database update
@@ -641,7 +666,7 @@ export default function EditListing() {
               </div>
 
               {/* Existing Photos */}
-              {existingImageUrls.length > 0 && (
+              {existingImageUrls.filter(url => url !== '').length > 0 && (
                 <div className="bg-card rounded-xl border border-border p-6 space-y-6">
                   <div>
                     <h2 className="font-display text-lg font-semibold">Current Photos</h2>
@@ -649,23 +674,28 @@ export default function EditListing() {
                   </div>
                   
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {existingImageUrls.map((url, index) => (
-                      <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
-                        <img src={url} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => removeExistingImage(index)}
-                          className="absolute top-2 right-2 p-1.5 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                        {index === 0 && (
-                          <span className="absolute bottom-2 left-2 px-2 py-1 bg-christmas text-white text-xs rounded">
-                            Cover
-                          </span>
-                        )}
-                      </div>
-                    ))}
+                    {existingImageUrls.filter(url => url !== '').map((url, index) => {
+                      // Find actual index in original array for removal
+                      const actualIndex = existingImageUrls.indexOf(url);
+                      const isCover = actualIndex === 0;
+                      return (
+                        <div key={actualIndex} className="relative aspect-square rounded-lg overflow-hidden group">
+                          <img src={url} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => removeExistingImage(actualIndex)}
+                            className="absolute top-2 right-2 p-1.5 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                          {isCover && (
+                            <span className="absolute bottom-2 left-2 px-2 py-1 bg-christmas text-white text-xs rounded">
+                              Cover
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

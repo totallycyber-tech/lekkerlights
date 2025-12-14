@@ -25,7 +25,7 @@ export function MapInfoWindow({
   onDirectionsClick,
   reviewStats,
 }: MapInfoWindowProps) {
-  const coverPhoto = listing.photos?.[0] || defaultCoverPhoto;
+  const coverPhoto = (listing.photos?.[0] && listing.photos[0] !== '') ? listing.photos[0] : defaultCoverPhoto;
   
   const getGoogleMapsUrl = () => {
     const address = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}`;
