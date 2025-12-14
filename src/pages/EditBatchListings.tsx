@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -12,6 +12,7 @@ import { ImageUploader } from "@/components/ImageUploader";
 import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
 import { YouTubePreview } from "@/components/YouTubePreview";
 import { TagSelector } from "@/components/TagSelector";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,7 +39,10 @@ import {
   Link as LinkIcon,
   Tags,
   Clock,
-  Trash2
+  Trash2,
+  User,
+  Mail,
+  Phone
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -87,6 +91,12 @@ interface BatchListing {
   youtube_urls?: string[];
   tags?: string[];
   operating_hours?: Record<string, any>;
+  contact_name?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  name_visible?: boolean;
+  email_visible?: boolean;
+  phone_visible?: boolean;
 }
 
 interface ListingMediaState {
@@ -98,6 +108,24 @@ interface ListingMediaState {
   selectedTags: string[];
   operatingHours: OperatingHours;
   operatingHoursOther: string;
+  // Contact info
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  nameVisible: boolean;
+  emailVisible: boolean;
+  phoneVisible: boolean;
+  // Address
+  streetNumber: string;
+  streetName: string;
+  suburb: string;
+  city: string;
+  province: string;
+  postalCode: string;
+  complexName: string;
+  unitNo: string;
+  showComplexField: boolean;
+  showUnitField: boolean;
 }
 
 function parseOperatingHours(hours: Record<string, any> | undefined): { operatingHours: OperatingHours; operatingHoursOther: string } {
@@ -105,7 +133,6 @@ function parseOperatingHours(hours: Record<string, any> | undefined): { operatin
     return { operatingHours: { ...defaultOperatingHours }, operatingHoursOther: '' };
   }
 
-  // Check if it's the "other" type
   if ('other' in hours && typeof hours.other === 'string') {
     return { operatingHours: { ...defaultOperatingHours }, operatingHoursOther: hours.other };
   }
@@ -173,7 +200,6 @@ export default function EditBatchListings() {
   const initializeListings = (fetchedListings: BatchListing[]) => {
     setListings(fetchedListings);
     
-    // Initialize media state for each listing
     const initialMediaState: Record<string, ListingMediaState> = {};
     fetchedListings.forEach((listing: BatchListing) => {
       const { operatingHours, operatingHoursOther } = parseOperatingHours(listing.operating_hours);
@@ -187,6 +213,24 @@ export default function EditBatchListings() {
         selectedTags: listing.tags || [],
         operatingHours,
         operatingHoursOther,
+        // Contact info
+        contactName: listing.contact_name || '',
+        contactEmail: listing.contact_email || '',
+        contactPhone: listing.contact_phone || '',
+        nameVisible: listing.name_visible ?? true,
+        emailVisible: listing.email_visible ?? true,
+        phoneVisible: listing.phone_visible ?? true,
+        // Address
+        streetNumber: listing.street_number || '',
+        streetName: listing.street_name || '',
+        suburb: listing.suburb || '',
+        city: listing.city || '',
+        province: listing.province || '',
+        postalCode: listing.postal_code || '',
+        complexName: listing.complex_name || '',
+        unitNo: listing.unit_no || '',
+        showComplexField: !!listing.complex_name,
+        showUnitField: !!listing.unit_no,
       };
     });
     setMediaState(initialMediaState);
@@ -214,7 +258,18 @@ export default function EditBatchListings() {
     return listing[field];
   };
 
-  // Media management functions
+  // Media state update helper
+  const updateMediaState = (listingId: string, updates: Partial<ListingMediaState>) => {
+    setMediaState(prev => ({
+      ...prev,
+      [listingId]: {
+        ...prev[listingId],
+        ...updates,
+      },
+    }));
+  };
+
+  // Image management
   const handleRemoveExistingImage = async (listingId: string, imageIndex: number) => {
     const state = mediaState[listingId];
     if (!state) return;
@@ -232,25 +287,14 @@ export default function EditBatchListings() {
   };
 
   const handleCoverPhotoChange = (listingId: string, photo: File | null) => {
-    setMediaState(prev => ({
-      ...prev,
-      [listingId]: {
-        ...prev[listingId],
-        newCoverPhoto: photo,
-      },
-    }));
+    updateMediaState(listingId, { newCoverPhoto: photo });
   };
 
   const handleAdditionalImagesChange = (listingId: string, images: File[]) => {
-    setMediaState(prev => ({
-      ...prev,
-      [listingId]: {
-        ...prev[listingId],
-        newAdditionalImages: images,
-      },
-    }));
+    updateMediaState(listingId, { newAdditionalImages: images });
   };
 
+  // YouTube URLs
   const handleAddYoutubeUrl = (listingId: string) => {
     const state = mediaState[listingId];
     if (!state || state.youtubeUrls.length >= 3) return;
@@ -286,13 +330,7 @@ export default function EditBatchListings() {
 
   // Tags management
   const handleTagsChange = (listingId: string, tags: string[]) => {
-    setMediaState(prev => ({
-      ...prev,
-      [listingId]: {
-        ...prev[listingId],
-        selectedTags: tags,
-      },
-    }));
+    updateMediaState(listingId, { selectedTags: tags });
   };
 
   // Operating hours management
@@ -305,7 +343,7 @@ export default function EditBatchListings() {
           ...prev[listingId].operatingHours,
           [day]: { ...prev[listingId].operatingHours[day], enabled: !prev[listingId].operatingHours[day].enabled }
         },
-        operatingHoursOther: '', // Clear other when enabling a day
+        operatingHoursOther: '',
       },
     }));
   };
@@ -324,14 +362,27 @@ export default function EditBatchListings() {
   };
 
   const updateOperatingHoursOther = (listingId: string, value: string) => {
-    setMediaState(prev => ({
-      ...prev,
-      [listingId]: {
-        ...prev[listingId],
-        operatingHoursOther: value,
-      },
-    }));
+    updateMediaState(listingId, { operatingHoursOther: value });
   };
+
+  // Address handling
+  const handleAddressSelect = useCallback((listingId: string, components: {
+    streetNumber: string;
+    streetName: string;
+    suburb: string;
+    city: string;
+    province: string;
+    postalCode: string;
+  }) => {
+    updateMediaState(listingId, {
+      streetNumber: components.streetNumber,
+      streetName: components.streetName,
+      suburb: components.suburb,
+      city: components.city,
+      province: components.province,
+      postalCode: components.postalCode,
+    });
+  }, []);
 
   // Delete listing
   const handleDeleteListing = async (listingId: string) => {
@@ -353,7 +404,6 @@ export default function EditBatchListings() {
         description: "The listing has been permanently removed.",
       });
 
-      // Remove from local state
       setListings(prev => prev.filter(l => l.id !== listingId));
       setMediaState(prev => {
         const newState = { ...prev };
@@ -366,7 +416,6 @@ export default function EditBatchListings() {
         return newState;
       });
 
-      // Expand next listing if the deleted one was expanded
       if (expandedListing === listingId) {
         const remainingListings = listings.filter(l => l.id !== listingId);
         setExpandedListing(remainingListings.length > 0 ? remainingListings[0].id : null);
@@ -387,12 +436,13 @@ export default function EditBatchListings() {
     setIsSaving(true);
 
     try {
-      // Process each listing
       for (const listing of listings) {
         const state = mediaState[listing.id];
         const changes = editedListings[listing.id] || {};
         
-        // Check if there are any changes to save
+        // Check for changes
+        const { operatingHours: originalHours, operatingHoursOther: originalOther } = parseOperatingHours(listing.operating_hours);
+        
         const hasTextChanges = Object.keys(changes).length > 0;
         const hasMediaChanges = state && (
           state.imagesToDelete.length > 0 ||
@@ -400,8 +450,24 @@ export default function EditBatchListings() {
           state.newAdditionalImages.length > 0 ||
           JSON.stringify(state.youtubeUrls.filter(u => u.trim())) !== JSON.stringify((listing.youtube_urls || []).filter(u => u.trim())) ||
           JSON.stringify(state.selectedTags) !== JSON.stringify(listing.tags || []) ||
-          JSON.stringify(state.operatingHours) !== JSON.stringify(parseOperatingHours(listing.operating_hours).operatingHours) ||
-          state.operatingHoursOther !== parseOperatingHours(listing.operating_hours).operatingHoursOther
+          JSON.stringify(state.operatingHours) !== JSON.stringify(originalHours) ||
+          state.operatingHoursOther !== originalOther ||
+          // Contact changes
+          state.contactName !== (listing.contact_name || '') ||
+          state.contactEmail !== (listing.contact_email || '') ||
+          state.contactPhone !== (listing.contact_phone || '') ||
+          state.nameVisible !== (listing.name_visible ?? true) ||
+          state.emailVisible !== (listing.email_visible ?? true) ||
+          state.phoneVisible !== (listing.phone_visible ?? true) ||
+          // Address changes
+          state.streetNumber !== (listing.street_number || '') ||
+          state.streetName !== (listing.street_name || '') ||
+          state.suburb !== (listing.suburb || '') ||
+          state.city !== (listing.city || '') ||
+          state.province !== (listing.province || '') ||
+          state.postalCode !== (listing.postal_code || '') ||
+          state.complexName !== (listing.complex_name || '') ||
+          state.unitNo !== (listing.unit_no || '')
         );
 
         if (!hasTextChanges && !hasMediaChanges) continue;
@@ -430,7 +496,6 @@ export default function EditBatchListings() {
         // Build updated image URLs
         let updatedImageUrls = [...(state?.existingImages || [])];
 
-        // Upload new images if any
         if (state?.newCoverPhoto || (state?.newAdditionalImages.length || 0) > 0) {
           const newImages: File[] = [];
           if (state.newCoverPhoto) newImages.push(state.newCoverPhoto);
@@ -467,6 +532,22 @@ export default function EditBatchListings() {
           youtube_urls: state?.youtubeUrls.filter(url => url.trim() !== '') || [],
           tags: state?.selectedTags || [],
           operating_hours: operatingHoursData,
+          // Contact info
+          contact_name: state?.contactName || null,
+          contact_email: state?.contactEmail || null,
+          contact_phone: state?.contactPhone || null,
+          name_visible: state?.nameVisible ?? true,
+          email_visible: state?.emailVisible ?? true,
+          phone_visible: state?.phoneVisible ?? true,
+          // Address
+          street_number: state?.streetNumber || listing.street_number,
+          street_name: state?.streetName || listing.street_name,
+          suburb: state?.suburb || listing.suburb,
+          city: state?.city || listing.city,
+          province: state?.province || listing.province,
+          postal_code: state?.postalCode || listing.postal_code,
+          complex_name: state?.complexName || null,
+          unit_no: state?.unitNo || null,
         };
 
         const { error } = await supabase.functions.invoke("update-listing", {
@@ -487,10 +568,8 @@ export default function EditBatchListings() {
         description: "All your listings have been updated successfully.",
       });
 
-      // Clear edited state and reload
       setEditedListings({});
       
-      // Re-fetch listings
       const { data } = await supabase.functions.invoke("verify-batch-token", {
         body: { batchId, editToken: token },
       });
@@ -527,7 +606,23 @@ export default function EditBatchListings() {
         JSON.stringify(state.youtubeUrls.filter(u => u.trim())) !== JSON.stringify((listing.youtube_urls || []).filter(u => u.trim())) ||
         JSON.stringify(state.selectedTags) !== JSON.stringify(listing.tags || []) ||
         JSON.stringify(state.operatingHours) !== JSON.stringify(originalHours) ||
-        state.operatingHoursOther !== originalOther
+        state.operatingHoursOther !== originalOther ||
+        // Contact changes
+        state.contactName !== (listing.contact_name || '') ||
+        state.contactEmail !== (listing.contact_email || '') ||
+        state.contactPhone !== (listing.contact_phone || '') ||
+        state.nameVisible !== (listing.name_visible ?? true) ||
+        state.emailVisible !== (listing.email_visible ?? true) ||
+        state.phoneVisible !== (listing.phone_visible ?? true) ||
+        // Address changes
+        state.streetNumber !== (listing.street_number || '') ||
+        state.streetName !== (listing.street_name || '') ||
+        state.suburb !== (listing.suburb || '') ||
+        state.city !== (listing.city || '') ||
+        state.province !== (listing.province || '') ||
+        state.postalCode !== (listing.postal_code || '') ||
+        state.complexName !== (listing.complex_name || '') ||
+        state.unitNo !== (listing.unit_no || '')
       );
     });
     
@@ -650,7 +745,7 @@ export default function EditBatchListings() {
                               </h3>
                               <p className="text-sm text-muted-foreground flex items-center gap-1">
                                 <MapPin className="h-3 w-3" />
-                                {listing.suburb}, {listing.city}
+                                {state?.suburb || listing.suburb}, {state?.city || listing.city}
                               </p>
                             </div>
                           </div>
@@ -668,7 +763,7 @@ export default function EditBatchListings() {
                               <div className="space-y-2">
                                 <Label>Title</Label>
                                 <Input
-                                  value={getFieldValue(listing, 'title') as string}
+                                  value={(getFieldValue(listing, 'title') as string) || ''}
                                   onChange={(e) => handleFieldChange(listing.id, 'title', e.target.value)}
                                   className="bg-secondary"
                                 />
@@ -677,11 +772,88 @@ export default function EditBatchListings() {
                               <div className="space-y-2">
                                 <Label>Description</Label>
                                 <Textarea
-                                  value={getFieldValue(listing, 'description') as string}
+                                  value={(getFieldValue(listing, 'description') as string) || ''}
                                   onChange={(e) => handleFieldChange(listing.id, 'description', e.target.value)}
                                   className="bg-secondary min-h-[100px]"
                                 />
                               </div>
+                            </div>
+
+                            {/* Location */}
+                            <div className="space-y-4">
+                              <div className="flex items-center gap-2">
+                                <MapPin className="h-5 w-5 text-christmas" />
+                                <Label className="text-sm font-medium">Location</Label>
+                              </div>
+
+                              {/* Current Address Display */}
+                              <div className="p-3 bg-secondary/50 rounded-lg">
+                                <p className="text-sm text-foreground">
+                                  <strong>Current:</strong> {state.streetNumber} {state.streetName}, {state.suburb}, {state.city}, {state.province} {state.postalCode}
+                                </p>
+                              </div>
+
+                              {/* Address Autocomplete */}
+                              <div className="space-y-2">
+                                <Label className="text-xs text-muted-foreground">Update Address</Label>
+                                <AddressAutocomplete 
+                                  onAddressSelect={(components) => handleAddressSelect(listing.id, components)} 
+                                />
+                              </div>
+
+                              {/* Complex/Estate Toggle */}
+                              <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                                <Label className="text-sm font-medium cursor-pointer">
+                                  Located in a complex or estate?
+                                </Label>
+                                <Switch
+                                  checked={state.showComplexField}
+                                  onCheckedChange={(checked) => {
+                                    updateMediaState(listing.id, { 
+                                      showComplexField: checked,
+                                      complexName: checked ? state.complexName : ''
+                                    });
+                                  }}
+                                />
+                              </div>
+                              {state.showComplexField && (
+                                <div className="space-y-2 pl-4 border-l-2 border-christmas/30">
+                                  <Label>Complex/Estate Name</Label>
+                                  <Input
+                                    placeholder="e.g., Silver Lakes Estate"
+                                    value={state.complexName}
+                                    onChange={(e) => updateMediaState(listing.id, { complexName: e.target.value })}
+                                    className="bg-secondary"
+                                  />
+                                </div>
+                              )}
+
+                              {/* Unit No Toggle */}
+                              <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                                <Label className="text-sm font-medium cursor-pointer">
+                                  Have a unit or flat number?
+                                </Label>
+                                <Switch
+                                  checked={state.showUnitField}
+                                  onCheckedChange={(checked) => {
+                                    updateMediaState(listing.id, { 
+                                      showUnitField: checked,
+                                      unitNo: checked ? state.unitNo : ''
+                                    });
+                                  }}
+                                />
+                              </div>
+                              {state.showUnitField && (
+                                <div className="space-y-2 pl-4 border-l-2 border-christmas/30">
+                                  <Label>Unit / Flat / House Number</Label>
+                                  <Input
+                                    placeholder="e.g., Unit 12, Flat 3A"
+                                    value={state.unitNo}
+                                    onChange={(e) => updateMediaState(listing.id, { unitNo: e.target.value })}
+                                    className="bg-secondary"
+                                  />
+                                </div>
+                              )}
                             </div>
 
                             {/* Current Photos */}
@@ -898,11 +1070,86 @@ export default function EditBatchListings() {
                               />
                             </div>
 
-                            <div className="pt-2 border-t border-border">
-                              <p className="text-xs text-muted-foreground">
-                                <MapPin className="h-3 w-3 inline mr-1" />
-                                {listing.street_number} {listing.street_name}, {listing.suburb}, {listing.city}, {listing.province}
-                              </p>
+                            {/* Contact Information */}
+                            <div className="space-y-4">
+                              <div className="flex items-center gap-2">
+                                <User className="h-5 w-5 text-christmas" />
+                                <Label className="text-sm font-medium">Contact Information</Label>
+                              </div>
+
+                              <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <User className="h-4 w-4 text-muted-foreground" />
+                                    <Label>Full Name</Label>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-muted-foreground">
+                                      {state.nameVisible ? 'Visible' : 'Hidden'}
+                                    </span>
+                                    <Switch
+                                      checked={state.nameVisible}
+                                      onCheckedChange={(checked) => updateMediaState(listing.id, { nameVisible: checked })}
+                                    />
+                                  </div>
+                                </div>
+                                <Input
+                                  placeholder="John Smith"
+                                  value={state.contactName}
+                                  onChange={(e) => updateMediaState(listing.id, { contactName: e.target.value })}
+                                  className="bg-secondary"
+                                />
+                              </div>
+
+                              <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <Mail className="h-4 w-4 text-muted-foreground" />
+                                    <Label>Email</Label>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-muted-foreground">
+                                      {state.emailVisible ? 'Visible' : 'Hidden'}
+                                    </span>
+                                    <Switch
+                                      checked={state.emailVisible}
+                                      onCheckedChange={(checked) => updateMediaState(listing.id, { emailVisible: checked })}
+                                    />
+                                  </div>
+                                </div>
+                                <Input
+                                  type="email"
+                                  placeholder="your@email.com"
+                                  value={state.contactEmail}
+                                  onChange={(e) => updateMediaState(listing.id, { contactEmail: e.target.value })}
+                                  className="bg-secondary"
+                                />
+                              </div>
+
+                              <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <Phone className="h-4 w-4 text-muted-foreground" />
+                                    <Label>Phone</Label>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-muted-foreground">
+                                      {state.phoneVisible ? 'Visible' : 'Hidden'}
+                                    </span>
+                                    <Switch
+                                      checked={state.phoneVisible}
+                                      onCheckedChange={(checked) => updateMediaState(listing.id, { phoneVisible: checked })}
+                                    />
+                                  </div>
+                                </div>
+                                <Input
+                                  type="tel"
+                                  placeholder="+27 12 345 6789"
+                                  value={state.contactPhone}
+                                  onChange={(e) => updateMediaState(listing.id, { contactPhone: e.target.value })}
+                                  className="bg-secondary"
+                                />
+                              </div>
                             </div>
 
                             {/* Delete Listing */}
