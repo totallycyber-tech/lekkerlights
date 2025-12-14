@@ -74,6 +74,14 @@ export default function EditListing() {
   const [phoneVisible, setPhoneVisible] = useState(true);
   const [showComplexField, setShowComplexField] = useState(false);
   const [showUnitField, setShowUnitField] = useState(false);
+  const [originalAddress, setOriginalAddress] = useState({
+    streetNumber: '',
+    streetName: '',
+    suburb: '',
+    city: '',
+    province: '',
+    postalCode: '',
+  });
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -168,6 +176,16 @@ export default function EditListing() {
           parkingInfo: listing.parking_info || '',
           maxVisitors: listing.max_visitors?.toString() || '',
           gateAccessInfo: listing.gate_access_info || '',
+        });
+
+        // Store original address for comparison
+        setOriginalAddress({
+          streetNumber: listing.street_number || '',
+          streetName: listing.street_name || '',
+          suburb: listing.suburb || '',
+          city: listing.city || '',
+          province: listing.province || '',
+          postalCode: listing.postal_code || '',
         });
 
         setNameVisible(listing.name_visible ?? true);
@@ -371,6 +389,39 @@ export default function EditListing() {
 
       if (error) throw error;
       if (data && !data.success) throw new Error(data.error || 'Update failed');
+
+      // Check if address was changed and trigger geocoding
+      const addressChanged = 
+        formData.streetNumber !== originalAddress.streetNumber ||
+        formData.streetName !== originalAddress.streetName ||
+        formData.suburb !== originalAddress.suburb ||
+        formData.city !== originalAddress.city ||
+        formData.province !== originalAddress.province ||
+        formData.postalCode !== originalAddress.postalCode;
+
+      if (addressChanged) {
+        try {
+          const fullAddress = [
+            formData.streetNumber,
+            formData.streetName,
+            formData.suburb,
+            formData.city,
+            formData.province,
+            formData.postalCode,
+            'South Africa'
+          ].filter(Boolean).join(', ');
+
+          await supabase.functions.invoke('geocode-address', {
+            body: {
+              listingId: id,
+              address: fullAddress,
+            },
+          });
+        } catch (geocodeError) {
+          console.error('Failed to geocode address:', geocodeError);
+          // Don't fail the update, just continue without updated coordinates
+        }
+      }
 
       toast({
         title: "Listing updated!",
