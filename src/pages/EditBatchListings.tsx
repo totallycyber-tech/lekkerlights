@@ -561,6 +561,39 @@ export default function EditBatchListings() {
         if (error) {
           throw new Error(`Failed to update listing "${listing.title}": ${error.message}`);
         }
+
+        // Check if address was changed and trigger geocoding
+        const addressChanged = 
+          state?.streetNumber !== (listing.street_number || '') ||
+          state?.streetName !== (listing.street_name || '') ||
+          state?.suburb !== (listing.suburb || '') ||
+          state?.city !== (listing.city || '') ||
+          state?.province !== (listing.province || '') ||
+          state?.postalCode !== (listing.postal_code || '');
+
+        if (addressChanged) {
+          try {
+            const fullAddress = [
+              state?.streetNumber || listing.street_number,
+              state?.streetName || listing.street_name,
+              state?.suburb || listing.suburb,
+              state?.city || listing.city,
+              state?.province || listing.province,
+              state?.postalCode || listing.postal_code,
+              'South Africa'
+            ].filter(Boolean).join(', ');
+
+            await supabase.functions.invoke('geocode-address', {
+              body: {
+                listingId: listing.id,
+                address: fullAddress,
+              },
+            });
+          } catch (geocodeError) {
+            console.error('Failed to geocode address:', geocodeError);
+            // Don't fail the save, just continue without updated coordinates
+          }
+        }
       }
 
       toast({
