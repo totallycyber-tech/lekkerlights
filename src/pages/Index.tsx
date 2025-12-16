@@ -4,6 +4,7 @@ import { Hero } from "@/components/Hero";
 import { CommunityThanks } from "@/components/CommunityThanks";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
+import { StringLightsBorder } from "@/components/StringLights";
 import { Sparkles, Users, Flag, TreePine, Star, Gift } from "lucide-react";
 
 const Index = () => {
@@ -36,75 +37,9 @@ const Index = () => {
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-4xl mx-auto">
               {/* Welcome Card - Centered with String Lights Border */}
-              <div className="relative p-6 sm:p-8 lg:p-10 bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-sm rounded-2xl shadow-xl overflow-visible">
-                {/* String Lights Border Effect with Wire */}
-                <div className="absolute -inset-2 rounded-2xl pointer-events-none">
-                  {/* Wire/cord - top */}
-                  <div className="absolute top-1 left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-gray-600 to-transparent rounded-full" />
-                  {/* Wire/cord - bottom */}
-                  <div className="absolute bottom-1 left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-gray-600 to-transparent rounded-full" />
-                  {/* Wire/cord - left */}
-                  <div className="absolute top-4 bottom-4 left-1 w-0.5 bg-gradient-to-b from-transparent via-gray-600 to-transparent rounded-full" />
-                  {/* Wire/cord - right */}
-                  <div className="absolute top-4 bottom-4 right-1 w-0.5 bg-gradient-to-b from-transparent via-gray-600 to-transparent rounded-full" />
-                  
-                  {/* Top string lights */}
-                  <div className="absolute top-0 left-2 right-2 h-3 flex justify-around items-center">
-                    {[...Array(10)].map((_, i) => (
-                      <div
-                        key={`top-${i}`}
-                        className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full animate-twinkle"
-                        style={{
-                          backgroundColor: ['#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444'][i],
-                          animationDelay: `${i * 0.2}s`,
-                          boxShadow: `0 0 10px 3px ${['#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444'][i]}90`
-                        }}
-                      />
-                    ))}
-                  </div>
-                  {/* Bottom string lights */}
-                  <div className="absolute bottom-0 left-2 right-2 h-3 flex justify-around items-center">
-                    {[...Array(10)].map((_, i) => (
-                      <div
-                        key={`bottom-${i}`}
-                        className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full animate-twinkle"
-                        style={{
-                          backgroundColor: ['#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e'][i],
-                          animationDelay: `${i * 0.15 + 0.1}s`,
-                          boxShadow: `0 0 10px 3px ${['#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e'][i]}90`
-                        }}
-                      />
-                    ))}
-                  </div>
-                  {/* Left string lights */}
-                  <div className="absolute top-2 bottom-2 left-0 w-3 flex flex-col justify-around items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <div
-                        key={`left-${i}`}
-                        className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full animate-twinkle"
-                        style={{
-                          backgroundColor: ['#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444'][i],
-                          animationDelay: `${i * 0.25 + 0.2}s`,
-                          boxShadow: `0 0 10px 3px ${['#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444'][i]}90`
-                        }}
-                      />
-                    ))}
-                  </div>
-                  {/* Right string lights */}
-                  <div className="absolute top-2 bottom-2 right-0 w-3 flex flex-col justify-around items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <div
-                        key={`right-${i}`}
-                        className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full animate-twinkle"
-                        style={{
-                          backgroundColor: ['#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e'][i],
-                          animationDelay: `${i * 0.3 + 0.15}s`,
-                          boxShadow: `0 0 10px 3px ${['#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e'][i]}90`
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
+              <div className="relative p-6 sm:p-8 lg:p-10 bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-sm rounded-2xl shadow-xl">
+                {/* String Lights Border */}
+                <StringLightsBorder />
                 
                 {/* Decorative glows - more vibrant */}
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-christmas/20 rounded-full blur-3xl" />
