@@ -69,10 +69,10 @@ export function MapListingDetail({
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">
-          {/* Image */}
+          {/* Image - only show first photo as cover if hasCoverPhoto is true */}
           <div className="relative w-full md:w-48 h-36 md:h-32 shrink-0 rounded-lg overflow-hidden">
             <img 
-              src={(listing.photos[0] && listing.photos[0] !== '') ? listing.photos[0] : defaultCoverPhoto} 
+              src={(listing.hasCoverPhoto && listing.photos[0] && listing.photos[0] !== '') ? listing.photos[0] : defaultCoverPhoto} 
               alt={`Christmas light display: ${listing.title}`}
               className="w-full h-full object-cover"
             />

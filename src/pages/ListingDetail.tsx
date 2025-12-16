@@ -28,8 +28,13 @@ export default function ListingDetail() {
     ? transformDbListing(dbListing as any)
     : mockListings.find(l => l.id === id);
   
-  // Get additional photos (exclude cover photo placeholder)
-  const additionalPhotos = listing?.photos.slice(1).filter(p => p && p !== '') || [];
+  // Get additional photos - if has cover photo, exclude first; otherwise all are additional
+  const additionalPhotos = listing?.hasCoverPhoto 
+    ? listing?.photos.slice(1).filter(p => p && p !== '') || []
+    : listing?.photos.filter(p => p && p !== '') || [];
+  
+  // Get cover photo - only if hasCoverPhoto is true
+  const coverPhotoUrl = listing?.hasCoverPhoto && listing?.photos[0] ? listing.photos[0] : defaultCoverPhoto;
 
   if (isLoading) {
     return (
@@ -116,8 +121,8 @@ export default function ListingDetail() {
         {/* Hero Image Gallery */}
         <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
           <img 
-            src={(listing.photos[0] && listing.photos[0] !== '') ? listing.photos[0] : defaultCoverPhoto} 
-            alt={isExampleListing 
+            src={coverPhotoUrl} 
+            alt={isExampleListing
               ? `Example listing preview: ${listing.title || 'Christmas Display'}` 
               : (listing.title || `Christmas Display in ${listing.location.suburb}`)}
             className="w-full h-full object-cover"

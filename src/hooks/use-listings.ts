@@ -74,6 +74,7 @@ export interface ListingInsert {
   youtube_urls?: string[];
   operating_hours?: Record<string, { enabled: boolean; startTime: string; endTime: string }> | { other: string };
   tags?: string[];
+  has_cover_photo?: boolean;
 }
 
 export function useListings() {

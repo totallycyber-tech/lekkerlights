@@ -445,6 +445,7 @@ export default function EditListing() {
             gate_access_info: formData.gateAccessInfo || null,
             youtube_urls: filteredYoutubeUrls,
             image_urls: allImageUrls,
+            has_cover_photo: !!coverUrl,
             operating_hours: DAYS_OF_WEEK.some(day => operatingHours[day].enabled) 
               ? operatingHours 
               : { other: operatingHoursOther },
