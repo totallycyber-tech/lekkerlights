@@ -173,8 +173,9 @@ const handler = async (req: Request): Promise<Response> => {
           'South Africa'
         ].filter(Boolean).join(', ');
 
-        const googleMapsKey = Deno.env.get("GOOGLE_MAPS_API_KEY");
+        const googleMapsKey = Deno.env.get("GOOGLE_MAPS_SERVER_API_KEY");
         if (googleMapsKey) {
+          console.log(`Geocoding address for listing ${newListing.id}: ${fullAddress}`);
           const geocodeResponse = await fetch(
             `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(fullAddress)}&key=${googleMapsKey}`
           );
