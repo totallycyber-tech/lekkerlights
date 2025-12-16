@@ -35,8 +35,68 @@ const Index = () => {
           
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-4xl mx-auto">
-              {/* Welcome Card - Centered */}
-              <div className="relative p-6 sm:p-8 lg:p-10 bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-sm rounded-2xl border border-christmas/20 shadow-xl overflow-hidden">
+              {/* Welcome Card - Centered with String Lights Border */}
+              <div className="relative p-6 sm:p-8 lg:p-10 bg-gradient-to-br from-card via-card to-card/90 backdrop-blur-sm rounded-2xl shadow-xl overflow-visible">
+                {/* String Lights Border Effect */}
+                <div className="absolute -inset-1 rounded-2xl overflow-hidden pointer-events-none">
+                  {/* Top string lights */}
+                  <div className="absolute top-0 left-0 right-0 h-2 flex justify-around items-center">
+                    {[...Array(12)].map((_, i) => (
+                      <div
+                        key={`top-${i}`}
+                        className="w-2.5 h-2.5 rounded-full animate-twinkle"
+                        style={{
+                          backgroundColor: ['#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308'][i % 6],
+                          animationDelay: `${i * 0.2}s`,
+                          boxShadow: `0 0 8px 2px ${['#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308'][i % 6]}80`
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {/* Bottom string lights */}
+                  <div className="absolute bottom-0 left-0 right-0 h-2 flex justify-around items-center">
+                    {[...Array(12)].map((_, i) => (
+                      <div
+                        key={`bottom-${i}`}
+                        className="w-2.5 h-2.5 rounded-full animate-twinkle"
+                        style={{
+                          backgroundColor: ['#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444'][i % 6],
+                          animationDelay: `${i * 0.15 + 0.1}s`,
+                          boxShadow: `0 0 8px 2px ${['#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444'][i % 6]}80`
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {/* Left string lights */}
+                  <div className="absolute top-0 bottom-0 left-0 w-2 flex flex-col justify-around items-center py-4">
+                    {[...Array(6)].map((_, i) => (
+                      <div
+                        key={`left-${i}`}
+                        className="w-2.5 h-2.5 rounded-full animate-twinkle"
+                        style={{
+                          backgroundColor: ['#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e'][i % 6],
+                          animationDelay: `${i * 0.25 + 0.2}s`,
+                          boxShadow: `0 0 8px 2px ${['#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e'][i % 6]}80`
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {/* Right string lights */}
+                  <div className="absolute top-0 bottom-0 right-0 w-2 flex flex-col justify-around items-center py-4">
+                    {[...Array(6)].map((_, i) => (
+                      <div
+                        key={`right-${i}`}
+                        className="w-2.5 h-2.5 rounded-full animate-twinkle"
+                        style={{
+                          backgroundColor: ['#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308'][i % 6],
+                          animationDelay: `${i * 0.3 + 0.15}s`,
+                          boxShadow: `0 0 8px 2px ${['#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308'][i % 6]}80`
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                
                 {/* Decorative glows - more vibrant */}
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-christmas/20 rounded-full blur-3xl" />
                 <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-festive-gold/20 rounded-full blur-3xl" />
