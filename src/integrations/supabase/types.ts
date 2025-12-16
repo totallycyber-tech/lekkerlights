@@ -91,6 +91,7 @@ export type Database = {
           email_visible: boolean
           favorites_count: number | null
           gate_access_info: string | null
+          has_cover_photo: boolean
           id: string
           image_urls: string[] | null
           lat: number | null
@@ -124,6 +125,7 @@ export type Database = {
           email_visible?: boolean
           favorites_count?: number | null
           gate_access_info?: string | null
+          has_cover_photo?: boolean
           id?: string
           image_urls?: string[] | null
           lat?: number | null
@@ -157,6 +159,7 @@ export type Database = {
           email_visible?: boolean
           favorites_count?: number | null
           gate_access_info?: string | null
+          has_cover_photo?: boolean
           id?: string
           image_urls?: string[] | null
           lat?: number | null
@@ -239,6 +242,7 @@ export type Database = {
           email_visible: boolean | null
           favorites_count: number | null
           gate_access_info: string | null
+          has_cover_photo: boolean | null
           id: string | null
           image_urls: string[] | null
           lat: number | null
@@ -271,6 +275,7 @@ export type Database = {
           email_visible?: boolean | null
           favorites_count?: number | null
           gate_access_info?: string | null
+          has_cover_photo?: boolean | null
           id?: string | null
           image_urls?: string[] | null
           lat?: number | null
@@ -303,6 +308,7 @@ export type Database = {
           email_visible?: boolean | null
           favorites_count?: number | null
           gate_access_info?: string | null
+          has_cover_photo?: boolean | null
           id?: string | null
           image_urls?: string[] | null
           lat?: number | null

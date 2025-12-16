@@ -424,6 +424,7 @@ export default function CreateListing() {
           ? operatingHours 
           : { other: operatingHoursOther },
         tags: selectedTags,
+        has_cover_photo: !!coverPhoto,
       });
 
       // Geocode the address to get lat/lng coordinates

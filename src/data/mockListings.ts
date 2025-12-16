@@ -13,6 +13,7 @@ export interface Listing {
     lng: number;
   };
   photos: string[];
+  hasCoverPhoto: boolean;
   youtubeUrls: string[];
   operatingHours: {
     days: string;
@@ -41,6 +42,7 @@ type DbListingInput = {
   lat: number | null;
   lng: number | null;
   image_urls: string[];
+  has_cover_photo?: boolean;
   youtube_urls: string[];
   operating_hours: Record<string, { enabled: boolean; startTime: string; endTime: string }> | { other: string } | null;
   contact_email: string | null;
@@ -101,6 +103,7 @@ export function transformDbListing(dbListing: DbListingInput): Listing {
       lng: dbListing.lng || 0,
     },
     photos,
+    hasCoverPhoto: dbListing.has_cover_photo ?? false,
     youtubeUrls: dbListing.youtube_urls || [],
     operatingHours: {
       days: daysStr,
