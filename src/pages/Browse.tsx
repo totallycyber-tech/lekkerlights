@@ -146,7 +146,7 @@ export default function Browse() {
           </div>
 
           {/* Suburb Quick Chips */}
-          {!isLoading && viewMode === "grid" && (
+          {!isLoading && (
             <div className="mb-6">
               <SuburbChips
                 listings={allListings}
