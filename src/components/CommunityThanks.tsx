@@ -50,52 +50,125 @@ export function CommunityThanks() {
       </div>
       
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
-          {/* Main heading with decorative elements */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-center gap-2 sm:gap-3">
-              <TreePine className="h-6 w-6 sm:h-8 w-8 text-festive-green animate-pulse" />
-              <h2 className="font-display text-2xl sm:text-3xl lg:text-5xl font-bold text-foreground">
-                Thank You, Benoni!
-              </h2>
-              <TreePine className="h-6 w-6 sm:h-8 w-8 text-festive-green animate-pulse" />
+        {/* Card with String Lights Border */}
+        <div className="max-w-3xl mx-auto relative">
+          {/* String Lights Border Effect with Wire */}
+          <div className="absolute -inset-2 rounded-2xl pointer-events-none">
+            {/* Wire/cord - top */}
+            <div className="absolute top-1 left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-gray-600 to-transparent rounded-full" />
+            {/* Wire/cord - bottom */}
+            <div className="absolute bottom-1 left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-gray-600 to-transparent rounded-full" />
+            {/* Wire/cord - left */}
+            <div className="absolute top-4 bottom-4 left-1 w-0.5 bg-gradient-to-b from-transparent via-gray-600 to-transparent rounded-full" />
+            {/* Wire/cord - right */}
+            <div className="absolute top-4 bottom-4 right-1 w-0.5 bg-gradient-to-b from-transparent via-gray-600 to-transparent rounded-full" />
+            
+            {/* Top string lights */}
+            <div className="absolute top-0 left-2 right-2 h-3 flex justify-around items-center">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={`top-${i}`}
+                  className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full animate-twinkle"
+                  style={{
+                    backgroundColor: ['#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e'][i],
+                    animationDelay: `${i * 0.2}s`,
+                    boxShadow: `0 0 10px 3px ${['#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e'][i]}90`
+                  }}
+                />
+              ))}
+            </div>
+            {/* Bottom string lights */}
+            <div className="absolute bottom-0 left-2 right-2 h-3 flex justify-around items-center">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={`bottom-${i}`}
+                  className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full animate-twinkle"
+                  style={{
+                    backgroundColor: ['#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308'][i],
+                    animationDelay: `${i * 0.15 + 0.1}s`,
+                    boxShadow: `0 0 10px 3px ${['#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308', '#ef4444', '#22c55e', '#eab308'][i]}90`
+                  }}
+                />
+              ))}
+            </div>
+            {/* Left string lights */}
+            <div className="absolute top-2 bottom-2 left-0 w-3 flex flex-col justify-around items-center">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={`left-${i}`}
+                  className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full animate-twinkle"
+                  style={{
+                    backgroundColor: ['#eab308', '#ef4444', '#22c55e', '#eab308'][i],
+                    animationDelay: `${i * 0.25 + 0.2}s`,
+                    boxShadow: `0 0 10px 3px ${['#eab308', '#ef4444', '#22c55e', '#eab308'][i]}90`
+                  }}
+                />
+              ))}
+            </div>
+            {/* Right string lights */}
+            <div className="absolute top-2 bottom-2 right-0 w-3 flex flex-col justify-around items-center">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={`right-${i}`}
+                  className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full animate-twinkle"
+                  style={{
+                    backgroundColor: ['#ef4444', '#22c55e', '#eab308', '#ef4444'][i],
+                    animationDelay: `${i * 0.3 + 0.15}s`,
+                    boxShadow: `0 0 10px 3px ${['#ef4444', '#22c55e', '#eab308', '#ef4444'][i]}90`
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+          
+          {/* Content Card */}
+          <div className="relative bg-card/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 lg:p-10 text-center space-y-8">
+            {/* Main heading with decorative elements */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-center gap-2 sm:gap-3">
+                <TreePine className="h-6 w-6 sm:h-8 w-8 text-festive-green animate-pulse" />
+                <h2 className="font-display text-2xl sm:text-3xl lg:text-5xl font-bold text-foreground">
+                  Thank You, Benoni!
+                </h2>
+                <TreePine className="h-6 w-6 sm:h-8 w-8 text-festive-green animate-pulse" />
+              </div>
+              
+              {/* Decorative line */}
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-px w-8 sm:w-12 bg-gradient-to-r from-transparent to-christmas" />
+                <Sparkles className="h-4 w-4 text-festive-gold animate-twinkle" />
+                <div className="h-px w-8 sm:w-12 bg-gradient-to-l from-transparent to-christmas" />
+              </div>
             </div>
             
-            {/* Decorative line */}
-            <div className="flex items-center justify-center gap-2">
-              <div className="h-px w-8 sm:w-12 bg-gradient-to-r from-transparent to-christmas" />
-              <Sparkles className="h-4 w-4 text-festive-gold animate-twinkle" />
-              <div className="h-px w-8 sm:w-12 bg-gradient-to-l from-transparent to-christmas" />
-            </div>
-          </div>
-          
-          {/* Heartfelt message */}
-          <div className="space-y-4 text-base sm:text-lg text-muted-foreground px-2">
-            <p className="leading-relaxed">
-              <span className="text-foreground font-semibold">Lekker Lights was born right here in Benoni</span> – and now it's lighting up homes across South Africa!
-            </p>
-            <p className="leading-relaxed">
-              Every display you share brings joy to families, neighbours, and visitors in our community and beyond.
-            </p>
-          </div>
-          
-          {/* Pun CTA section - with extra spacing */}
-          <div className="pt-8 sm:pt-12 space-y-10 sm:space-y-12">
-            <div className="flex items-center justify-center gap-2 px-2">
-              <Star className="h-4 w-4 sm:h-5 w-5 text-festive-gold animate-twinkle shrink-0" />
-              <p className="text-lg sm:text-xl lg:text-2xl font-display font-semibold text-foreground italic">
-                "Be on everyone's Christmas list – list your display!"
+            {/* Heartfelt message */}
+            <div className="space-y-4 text-base sm:text-lg text-muted-foreground px-2">
+              <p className="leading-relaxed">
+                <span className="text-foreground font-semibold">Lekker Lights was born right here in Benoni</span> – and now it's lighting up homes across South Africa!
               </p>
-              <Star className="h-4 w-4 sm:h-5 w-5 text-festive-gold animate-twinkle shrink-0" style={{ animationDelay: "0.5s" }} />
+              <p className="leading-relaxed">
+                Every display you share brings joy to families, neighbours, and visitors in our community and beyond.
+              </p>
             </div>
             
-            <Link to="/create">
-              <Button size="lg" className="group">
-                <Gift className="h-5 w-5 mr-2 group-hover:animate-bounce" />
-                List Your Display
-                <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </Link>
+            {/* Pun CTA section - with doubled spacing */}
+            <div className="pt-8 sm:pt-12">
+              <div className="flex items-center justify-center gap-2 px-2 mb-16 sm:mb-20">
+                <Star className="h-4 w-4 sm:h-5 w-5 text-festive-gold animate-twinkle shrink-0" />
+                <p className="text-lg sm:text-xl lg:text-2xl font-display font-semibold text-foreground italic">
+                  "Be on everyone's Christmas list – list your display!"
+                </p>
+                <Star className="h-4 w-4 sm:h-5 w-5 text-festive-gold animate-twinkle shrink-0" style={{ animationDelay: "0.5s" }} />
+              </div>
+              
+              <Link to="/create">
+                <Button size="lg" className="group">
+                  <Gift className="h-5 w-5 mr-2 group-hover:animate-bounce" />
+                  List Your Display
+                  <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
