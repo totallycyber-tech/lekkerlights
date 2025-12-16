@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -80,6 +80,7 @@ export function ListingCard({
           src={(listing.hasCoverPhoto && listing.photos[0] && listing.photos[0] !== '') ? listing.photos[0] : defaultCoverPhoto} 
           alt={`Christmas light display: ${listing.title} in ${listing.location.suburb}, ${listing.location.city}`}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" aria-hidden="true" />
         
@@ -102,43 +103,63 @@ export function ListingCard({
           </Badge>
         )}
 
+        {/* Photo Count Badge */}
+        {(() => {
+          const totalPhotos = listing.photos.filter(url => url && url !== '').length;
+          if (totalPhotos > 0) {
+            return (
+              <Badge 
+                variant="secondary"
+                className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm"
+                style={{ right: isPopular ? 'auto' : undefined, left: isPopular ? '8rem' : undefined }}
+              >
+                <Camera className="h-3 w-3 mr-1" aria-hidden="true" />
+                {totalPhotos}
+              </Badge>
+            );
+          }
+          return null;
+        })()}
+
         {/* Distance Badge - show when location is provided */}
         {distance !== undefined && distance !== null && (
           <Badge 
             variant="secondary"
-            className="absolute bottom-3 left-3 bg-background/80 backdrop-blur-sm"
+            className="absolute bottom-14 left-3 bg-background/80 backdrop-blur-sm"
           >
             <Navigation className="h-3 w-3 mr-1" aria-hidden="true" />
             <span className="sr-only">Distance: </span>{formatDistance(distance)}
           </Badge>
         )}
 
-        {/* Additional Photos Thumbnails */}
+        {/* Additional Photos Thumbnails - Full Width Row */}
         {(() => {
           const additionalPhotos = listing.hasCoverPhoto 
             ? listing.photos.slice(1).filter(url => url && url !== '')
             : listing.photos.filter(url => url && url !== '');
           
           if (additionalPhotos.length > 0) {
-            const displayPhotos = additionalPhotos.slice(0, 3);
-            const remainingCount = additionalPhotos.length - 3;
+            const maxDisplay = 4;
+            const displayPhotos = additionalPhotos.slice(0, maxDisplay);
+            const remainingCount = additionalPhotos.length - maxDisplay;
             
             return (
-              <div className="absolute bottom-3 left-3 flex gap-1">
+              <div className="absolute bottom-0 left-0 right-0 flex gap-0.5 p-1 bg-background/60 backdrop-blur-sm">
                 {displayPhotos.map((photo, idx) => (
                   <div 
                     key={idx} 
-                    className="w-8 h-8 rounded border-2 border-background/80 overflow-hidden shadow-md"
+                    className="flex-1 aspect-[4/3] overflow-hidden rounded-sm"
                   >
                     <img 
                       src={photo} 
                       alt={`Additional photo ${idx + 1}`}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   </div>
                 ))}
                 {remainingCount > 0 && (
-                  <div className="w-8 h-8 rounded border-2 border-background/80 bg-background/90 flex items-center justify-center text-xs font-medium shadow-md">
+                  <div className="flex-1 aspect-[4/3] rounded-sm bg-background/90 flex items-center justify-center text-sm font-medium">
                     +{remainingCount}
                   </div>
                 )}
@@ -149,7 +170,7 @@ export function ListingCard({
         })()}
 
         {/* Action Buttons */}
-        <div className="absolute bottom-3 right-3 flex gap-2">
+        <div className="absolute bottom-14 right-3 flex gap-2">
           <button 
             className="p-2 rounded-full backdrop-blur-sm transition-all bg-background/50 hover:bg-background/80"
             onClick={handleShareClick}
