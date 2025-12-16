@@ -113,6 +113,41 @@ export function ListingCard({
           </Badge>
         )}
 
+        {/* Additional Photos Thumbnails */}
+        {(() => {
+          const additionalPhotos = listing.hasCoverPhoto 
+            ? listing.photos.slice(1).filter(url => url && url !== '')
+            : listing.photos.filter(url => url && url !== '');
+          
+          if (additionalPhotos.length > 0) {
+            const displayPhotos = additionalPhotos.slice(0, 3);
+            const remainingCount = additionalPhotos.length - 3;
+            
+            return (
+              <div className="absolute bottom-3 left-3 flex gap-1">
+                {displayPhotos.map((photo, idx) => (
+                  <div 
+                    key={idx} 
+                    className="w-8 h-8 rounded border-2 border-background/80 overflow-hidden shadow-md"
+                  >
+                    <img 
+                      src={photo} 
+                      alt={`Additional photo ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+                {remainingCount > 0 && (
+                  <div className="w-8 h-8 rounded border-2 border-background/80 bg-background/90 flex items-center justify-center text-xs font-medium shadow-md">
+                    +{remainingCount}
+                  </div>
+                )}
+              </div>
+            );
+          }
+          return null;
+        })()}
+
         {/* Action Buttons */}
         <div className="absolute bottom-3 right-3 flex gap-2">
           <button 
