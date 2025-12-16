@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { SearchFilters, SearchFilters as SearchFiltersType } from "@/components/SearchFilters";
+import { SuburbChips } from "@/components/SuburbChips";
 import { ListingCard } from "@/components/ListingCard";
 import { ListingsMap } from "@/components/ListingsMap";
 import { MapListingDetail } from "@/components/MapListingDetail";
@@ -140,9 +141,21 @@ export default function Browse() {
           </div>
 
           {/* Filters */}
-          <div className="mb-8">
+          <div className="mb-4">
             <SearchFilters onFilterChange={setFilters} />
           </div>
+
+          {/* Suburb Quick Chips */}
+          {!isLoading && viewMode === "grid" && (
+            <div className="mb-6">
+              <SuburbChips
+                listings={allListings}
+                selectedSuburb={filters.suburb}
+                selectedProvince={filters.province}
+                onSuburbSelect={(suburb) => setFilters(prev => ({ ...prev, suburb }))}
+              />
+            </div>
+          )}
 
           {/* Results Header */}
           <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
