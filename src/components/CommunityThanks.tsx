@@ -80,7 +80,7 @@ export function CommunityThanks() {
           </div>
           
           {/* Pun CTA section - with extra spacing */}
-          <div className="pt-8 sm:pt-12 space-y-8">
+          <div className="pt-8 sm:pt-12 space-y-10 sm:space-y-12">
             <div className="flex items-center justify-center gap-2 px-2">
               <Star className="h-4 w-4 sm:h-5 w-5 text-festive-gold animate-twinkle shrink-0" />
               <p className="text-lg sm:text-xl lg:text-2xl font-display font-semibold text-foreground italic">
