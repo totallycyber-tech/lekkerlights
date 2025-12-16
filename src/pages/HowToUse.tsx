@@ -112,6 +112,10 @@ export default function HowToUse() {
                         <span><strong>Suburb</strong> – Type a suburb name to search in that area</span>
                       </li>
                       <li className="flex items-center gap-2">
+                        <Filter className="h-4 w-4 text-primary" />
+                        <span><strong>Suburb Chips</strong> – Use the quick-filter suburb chips below the search filters to instantly filter by popular suburbs. Each chip shows the number of displays in that area.</span>
+                      </li>
+                      <li className="flex items-center gap-2">
                         <Tags className="h-4 w-4 text-primary" />
                         <span><strong>Tags</strong> – Filter by features like "family-friendly", "walk-through", "music-synchronized", etc.</span>
                       </li>
@@ -534,6 +538,20 @@ export default function HowToUse() {
                       On the Browse Displays page, you can filter by province (select from the dropdown), suburb (type to search), 
                       and tags (select features you're looking for). When you select multiple tags, only displays that have 
                       ALL the selected tags will be shown. Click the "Search" button after setting your filters to apply them.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="suburb-chips" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      What are the suburb chips and how do I use them?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      The suburb chips are quick-filter buttons that appear below the main search filters on both the Grid View 
+                      and Map View. Each chip displays a suburb name along with a count showing how many displays are in that area. 
+                      Simply click on a suburb chip to instantly filter displays to that suburb only. Click "All Areas" to clear 
+                      the suburb filter and see all displays again. The chips automatically update based on your province selection 
+                      – if you select a province first, only suburbs within that province will be shown. This makes it easy to 
+                      quickly explore different neighbourhoods without typing suburb names.
                     </AccordionContent>
                   </AccordionItem>
 

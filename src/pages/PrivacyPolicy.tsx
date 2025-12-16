@@ -133,11 +133,11 @@ export default function PrivacyPolicy() {
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.3 Cookies and Similar Technologies</h3>
               <p className="text-muted-foreground leading-relaxed">We use cookies and similar technologies to:</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
-                <li>Remember your basic preferences (such as search filters, view mode preference between Grid View and Map View, and favourites)</li>
+                <li>Remember your basic preferences (such as search filters, selected suburb chips, view mode preference between Grid View and Map View, and favourites)</li>
                 <li>Understand how the Service is used</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-2">
-                You may disable cookies in your browser settings, but some features of the Service may not function properly if you do so.
+                The suburb chip selections allow you to quickly filter displays by clicking on suburb names. Your filter preferences, including any selected suburb chips, may be stored locally to improve your browsing experience. You may disable cookies in your browser settings, but some features of the Service may not function properly if you do so.
               </p>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.4 Third-Party Services and Google Maps</h3>
