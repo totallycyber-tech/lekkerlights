@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Listing } from "@/data/mockListings";
@@ -16,6 +16,19 @@ export function SuburbChips({
   selectedProvince,
   onSuburbSelect 
 }: SuburbChipsProps) {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [prevSuburb, setPrevSuburb] = useState(selectedSuburb);
+
+  // Trigger animation on selection change
+  useEffect(() => {
+    if (prevSuburb !== selectedSuburb) {
+      setIsAnimating(true);
+      setPrevSuburb(selectedSuburb);
+      const timer = setTimeout(() => setIsAnimating(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedSuburb, prevSuburb]);
+
   // Extract unique suburbs with counts, filtered by province if selected
   const suburbData = useMemo(() => {
     const filteredListings = selectedProvince 
@@ -43,6 +56,11 @@ export function SuburbChips({
     !selectedProvince || l.location.province === selectedProvince
   ).length;
 
+  const handleSelect = (suburb: string) => {
+    setIsAnimating(true);
+    onSuburbSelect(suburb);
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -58,21 +76,25 @@ export function SuburbChips({
         {/* Right fade */}
         <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none sm:hidden" />
         
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 px-1 sm:flex-wrap sm:overflow-visible">
+        <div className={cn(
+          "flex gap-2 overflow-x-auto scrollbar-hide pb-1 px-1 sm:flex-wrap sm:overflow-visible transition-opacity duration-200",
+          isAnimating && "opacity-90"
+        )}>
           {/* All Areas Chip */}
           <button
-            onClick={() => onSuburbSelect("")}
+            onClick={() => handleSelect("")}
             className={cn(
-              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 shrink-0",
-              "border hover:scale-105 active:scale-95",
+              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium shrink-0",
+              "border transition-all duration-300 ease-out",
+              "hover:scale-105 active:scale-95",
               !selectedSuburb
-                ? "bg-christmas text-christmas-foreground border-christmas shadow-md shadow-christmas/20"
+                ? "bg-christmas text-christmas-foreground border-christmas shadow-md shadow-christmas/20 scale-105"
                 : "bg-secondary/50 text-muted-foreground border-border hover:bg-secondary hover:text-foreground hover:border-christmas/50"
             )}
           >
             <span>All Areas</span>
             <span className={cn(
-              "text-xs px-1.5 py-0.5 rounded-full",
+              "text-xs px-1.5 py-0.5 rounded-full transition-colors duration-300",
               !selectedSuburb 
                 ? "bg-christmas-foreground/20 text-christmas-foreground" 
                 : "bg-muted text-muted-foreground"
@@ -82,24 +104,28 @@ export function SuburbChips({
           </button>
 
           {/* Suburb Chips */}
-          {suburbData.map(({ suburb, count }) => {
+          {suburbData.map(({ suburb, count }, index) => {
             const isSelected = selectedSuburb.toLowerCase() === suburb.toLowerCase();
             
             return (
               <button
                 key={suburb}
-                onClick={() => onSuburbSelect(isSelected ? "" : suburb)}
+                onClick={() => handleSelect(isSelected ? "" : suburb)}
+                style={{ 
+                  animationDelay: `${index * 30}ms`,
+                }}
                 className={cn(
-                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 shrink-0",
-                  "border hover:scale-105 active:scale-95",
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium shrink-0",
+                  "border transition-all duration-300 ease-out animate-fade-in",
+                  "hover:scale-105 active:scale-95",
                   isSelected
-                    ? "bg-christmas text-christmas-foreground border-christmas shadow-md shadow-christmas/20"
+                    ? "bg-christmas text-christmas-foreground border-christmas shadow-md shadow-christmas/20 scale-105"
                     : "bg-secondary/50 text-muted-foreground border-border hover:bg-secondary hover:text-foreground hover:border-christmas/50"
                 )}
               >
                 <span>{suburb}</span>
                 <span className={cn(
-                  "text-xs px-1.5 py-0.5 rounded-full",
+                  "text-xs px-1.5 py-0.5 rounded-full transition-colors duration-300",
                   isSelected 
                     ? "bg-christmas-foreground/20 text-christmas-foreground" 
                     : "bg-muted text-muted-foreground"
