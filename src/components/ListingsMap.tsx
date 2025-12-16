@@ -29,15 +29,38 @@ const defaultCenter = {
 
 const defaultZoom = 5;
 
-// Christmas tree marker SVG - regular
-const createTreeMarker = (isFavorite: boolean) => {
+// Calculate marker size based on number of listings
+const getMarkerSize = (listingCount: number): { width: number; height: number } => {
+  // Base size for few markers, scales down as count increases
+  if (listingCount <= 5) return { width: 40, height: 48 };
+  if (listingCount <= 10) return { width: 36, height: 43 };
+  if (listingCount <= 20) return { width: 32, height: 38 };
+  if (listingCount <= 35) return { width: 28, height: 34 };
+  if (listingCount <= 50) return { width: 24, height: 29 };
+  return { width: 20, height: 24 }; // Minimum size for many markers
+};
+
+// Christmas tree marker SVG - scalable
+const createTreeMarker = (isFavorite: boolean, size: { width: number; height: number }) => {
+  const { width, height } = size;
+  const scale = width / 40; // Base scale factor from original 40px width
+  
+  // Scale heart badge position and size
+  const heartRadius = Math.max(4, 6 * scale);
+  const heartX = width - (width * 0.5);
+  const heartY = 8 * scale;
+  
   const heartIcon = isFavorite 
-    ? `<circle cx="20" cy="8" r="6" fill="#ef4444"/>
-       <path d="M20 5 L20 11 M17 8 L23 8" stroke="white" stroke-width="1.5" fill="none"/>`
+    ? `<circle cx="${heartX}" cy="${heartY}" r="${heartRadius}" fill="#ef4444"/>
+       <path d="M${heartX} ${heartY - 3 * scale} L${heartX} ${heartY + 3 * scale} M${heartX - 3 * scale} ${heartY} L${heartX + 3 * scale} ${heartY}" stroke="white" stroke-width="${Math.max(1, 1.5 * scale)}" fill="none"/>`
     : '';
   
+  // Scale ornament sizes
+  const ornamentSize = Math.max(1.5, 2.5 * scale);
+  const smallOrnamentSize = Math.max(1.2, 2 * scale);
+  
   return `data:image/svg+xml,${encodeURIComponent(`
-    <svg width="40" height="48" viewBox="0 0 40 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="${width}" height="${height}" viewBox="0 0 40 48" fill="none" xmlns="http://www.w3.org/2000/svg">
       <!-- Tree shadow -->
       <ellipse cx="20" cy="44" rx="8" ry="3" fill="rgba(0,0,0,0.2)"/>
       
@@ -52,14 +75,20 @@ const createTreeMarker = (isFavorite: boolean) => {
       <!-- Star on top -->
       <polygon points="20,2 21.5,6 26,6 22.5,9 24,14 20,11 16,14 17.5,9 14,6 18.5,6" fill="#FFD700"/>
       
-      <!-- Ornaments -->
-      <circle cx="14" cy="24" r="2.5" fill="#ef4444"/>
-      <circle cx="26" cy="24" r="2.5" fill="#3b82f6"/>
-      <circle cx="20" cy="30" r="2.5" fill="#eab308"/>
-      <circle cx="12" cy="32" r="2" fill="#22c55e"/>
-      <circle cx="28" cy="32" r="2" fill="#ef4444"/>
-      <circle cx="16" cy="18" r="2" fill="#eab308"/>
-      <circle cx="24" cy="18" r="2" fill="#22c55e"/>
+      <!-- Ornaments (simplified if marker is small) -->
+      ${scale >= 0.6 ? `
+        <circle cx="14" cy="24" r="${ornamentSize}" fill="#ef4444"/>
+        <circle cx="26" cy="24" r="${ornamentSize}" fill="#3b82f6"/>
+        <circle cx="20" cy="30" r="${ornamentSize}" fill="#eab308"/>
+        <circle cx="12" cy="32" r="${smallOrnamentSize}" fill="#22c55e"/>
+        <circle cx="28" cy="32" r="${smallOrnamentSize}" fill="#ef4444"/>
+        <circle cx="16" cy="18" r="${smallOrnamentSize}" fill="#eab308"/>
+        <circle cx="24" cy="18" r="${smallOrnamentSize}" fill="#22c55e"/>
+      ` : `
+        <circle cx="14" cy="26" r="${ornamentSize}" fill="#ef4444"/>
+        <circle cx="26" cy="26" r="${ornamentSize}" fill="#3b82f6"/>
+        <circle cx="20" cy="32" r="${ornamentSize}" fill="#eab308"/>
+      `}
       
       <!-- Favorite heart badge -->
       ${heartIcon}
@@ -140,6 +169,9 @@ function ListingsMapInner({
     markersRef.current.forEach((marker) => marker.setMap(null));
     markersRef.current = [];
 
+    // Calculate marker size based on listing count
+    const markerSize = getMarkerSize(listingsWithCoords.length);
+
     // Create new markers
     listingsWithCoords.forEach((listing) => {
       const marker = new google.maps.Marker({
@@ -149,9 +181,9 @@ function ListingsMapInner({
         },
         map: mapRef.current,
         icon: {
-          url: createTreeMarker(favorites.includes(listing.id)),
-          scaledSize: new google.maps.Size(40, 48),
-          anchor: new google.maps.Point(20, 48),
+          url: createTreeMarker(favorites.includes(listing.id), markerSize),
+          scaledSize: new google.maps.Size(markerSize.width, markerSize.height),
+          anchor: new google.maps.Point(markerSize.width / 2, markerSize.height),
         },
         animation: google.maps.Animation.DROP,
       });
