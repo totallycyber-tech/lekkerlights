@@ -16,7 +16,8 @@ import {
   Youtube,
   X,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  Eye
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -862,26 +863,30 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
               className="bg-secondary"
             />
           </div>
-
-          {/* Private Notes */}
-          <div className="space-y-3 pt-4 border-t border-border">
-            <Label htmlFor="submitterNotes" className="flex items-center gap-2">
-              Private Notes
-              <span className="text-xs text-muted-foreground font-normal">(not shown publicly)</span>
-            </Label>
-            <Textarea
-              id="submitterNotes"
-              value={submitterNotes}
-              onChange={(e) => setSubmitterNotes(e.target.value)}
-              placeholder="e.g., 'Neighborhood batch from Benoni', 'Houses spotted during Dec walk'..."
-              className="bg-secondary min-h-[80px]"
-              maxLength={200}
-            />
-            <p className="text-xs text-muted-foreground">
-              Helps identify this batch of listings in the edit link email. {submitterNotes.length}/200
-            </p>
-          </div>
         </div>
+      </div>
+
+      {/* Private Notes - Separate Card */}
+      <div className="bg-card rounded-xl border border-border p-6 space-y-4">
+        <div>
+          <h2 className="font-display text-lg font-semibold flex items-center gap-2">
+            <Eye className="h-5 w-5" />
+            Private Notes (Optional)
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Add notes to help you identify this batch in your edit link emails. These notes are private and will not be shown publicly.
+          </p>
+        </div>
+        <Textarea
+          value={submitterNotes}
+          onChange={(e) => setSubmitterNotes(e.target.value)}
+          placeholder="e.g., 'My house', 'Neighbor on Oak Street', 'The big display with inflatables'..."
+          className="bg-secondary min-h-[100px]"
+          maxLength={200}
+        />
+        <p className="text-xs text-muted-foreground">
+          {submitterNotes.length}/200 characters
+        </p>
       </div>
 
       {/* Submit */}
