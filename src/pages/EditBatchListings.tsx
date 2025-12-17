@@ -43,7 +43,8 @@ import {
   User,
   Mail,
   Phone,
-  Wand2
+  Wand2,
+  FileText
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -98,6 +99,8 @@ interface BatchListing {
   name_visible?: boolean;
   email_visible?: boolean;
   phone_visible?: boolean;
+  submitter_notes?: string;
+  revision?: number;
 }
 
 interface ListingMediaState {
@@ -131,6 +134,7 @@ interface ListingMediaState {
   showDescriptionField: boolean;
   isGeneratingTitle: boolean;
   isGeneratingDescription: boolean;
+  submitterNotes: string;
 }
 
 function parseOperatingHours(hours: Record<string, any> | undefined): { operatingHours: OperatingHours; operatingHoursOther: string } {
@@ -240,6 +244,7 @@ export default function EditBatchListings() {
         showDescriptionField: !!listing.description,
         isGeneratingTitle: false,
         isGeneratingDescription: false,
+        submitterNotes: listing.submitter_notes || '',
       };
     });
     setMediaState(initialMediaState);
@@ -517,7 +522,9 @@ export default function EditBatchListings() {
           state.province !== (listing.province || '') ||
           state.postalCode !== (listing.postal_code || '') ||
           state.complexName !== (listing.complex_name || '') ||
-          state.unitNo !== (listing.unit_no || '')
+          state.unitNo !== (listing.unit_no || '') ||
+          // Private notes
+          state.submitterNotes !== (listing.submitter_notes || '')
         );
 
         if (!hasTextChanges && !hasMediaChanges) continue;
@@ -623,6 +630,7 @@ export default function EditBatchListings() {
           postal_code: state?.postalCode || listing.postal_code,
           complex_name: state?.complexName || null,
           unit_no: state?.unitNo || null,
+          submitter_notes: state?.submitterNotes || null,
         };
 
         const { error } = await supabase.functions.invoke("update-listing", {
@@ -730,7 +738,9 @@ export default function EditBatchListings() {
         state.province !== (listing.province || '') ||
         state.postalCode !== (listing.postal_code || '') ||
         state.complexName !== (listing.complex_name || '') ||
-        state.unitNo !== (listing.unit_no || '')
+        state.unitNo !== (listing.unit_no || '') ||
+        // Private notes
+        state.submitterNotes !== (listing.submitter_notes || '')
       );
     });
     
@@ -1339,6 +1349,25 @@ export default function EditBatchListings() {
                                   className="bg-secondary"
                                 />
                               </div>
+                            </div>
+
+                            {/* Private Notes */}
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-2">
+                                <FileText className="h-5 w-5 text-christmas" />
+                                <div>
+                                  <Label className="text-sm font-medium">Private Notes</Label>
+                                  <p className="text-xs text-muted-foreground">
+                                    Only visible to you in edit link emails
+                                  </p>
+                                </div>
+                              </div>
+                              <Textarea
+                                placeholder="e.g., Neighbour's display on Main Street..."
+                                value={state.submitterNotes}
+                                onChange={(e) => updateMediaState(listing.id, { submitterNotes: e.target.value })}
+                                className="bg-secondary min-h-[60px]"
+                              />
                             </div>
 
                             {/* Delete Listing */}

@@ -15,6 +15,74 @@ interface UpdateListingRequest {
   skipTokenVerification?: boolean;
 }
 
+// Field name mappings for human-readable change summaries
+const fieldDisplayNames: Record<string, string> = {
+  title: "Title",
+  description: "Description",
+  street_number: "Street Number",
+  street_name: "Street Name",
+  suburb: "Suburb",
+  city: "City",
+  province: "Province",
+  postal_code: "Postal Code",
+  complex_name: "Complex/Estate Name",
+  unit_no: "Unit Number",
+  contact_name: "Contact Name",
+  contact_email: "Contact Email",
+  contact_phone: "Contact Phone",
+  name_visible: "Name Visibility",
+  email_visible: "Email Visibility",
+  phone_visible: "Phone Visibility",
+  parking_info: "Parking Information",
+  max_visitors: "Maximum Visitors",
+  gate_access_info: "Gate Access Info",
+  youtube_urls: "YouTube Videos",
+  image_urls: "Photos",
+  has_cover_photo: "Cover Photo",
+  operating_hours: "Operating Hours",
+  tags: "Tags",
+  submitter_notes: "Private Notes",
+};
+
+function getChangedFields(original: Record<string, unknown>, updates: Record<string, unknown>): string[] {
+  const changedFields: string[] = [];
+  
+  for (const [key, newValue] of Object.entries(updates)) {
+    const oldValue = original[key];
+    
+    // Skip non-trackable fields
+    if (['id', 'created_at', 'updated_at', 'revision', 'lat', 'lng', 'directions_clicks', 'favorites_count', 'batch_id'].includes(key)) {
+      continue;
+    }
+    
+    // Compare values (handle arrays and objects)
+    const oldStr = JSON.stringify(oldValue ?? null);
+    const newStr = JSON.stringify(newValue ?? null);
+    
+    if (oldStr !== newStr) {
+      changedFields.push(key);
+    }
+  }
+  
+  return changedFields;
+}
+
+function generateChangesSummary(changedFields: string[]): string {
+  if (changedFields.length === 0) return "No changes";
+  
+  const displayNames = changedFields
+    .map(field => fieldDisplayNames[field] || field)
+    .filter(Boolean);
+  
+  if (displayNames.length === 1) {
+    return `Updated ${displayNames[0]}`;
+  } else if (displayNames.length <= 3) {
+    return `Updated ${displayNames.join(", ")}`;
+  } else {
+    return `Updated ${displayNames.slice(0, 2).join(", ")} and ${displayNames.length - 2} more fields`;
+  }
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -137,11 +205,43 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
+    // Fetch current listing data for comparison
+    const { data: currentListing, error: fetchError } = await supabase
+      .from("listings")
+      .select("*")
+      .eq("id", listingId)
+      .single();
+
+    if (fetchError || !currentListing) {
+      console.error("Failed to fetch current listing:", fetchError);
+      return new Response(
+        JSON.stringify({ success: false, error: "Listing not found" }),
+        { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     // Sanitize updates - remove any sensitive fields that shouldn't be updated
     const sanitizedUpdates = { ...updates };
     delete sanitizedUpdates.id;
     delete sanitizedUpdates.edit_token;
     delete sanitizedUpdates.created_at;
+    delete sanitizedUpdates.revision; // Don't allow manual revision updates
+
+    // Detect changed fields
+    const changedFields = getChangedFields(currentListing as Record<string, unknown>, sanitizedUpdates);
+    
+    // Only proceed if there are actual changes
+    if (changedFields.length === 0) {
+      console.log("No changes detected for listing:", listingId);
+      return new Response(
+        JSON.stringify({ success: true, listing: currentListing, message: "No changes detected" }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Increment revision and add to updates
+    const newRevision = (currentListing.revision || 1) + 1;
+    sanitizedUpdates.revision = newRevision;
 
     // Perform the update
     const { data: updatedListing, error: updateError } = await supabase
@@ -159,13 +259,29 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Create revision history entry
+    const changesSummary = generateChangesSummary(changedFields);
+    const { error: revisionError } = await supabase
+      .from("listing_revisions")
+      .insert({
+        listing_id: listingId,
+        revision: newRevision,
+        changes_summary: changesSummary,
+        changed_fields: changedFields,
+      });
+
+    if (revisionError) {
+      console.error("Failed to create revision entry:", revisionError);
+      // Don't fail the update, just log the error
+    }
+
     // Remove edit_token from response
     const { edit_token: _, ...safeResponse } = updatedListing;
 
-    console.log("Listing updated successfully:", listingId);
+    console.log(`Listing updated successfully: ${listingId}, revision: ${newRevision}, changes: ${changesSummary}`);
 
     return new Response(
-      JSON.stringify({ success: true, listing: safeResponse }),
+      JSON.stringify({ success: true, listing: safeResponse, revision: newRevision }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   } catch (error: any) {

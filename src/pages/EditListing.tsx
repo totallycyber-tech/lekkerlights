@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Trash2, EyeOff, Loader2, Wand2, ImageIcon } from "lucide-react";
+import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Trash2, EyeOff, Loader2, Wand2, ImageIcon, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
@@ -78,6 +78,14 @@ export default function EditListing() {
   const [showDescriptionField, setShowDescriptionField] = useState(false);
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+  const [submitterNotes, setSubmitterNotes] = useState('');
+  const [currentRevision, setCurrentRevision] = useState(1);
+  const [revisionHistory, setRevisionHistory] = useState<Array<{
+    revision: number;
+    changes_summary: string;
+    changed_at: string;
+    changed_fields: string[];
+  }>>([]);
   const [originalAddress, setOriginalAddress] = useState({
     streetNumber: '',
     streetName: '',
@@ -202,6 +210,20 @@ export default function EditListing() {
         setExistingImageUrls(listing.image_urls || []);
         setYoutubeUrls(listing.youtube_urls?.length ? listing.youtube_urls : ['']);
         setSelectedTags(listing.tags || []);
+        setSubmitterNotes(listing.submitter_notes || '');
+        setCurrentRevision(listing.revision || 1);
+
+        // Fetch revision history
+        const { data: revisions } = await supabase
+          .from('listing_revisions')
+          .select('revision, changes_summary, changed_at, changed_fields')
+          .eq('listing_id', id)
+          .order('revision', { ascending: false })
+          .limit(10);
+        
+        if (revisions) {
+          setRevisionHistory(revisions);
+        }
 
         // Parse operating hours
         if (listing.operating_hours && typeof listing.operating_hours === 'object') {
@@ -449,6 +471,7 @@ export default function EditListing() {
               ? operatingHours 
               : { other: operatingHoursOther },
             tags: selectedTags,
+            submitter_notes: submitterNotes || null,
           },
         },
       });
@@ -1157,6 +1180,61 @@ export default function EditListing() {
                   </div>
                 </div>
               </div>
+
+              {/* Private Notes */}
+              <div className="bg-card rounded-xl border border-border p-6 space-y-4">
+                <div>
+                  <h2 className="font-display text-lg font-semibold">Private Notes</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Only visible to you in edit link emails – never shown publicly
+                  </p>
+                </div>
+                <Textarea
+                  id="submitterNotes"
+                  placeholder="e.g., My display in Rynfield, submitted Dec 2024..."
+                  value={submitterNotes}
+                  onChange={(e) => setSubmitterNotes(e.target.value)}
+                  className="bg-secondary min-h-[80px]"
+                />
+              </div>
+
+              {/* Revision History */}
+              {revisionHistory.length > 0 && (
+                <div className="bg-card rounded-xl border border-border p-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="font-display text-lg font-semibold">Revision History</h2>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Current version: <span className="font-medium text-christmas">v{currentRevision}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {revisionHistory.map((rev) => (
+                      <div 
+                        key={rev.revision} 
+                        className="flex items-start gap-3 p-3 bg-secondary/50 rounded-lg"
+                      >
+                        <div className="flex-shrink-0 w-8 h-8 bg-christmas/10 text-christmas rounded-full flex items-center justify-center text-sm font-bold">
+                          v{rev.revision}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium">{rev.changes_summary}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {new Date(rev.changed_at).toLocaleDateString('en-ZA', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Actions */}
               <div className="flex flex-col gap-4">
