@@ -12,13 +12,36 @@ serve(async (req: Request) => {
   }
 
   try {
+    // Verify this is a service role request (admin-only function)
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      console.error("Missing authorization header");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized - missing authorization" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Extract and verify the token is service role
+    const token = authHeader.replace("Bearer ", "");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    
+    // Only allow service role key (not anon key)
+    if (token !== supabaseServiceKey) {
+      console.error("Invalid authorization - not service role");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized - admin access required" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log("Authorized service role request for batch geocode");
     const googleMapsKey = Deno.env.get("GOOGLE_MAPS_SERVER_API_KEY");
     if (!googleMapsKey) {
       throw new Error("Google Maps server API key not configured");
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Fetch all listings without coordinates
