@@ -243,6 +243,33 @@ export default function HowToUse() {
                     </p>
                   </div>
                 </div>
+
+                {/* Step 8 */}
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">
+                    8
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Plan Your Lights Tour</h3>
+                    <p className="text-muted-foreground mb-3">
+                      Want to visit multiple displays in one trip? Use the <strong>"Plan Tour"</strong> feature to create an optimized route:
+                    </p>
+                    <ul className="space-y-2 text-muted-foreground">
+                      <li className="flex items-center gap-2">
+                        <Plus className="h-4 w-4 text-primary" />
+                        <span>Click the route icon on listing cards or "Add to Tour" button to add displays (up to 10)</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Navigation className="h-4 w-4 text-primary" />
+                        <span>Click "Optimize Route" to arrange stops for shortest driving distance</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Map className="h-4 w-4 text-primary" />
+                        <span>See estimated distance and time, then open in Google Maps for turn-by-turn directions</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -586,6 +613,27 @@ export default function HowToUse() {
                       at the top of the panel for easy identification. From there you can favourite, get directions, 
                       or view the full listing. Use the "Refresh" button to reload the latest displays. All your filters 
                       (province, suburb, tags, and street address) also apply to the map view.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="plan-tour" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      How do I plan a Christmas lights tour?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      You can plan a route to visit multiple displays in one trip using the <strong>"Plan Tour"</strong> feature:
+                      <ol className="list-decimal list-inside mt-2 space-y-2">
+                        <li>Click the <strong>route icon</strong> on any listing card (Grid View) or the <strong>"Add to Tour"</strong> button in listing details (Map View)</li>
+                        <li>Add up to <strong>10 displays</strong> to your tour – displays in your tour show a purple marker with their position number on the map</li>
+                        <li>Click the <strong>"Plan Tour"</strong> button to open the tour panel</li>
+                        <li>Use the <strong>up/down arrows</strong> to reorder stops, or click <strong>"Optimize Route"</strong> to automatically arrange stops for the shortest driving distance</li>
+                        <li>See the <strong>estimated distance and time</strong> for your tour at the top of the panel</li>
+                        <li>Click <strong>"Start Tour in Google Maps"</strong> to open turn-by-turn navigation (optionally starting from your current location)</li>
+                        <li>Use <strong>"Share Tour Link"</strong> to copy a link that others can use to see your planned route</li>
+                      </ol>
+                      <p className="mt-2">
+                        Your tour is saved in your browser, so you can close the page and come back later to continue planning.
+                      </p>
                     </AccordionContent>
                   </AccordionItem>
 

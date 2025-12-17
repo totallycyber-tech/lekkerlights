@@ -11,7 +11,7 @@ import { MapListingDetail } from "@/components/MapListingDetail";
 import { TourPanel } from "@/components/TourPanel";
 import { Button } from "@/components/ui/button";
 import { mockListings, transformDbListing, Listing } from "@/data/mockListings";
-import { Sparkles, Heart, Loader2, LayoutGrid, Map, RefreshCw, MousePointerClick } from "lucide-react";
+import { Sparkles, Heart, Loader2, LayoutGrid, Map, RefreshCw, MousePointerClick, Route, Lightbulb } from "lucide-react";
 import { useFavorites } from "@/hooks/use-favorites";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useListings } from "@/hooks/use-listings";
@@ -308,19 +308,17 @@ export default function Browse() {
                 </Button>
               )}
               
-              {/* Tour Panel - only shown in map view */}
-              {viewMode === "map" && (
-                <TourPanel
-                  tourListings={tourListings}
-                  maxStops={maxStops}
-                  onRemove={removeFromTour}
-                  onClear={clearTour}
-                  onReorder={reorderTour}
-                  onOptimize={optimizeRoute}
-                  generateGoogleMapsUrl={generateGoogleMapsUrl}
-                  generateShareUrl={generateShareUrl}
-                />
-              )}
+              {/* Tour Panel */}
+              <TourPanel
+                tourListings={tourListings}
+                maxStops={maxStops}
+                onRemove={removeFromTour}
+                onClear={clearTour}
+                onReorder={reorderTour}
+                onOptimize={optimizeRoute}
+                generateGoogleMapsUrl={generateGoogleMapsUrl}
+                generateShareUrl={generateShareUrl}
+              />
               
               {/* Favourites Filter */}
               <Button
@@ -342,10 +340,18 @@ export default function Browse() {
             </div>
           ) : viewMode === "map" ? (
             <div className="space-y-4">
-              {/* Map Instructions */}
-              <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-lg px-4 py-3 border border-border">
-                <MousePointerClick className="h-4 w-4 text-christmas shrink-0" />
-                <span>Click on any marker to view display details below the map</span>
+              {/* Map Instructions with Tour Tip */}
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex-1 flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-lg px-4 py-3 border border-border">
+                  <MousePointerClick className="h-4 w-4 text-christmas shrink-0" />
+                  <span>Click on any marker to view display details below the map</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm bg-primary/10 rounded-lg px-4 py-3 border border-primary/20">
+                  <Lightbulb className="h-4 w-4 text-primary shrink-0" />
+                  <span className="text-primary">
+                    <strong>Did you know?</strong> Use "Plan Tour" to create a route visiting multiple displays!
+                  </span>
+                </div>
               </div>
               
               {/* Map */}
@@ -354,6 +360,7 @@ export default function Browse() {
                   key={mapKey}
                   listings={filteredListings}
                   favorites={favorites}
+                  tourListingIds={tourListings.map(l => l.id)}
                   onToggleFavorite={toggleFavorite}
                   onDirectionsClick={trackDirectionsClick}
                   reviewStats={reviewStats || null}
@@ -380,19 +387,33 @@ export default function Browse() {
               )}
             </div>
           ) : filteredListings.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredListings.map((listing) => (
-                <ListingCard 
-                  key={listing.id} 
-                  listing={listing}
-                  isFavorite={isFavorite(listing.id)}
-                  onToggleFavorite={toggleFavorite}
-                  isPopular={isPopular(listing.id)}
-                  onDirectionsClick={trackDirectionsClick}
-                  distance={null}
-                  reviewStats={reviewStats?.[listing.id] || null}
-                />
-              ))}
+            <div className="space-y-4">
+              {/* Grid View Tour Tip */}
+              <div className="flex items-center gap-2 text-sm bg-primary/10 rounded-lg px-4 py-3 border border-primary/20">
+                <Lightbulb className="h-4 w-4 text-primary shrink-0" />
+                <span className="text-primary">
+                  <strong>Did you know?</strong> Click the <Route className="h-4 w-4 inline mx-1" /> button on any listing to add it to your tour, then use "Plan Tour" to get directions!
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredListings.map((listing) => (
+                  <ListingCard 
+                    key={listing.id} 
+                    listing={listing}
+                    isFavorite={isFavorite(listing.id)}
+                    onToggleFavorite={toggleFavorite}
+                    isPopular={isPopular(listing.id)}
+                    onDirectionsClick={trackDirectionsClick}
+                    distance={null}
+                    reviewStats={reviewStats?.[listing.id] || null}
+                    isInTour={isInTour(listing.id)}
+                    tourIsFull={tourIsFull}
+                    onAddToTour={addToTour}
+                    onRemoveFromTour={removeFromTour}
+                  />
+                ))}
+              </div>
             </div>
           ) : (
             <div className="text-center py-16">

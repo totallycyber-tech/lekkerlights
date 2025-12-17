@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera, Eye, Youtube, Play } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera, Eye, Youtube, Play, Route, Check } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -23,6 +23,10 @@ interface ListingCardProps {
   onDirectionsClick?: (listingId: string) => void;
   distance?: number | null;
   reviewStats?: { average_rating: number; review_count: number } | null;
+  isInTour?: boolean;
+  tourIsFull?: boolean;
+  onAddToTour?: (listing: Listing) => void;
+  onRemoveFromTour?: (listingId: string) => void;
 }
 
 export function ListingCard({ 
@@ -34,6 +38,10 @@ export function ListingCard({
   onDirectionsClick,
   distance,
   reviewStats,
+  isInTour = false,
+  tourIsFull = false,
+  onAddToTour,
+  onRemoveFromTour,
 }: ListingCardProps) {
   const getDirectionsUrl = () => {
     const address = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}, ${listing.location.postalCode}`;
@@ -70,6 +78,30 @@ export function ListingCard({
       return `${Math.round(km * 1000)} m`;
     }
     return `${km.toFixed(1)} km`;
+  };
+
+  const handleTourClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isInTour) {
+      onRemoveFromTour?.(listing.id);
+      toast({
+        title: "Removed from tour",
+        description: `${listing.title || 'Display'} removed from your tour.`,
+      });
+    } else if (tourIsFull) {
+      toast({
+        title: "Tour is full",
+        description: "Remove a stop to add more (max 10 stops).",
+        variant: "destructive",
+      });
+    } else {
+      onAddToTour?.(listing);
+      toast({
+        title: "Added to tour!",
+        description: `${listing.title || 'Display'} added to your tour.`,
+      });
+    }
   };
 
   return (
@@ -237,6 +269,26 @@ export function ListingCard({
 
         {/* Action Buttons */}
         <div className="absolute bottom-14 right-3 flex gap-2">
+          {/* Tour Button */}
+          {onAddToTour && (
+            <button 
+              className={cn(
+                "p-2 rounded-full backdrop-blur-sm transition-all",
+                isInTour 
+                  ? "bg-primary text-white hover:bg-primary/80" 
+                  : "bg-background/50 hover:bg-background/80"
+              )}
+              onClick={handleTourClick}
+              disabled={!isInTour && tourIsFull}
+              aria-label={isInTour ? `Remove ${listing.title} from tour` : `Add ${listing.title} to tour`}
+            >
+              {isInTour ? (
+                <Check className="h-5 w-5" aria-hidden="true" />
+              ) : (
+                <Route className="h-5 w-5" aria-hidden="true" />
+              )}
+            </button>
+          )}
           <button 
             className="p-2 rounded-full backdrop-blur-sm transition-all bg-background/50 hover:bg-background/80"
             onClick={handleShareClick}
