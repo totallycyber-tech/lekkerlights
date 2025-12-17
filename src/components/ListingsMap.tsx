@@ -14,6 +14,7 @@ interface ReviewStats {
 interface ListingsMapProps {
   listings: Listing[];
   favorites: string[];
+  tourListingIds?: string[];
   onToggleFavorite: (id: string) => void;
   onDirectionsClick: (id: string) => void;
   reviewStats: Record<string, ReviewStats> | null;
@@ -40,20 +41,35 @@ const getMarkerSize = (listingCount: number): { width: number; height: number } 
   return { width: 20, height: 24 }; // Minimum size for many markers
 };
 
-// Christmas tree marker SVG - scalable
-const createTreeMarker = (isFavorite: boolean, size: { width: number; height: number }) => {
+// Christmas tree marker SVG - scalable with tour indicator
+const createTreeMarker = (isFavorite: boolean, isInTour: boolean, tourNumber: number | null, size: { width: number; height: number }) => {
   const { width, height } = size;
   const scale = width / 40; // Base scale factor from original 40px width
   
-  // Scale heart badge position and size
+  // Scale badge position and size
+  const badgeRadius = Math.max(5, 7 * scale);
+  const badgeX = width - (width * 0.25);
+  const badgeY = 6 * scale;
+  
+  // Heart badge for favorites (top-left if in tour, top-right otherwise)
+  const heartX = isInTour ? (width * 0.25) : badgeX;
+  const heartY = badgeY;
   const heartRadius = Math.max(4, 6 * scale);
-  const heartX = width - (width * 0.5);
-  const heartY = 8 * scale;
   
   const heartIcon = isFavorite 
     ? `<circle cx="${heartX}" cy="${heartY}" r="${heartRadius}" fill="#ef4444"/>
        <path d="M${heartX} ${heartY - 3 * scale} L${heartX} ${heartY + 3 * scale} M${heartX - 3 * scale} ${heartY} L${heartX + 3 * scale} ${heartY}" stroke="white" stroke-width="${Math.max(1, 1.5 * scale)}" fill="none"/>`
     : '';
+  
+  // Tour badge (top-right with number)
+  const tourBadge = isInTour && tourNumber !== null
+    ? `<circle cx="${badgeX}" cy="${badgeY}" r="${badgeRadius}" fill="#8B5CF6"/>
+       <text x="${badgeX}" y="${badgeY + 3 * scale}" text-anchor="middle" font-size="${Math.max(8, 10 * scale)}" font-weight="bold" fill="white">${tourNumber}</text>`
+    : '';
+  
+  // Different tree color for tour items
+  const treeColor1 = isInTour ? '#7C3AED' : '#228B22';
+  const treeColor2 = isInTour ? '#8B5CF6' : '#2E8B2E';
   
   // Scale ornament sizes
   const ornamentSize = Math.max(1.5, 2.5 * scale);
@@ -68,12 +84,12 @@ const createTreeMarker = (isFavorite: boolean, size: { width: number; height: nu
       <rect x="17" y="36" width="6" height="6" fill="#8B4513"/>
       
       <!-- Tree layers -->
-      <polygon points="20,4 32,20 8,20" fill="#228B22"/>
-      <polygon points="20,12 34,28 6,28" fill="#2E8B2E"/>
-      <polygon points="20,20 36,36 4,36" fill="#228B22"/>
+      <polygon points="20,4 32,20 8,20" fill="${treeColor1}"/>
+      <polygon points="20,12 34,28 6,28" fill="${treeColor2}"/>
+      <polygon points="20,20 36,36 4,36" fill="${treeColor1}"/>
       
       <!-- Star on top -->
-      <polygon points="20,2 21.5,6 26,6 22.5,9 24,14 20,11 16,14 17.5,9 14,6 18.5,6" fill="#FFD700"/>
+      <polygon points="20,2 21.5,6 26,6 22.5,9 24,14 20,11 16,14 17.5,9 14,6 18.5,6" fill="${isInTour ? '#FBBF24' : '#FFD700'}"/>
       
       <!-- Ornaments (simplified if marker is small) -->
       ${scale >= 0.6 ? `
@@ -92,6 +108,9 @@ const createTreeMarker = (isFavorite: boolean, size: { width: number; height: nu
       
       <!-- Favorite heart badge -->
       ${heartIcon}
+      
+      <!-- Tour number badge -->
+      ${tourBadge}
     </svg>
   `)}`;
 };
@@ -116,6 +135,7 @@ function ListingsMapInner({
   apiKey,
   listings,
   favorites,
+  tourListingIds = [],
   onToggleFavorite,
   onDirectionsClick,
   reviewStats,
@@ -174,6 +194,11 @@ function ListingsMapInner({
 
     // Create new markers
     listingsWithCoords.forEach((listing) => {
+      const isFavorite = favorites.includes(listing.id);
+      const tourIndex = tourListingIds.indexOf(listing.id);
+      const isInTour = tourIndex !== -1;
+      const tourNumber = isInTour ? tourIndex + 1 : null;
+      
       const marker = new google.maps.Marker({
         position: {
           lat: listing.location.lat!,
@@ -181,11 +206,12 @@ function ListingsMapInner({
         },
         map: mapRef.current,
         icon: {
-          url: createTreeMarker(favorites.includes(listing.id), markerSize),
+          url: createTreeMarker(isFavorite, isInTour, tourNumber, markerSize),
           scaledSize: new google.maps.Size(markerSize.width, markerSize.height),
           anchor: new google.maps.Point(markerSize.width / 2, markerSize.height),
         },
         animation: google.maps.Animation.DROP,
+        zIndex: isInTour ? 1000 + tourIndex : 1, // Tour items appear on top
       });
 
       marker.addListener("click", () => {
@@ -217,7 +243,7 @@ function ListingsMapInner({
         }
       });
     }
-  }, [isLoaded, listingsWithCoords, favorites, onSelectListing]);
+  }, [isLoaded, listingsWithCoords, favorites, tourListingIds, onSelectListing]);
 
 
   if (!isLoaded) {

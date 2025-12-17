@@ -1,6 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -17,16 +16,16 @@ import {
   Navigation,
   Share2,
   Sparkles,
-  GripVertical,
-  MapPin,
   ChevronUp,
   ChevronDown,
-  ExternalLink,
   Loader2,
+  Clock,
+  MapPin,
 } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { calculateDistance } from "@/lib/geo-utils";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 interface TourPanelProps {
@@ -38,6 +37,20 @@ interface TourPanelProps {
   onOptimize: (startLat?: number, startLng?: number) => void;
   generateGoogleMapsUrl: (userLat?: number, userLng?: number) => string | null;
   generateShareUrl: () => string;
+}
+
+// Estimate driving time based on distance (average 40 km/h in suburban areas + 2 min per stop)
+function estimateDrivingTime(distanceKm: number, stops: number): string {
+  const drivingMinutes = Math.round((distanceKm / 40) * 60);
+  const stopTime = stops * 2; // 2 minutes per stop for viewing
+  const totalMinutes = drivingMinutes + stopTime;
+  
+  if (totalMinutes < 60) {
+    return `~${totalMinutes} min`;
+  }
+  const hours = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
+  return mins > 0 ? `~${hours}h ${mins}m` : `~${hours}h`;
 }
 
 export function TourPanel({
@@ -53,6 +66,34 @@ export function TourPanel({
   const [isOpen, setIsOpen] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  // Calculate total distance between all stops
+  const tourStats = useMemo(() => {
+    const listingsWithCoords = tourListings.filter(
+      (l) => l.location.lat != null && l.location.lng != null
+    );
+    
+    if (listingsWithCoords.length < 2) {
+      return { totalDistance: 0, estimatedTime: null };
+    }
+    
+    let totalDistance = 0;
+    for (let i = 0; i < listingsWithCoords.length - 1; i++) {
+      const from = listingsWithCoords[i];
+      const to = listingsWithCoords[i + 1];
+      totalDistance += calculateDistance(
+        from.location.lat!,
+        from.location.lng!,
+        to.location.lat!,
+        to.location.lng!
+      );
+    }
+    
+    return {
+      totalDistance: Math.round(totalDistance * 10) / 10,
+      estimatedTime: estimateDrivingTime(totalDistance, listingsWithCoords.length),
+    };
+  }, [tourListings]);
 
   const getUserLocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -128,9 +169,25 @@ export function TourPanel({
     <div className="flex flex-col h-full">
       {/* Header Stats */}
       <div className="flex items-center justify-between mb-4">
-        <Badge variant="secondary" className="text-sm">
-          {tourListings.length} / {maxStops} stops
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="text-sm">
+            {tourListings.length} / {maxStops} stops
+          </Badge>
+          {tourStats.totalDistance > 0 && (
+            <>
+              <Badge variant="outline" className="text-sm gap-1">
+                <MapPin className="h-3 w-3" />
+                {tourStats.totalDistance} km
+              </Badge>
+              {tourStats.estimatedTime && (
+                <Badge variant="outline" className="text-sm gap-1">
+                  <Clock className="h-3 w-3" />
+                  {tourStats.estimatedTime}
+                </Badge>
+              )}
+            </>
+          )}
+        </div>
         {tourListings.length > 0 && (
           <Button
             variant="ghost"
@@ -139,7 +196,7 @@ export function TourPanel({
             className="text-destructive hover:text-destructive"
           >
             <Trash2 className="h-4 w-4 mr-1" />
-            Clear All
+            Clear
           </Button>
         )}
       </div>
@@ -173,7 +230,7 @@ export function TourPanel({
                     >
                       <ChevronUp className="h-3 w-3" />
                     </Button>
-                    <span className="text-xs font-bold text-christmas w-5 text-center">
+                    <span className="text-xs font-bold text-primary w-5 text-center bg-primary/10 rounded">
                       {index + 1}
                     </span>
                     <Button
