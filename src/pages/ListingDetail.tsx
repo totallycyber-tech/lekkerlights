@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { mockListings, transformDbListing } from "@/data/mockListings";
 import { 
   MapPin, Clock, Mail, Phone, ExternalLink, 
-  ArrowLeft, Share2, Heart, Flag, Calendar, Loader2 
+  ArrowLeft, Share2, Heart, Flag, Calendar, Loader2, RefreshCw
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useListing } from "@/hooks/use-listings";
@@ -17,6 +17,7 @@ import { ReportListingDialog } from "@/components/ReportListingDialog";
 import { PhotoLightbox } from "@/components/PhotoLightbox";
 import { EditListingDialog } from "@/components/EditListingDialog";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
+import { format } from "date-fns";
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -302,6 +303,16 @@ export default function ListingDetail() {
                 onClose={() => setLightboxOpen(false)}
                 altPrefix={listing.title}
               />
+
+              {/* Last Updated Info */}
+              {!isExampleListing && listing.updatedAt && (
+                <div className="border-t border-border pt-4 mb-4">
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <RefreshCw className="h-4 w-4" />
+                    Last updated: {format(new Date(listing.updatedAt), "d MMM yyyy 'at' HH:mm")}
+                  </p>
+                </div>
+              )}
 
               {/* Edit & Report Buttons */}
               <div className="border-t border-border pt-6 flex justify-between items-center">
