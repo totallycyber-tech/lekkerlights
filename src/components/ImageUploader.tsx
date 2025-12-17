@@ -16,7 +16,7 @@ const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 export function ImageUploader({ 
   images, 
   onImagesChange, 
-  maxImages = 10, 
+  maxImages = 15, 
   maxSizeMB = 5 
 }: ImageUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
