@@ -425,10 +425,10 @@ export default function HowToUse() {
                   </div>
                 </div>
 
-                {/* Step 11 */}
+                {/* Step 10 */}
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 w-10 h-10 bg-christmas text-white rounded-full flex items-center justify-center font-bold">
-                    11
+                    10
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Edit or Delete Your Listing</h3>
