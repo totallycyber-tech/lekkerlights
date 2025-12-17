@@ -153,47 +153,53 @@ export default function CreateListing() {
       });
 
       if (error) throw error;
-      
+
       // Check for application-level errors from edge function
       if (data && !data.success) {
         throw new Error(data.error || 'Failed to create listings');
       }
 
-      // Upload images for each listing with progress tracking
       const createdListings = data?.listings || [];
+      const batchToken: string | undefined = data?.editToken;
+
+      // Upload images for each listing with progress tracking
       let uploadedCount = 0;
       const listingsWithImages = listings.filter(l => l.coverPhoto || l.additionalImages?.length > 0);
       const totalWithImages = listingsWithImages.length;
       let totalUploadErrors: string[] = [];
-      
+
+      if (totalWithImages > 0 && !batchToken) {
+        throw new Error('Missing edit token for photo uploads');
+      }
+
       for (let i = 0; i < listings.length; i++) {
         const listing = listings[i];
         const createdListing = createdListings[i];
-        
+
         if (!createdListing?.id) continue;
-        
+
         // Combine cover photo + additional images
         const allImages: File[] = [];
         if (listing.coverPhoto) allImages.push(listing.coverPhoto);
         if (listing.additionalImages?.length > 0) allImages.push(...listing.additionalImages);
-        
+
         if (allImages.length > 0) {
           uploadedCount++;
           setStatusMessage(`Uploading photos for listing ${uploadedCount}/${totalWithImages}...`);
-          
+
           try {
-            const { urls: imageUrls, errors } = await uploadImages(allImages, createdListing.id);
+            const { urls: imageUrls, errors } = await uploadImages(allImages, createdListing.id, batchToken);
             if (errors.length > 0) {
               totalUploadErrors.push(...errors.map(e => `Listing ${uploadedCount}: ${e}`));
             }
-            
+
             if (imageUrls.length > 0) {
               // Update listing with image URLs via edge function
               await supabase.functions.invoke('update-listing', {
                 body: {
                   listingId: createdListing.id,
+                  batchToken,
                   updates: { image_urls: imageUrls },
-                  skipTokenVerification: true,
                 },
               });
             }
@@ -437,6 +443,8 @@ export default function CreateListing() {
       }
 
       const listingId = data?.listingId;
+      const editToken: string | undefined = data?.editToken;
+
       if (!listingId) {
         throw new Error('No listing ID returned');
       }
@@ -445,20 +453,24 @@ export default function CreateListing() {
       const allImages: File[] = [];
       if (coverPhoto) allImages.push(coverPhoto);
       allImages.push(...additionalImages);
-      
+
       let uploadErrors: string[] = [];
       if (allImages.length > 0) {
+        if (!editToken) {
+          throw new Error('Missing edit token for photo uploads');
+        }
+
         setStatusMessage('Uploading photos...');
-        const { urls: imageUrls, errors } = await uploadImages(allImages, listingId);
+        const { urls: imageUrls, errors } = await uploadImages(allImages, listingId, editToken);
         uploadErrors = errors;
-        
+
         if (imageUrls.length > 0) {
           // Update listing with image URLs via edge function
           await supabase.functions.invoke('update-listing', {
             body: {
-              listingId: listingId,
+              listingId,
+              editToken,
               updates: { image_urls: imageUrls },
-              skipTokenVerification: true,
             },
           });
         }
