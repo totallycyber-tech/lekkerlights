@@ -93,7 +93,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Find all listings with this email (without edit_token - that's in separate secure table)
     const { data: listings, error } = await supabase
       .from("listings")
-      .select("id, title")
+      .select("id, title, street_number, street_name, suburb, submitter_notes")
       .eq("contact_email", email.trim().toLowerCase());
 
     if (error) {
@@ -139,11 +139,14 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       const editLink = `${siteUrl}/edit-listing/${listing.id}?token=${newToken}`;
-      const safeTitle = escapeHtml(listing.title || 'Untitled Display');
+      const displayName = listing.title || `${listing.street_number} ${listing.street_name}, ${listing.suburb}`;
+      const safeTitle = escapeHtml(displayName);
+      const safeNotes = listing.submitter_notes ? escapeHtml(listing.submitter_notes) : null;
       
       listingsHtml.push(`
         <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0;">
           <h3 style="margin: 0 0 8px; color: #111827;">${safeTitle}</h3>
+          ${safeNotes ? `<p style="color: #0369a1; font-size: 13px; margin: 0 0 12px; background: #e0f2fe; padding: 8px; border-radius: 4px;">📝 ${safeNotes}</p>` : ''}
           <a href="${editLink}" style="display: inline-block; background: #dc2626; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-size: 14px;">Edit This Listing</a>
           <p style="color: #666; font-size: 11px; margin: 12px 0 0; word-break: break-all;">Link: ${editLink}</p>
         </div>

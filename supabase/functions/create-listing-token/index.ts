@@ -11,6 +11,7 @@ interface CreateTokenRequest {
   listingId: string;
   email: string;
   listingTitle: string;
+  submitterNotes?: string | null;
 }
 
 // HTML escape function to prevent injection
@@ -31,7 +32,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { listingId, email, listingTitle }: CreateTokenRequest = await req.json();
+    const { listingId, email, listingTitle, submitterNotes }: CreateTokenRequest = await req.json();
 
     if (!listingId || !email || !listingTitle) {
       return new Response(
@@ -103,7 +104,8 @@ const handler = async (req: Request): Promise<Response> => {
     // Send email with edit link
     const siteUrl = Deno.env.get("SITE_URL") || "https://lekkerlights.co.za";
     const editLink = `${siteUrl}/edit-listing/${listingId}?token=${editToken}`;
-    const safeTitle = escapeHtml(listingTitle);
+    const safeTitle = escapeHtml(listingTitle || 'Untitled Display');
+    const safeNotes = submitterNotes ? escapeHtml(submitterNotes) : null;
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -120,6 +122,11 @@ const handler = async (req: Request): Promise<Response> => {
             <h1 style="color: #dc2626;">🎄 Lekker Lights</h1>
             <h2>Your Listing is Live!</h2>
             <p>Thank you for listing "<strong>${safeTitle}</strong>" on Lekker Lights!</p>
+            ${safeNotes ? `
+            <div style="background: #e0f2fe; padding: 12px 16px; border-radius: 8px; margin: 16px 0; border-left: 4px solid #0284c7;">
+              <p style="color: #0369a1; margin: 0; font-size: 14px;"><strong>📝 Your notes:</strong> ${safeNotes}</p>
+            </div>
+            ` : ''}
             <div style="background: #fef3c7; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
               <p style="color: #92400e; font-weight: bold; margin: 0 0 8px;">⏰ This link expires in 1 hour</p>
               <p style="color: #92400e; margin: 0; font-size: 14px;">

@@ -64,6 +64,7 @@ export interface ListingEntry {
   parkingInfo: string;
   maxVisitors: string;
   gateAccessInfo: string;
+  submitterNotes: string;
   addressSelected: boolean;
   duplicateAddressError: string | null;
   isCheckingDuplicate: boolean;
@@ -94,6 +95,7 @@ export const createEmptyListing = (): ListingEntry => ({
   parkingInfo: '',
   maxVisitors: '',
   gateAccessInfo: '',
+  submitterNotes: '',
   addressSelected: false,
   duplicateAddressError: null,
   isCheckingDuplicate: false,
@@ -777,6 +779,24 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
                       placeholder="e.g., 20 (leave empty if no limit)"
                       className="bg-secondary max-w-xs"
                     />
+                  </div>
+
+                  {/* Private Notes */}
+                  <div className="space-y-2">
+                    <Label className="text-sm flex items-center gap-2">
+                      Private Notes
+                      <span className="text-xs text-muted-foreground font-normal">(not shown publicly)</span>
+                    </Label>
+                    <Textarea
+                      value={listing.submitterNotes}
+                      onChange={(e) => updateListing(listing.id, 'submitterNotes', e.target.value)}
+                      placeholder="e.g., 'Blue house on corner', 'My neighbor's place'..."
+                      className="bg-secondary min-h-[60px]"
+                      maxLength={200}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Helps identify this listing in edit link emails. {listing.submitterNotes.length}/200
+                    </p>
                   </div>
                 </div>
               </div>

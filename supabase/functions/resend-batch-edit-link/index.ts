@@ -122,12 +122,13 @@ const handler = async (req: Request): Promise<Response> => {
       // Get listings for this batch with address details
       const { data: listings } = await supabase
         .from("listings")
-        .select("title, street_number, street_name, suburb")
+        .select("title, street_number, street_name, suburb, submitter_notes")
         .eq("batch_id", token.batch_id);
 
       const listingTitles = listings?.map(l => {
         const displayName = l.title || `${l.street_number} ${l.street_name}, ${l.suburb}`;
-        return `• ${escapeHtml(displayName)}`;
+        const notesText = l.submitter_notes ? ` <span style="color: #0369a1; font-size: 12px;">(${escapeHtml(l.submitter_notes)})</span>` : '';
+        return `• ${escapeHtml(displayName)}${notesText}`;
       }).join("<br>") || "Your listings";
       const editLink = `${siteUrl}/edit-batch/${token.batch_id}?token=${newToken}`;
 

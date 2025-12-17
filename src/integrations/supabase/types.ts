@@ -105,6 +105,7 @@ export type Database = {
           province: string
           street_name: string
           street_number: string
+          submitter_notes: string | null
           suburb: string
           tags: string[] | null
           title: string | null
@@ -139,6 +140,7 @@ export type Database = {
           province: string
           street_name: string
           street_number: string
+          submitter_notes?: string | null
           suburb: string
           tags?: string[] | null
           title?: string | null
@@ -173,6 +175,7 @@ export type Database = {
           province?: string
           street_name?: string
           street_number?: string
+          submitter_notes?: string | null
           suburb?: string
           tags?: string[] | null
           title?: string | null
