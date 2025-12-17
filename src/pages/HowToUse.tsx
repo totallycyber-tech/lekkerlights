@@ -617,6 +617,24 @@ export default function HowToUse() {
                     </AccordionContent>
                   </AccordionItem>
 
+                  <AccordionItem value="count-badges" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      What do the photo and video count badges mean?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      On each listing card in Grid View, you'll see small badges in the top-right corner that show:
+                      <ul className="list-disc list-inside mt-2 space-y-1">
+                        <li><strong>Photo count badge</strong> (camera icon) – Shows the total number of photos uploaded for that display</li>
+                        <li><strong>Video count badge</strong> (YouTube icon) – Shows how many YouTube videos are linked to the listing</li>
+                      </ul>
+                      <p className="mt-2">
+                        These badges help you quickly identify listings with rich media content. At the bottom of each card, 
+                        you'll also see thumbnail previews – <strong>video thumbnails appear first</strong> (with a red play button overlay) 
+                        followed by photo thumbnails. This lets you preview the content before opening the full listing.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+
                   <AccordionItem value="report-listing" className="border-b-0">
                     <AccordionTrigger className="hover:no-underline py-3">
                       How do I report a problem with a listing?
@@ -645,6 +663,26 @@ export default function HowToUse() {
                     <AccordionContent className="text-muted-foreground pb-4">
                       Your listing goes live immediately after you click "Publish Listing"! There's no waiting period or 
                       approval process. Your display will be visible to visitors right away.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="instant-edit" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      Can I edit my listing instantly without waiting for an email?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      Yes! You can edit your listing instantly using the <strong>"Edit Listing"</strong> button at the bottom of 
+                      any listing detail page. Here's how it works:
+                      <ol className="list-decimal list-inside mt-2 space-y-1">
+                        <li>Click the "Edit Listing" button on your listing's detail page</li>
+                        <li>Enter the email address you used when creating the listing</li>
+                        <li>If the email matches, you'll be redirected to the edit page <strong>immediately</strong></li>
+                      </ol>
+                      <p className="mt-2">
+                        This "instant edit" feature gives you immediate access without waiting for an email to arrive. 
+                        For security awareness, an edit link is still sent to your email in the background so you have 
+                        a record that edit access was granted. This dual approach provides both convenience and security.
+                      </p>
                     </AccordionContent>
                   </AccordionItem>
 
