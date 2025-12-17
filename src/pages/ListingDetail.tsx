@@ -16,6 +16,7 @@ import { ListingReviews } from "@/components/ListingReviews";
 import { ReportListingDialog } from "@/components/ReportListingDialog";
 import { PhotoLightbox } from "@/components/PhotoLightbox";
 import { EditListingDialog } from "@/components/EditListingDialog";
+import { YouTubePreview } from "@/components/YouTubePreview";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 import { format } from "date-fns";
 
@@ -303,6 +304,14 @@ export default function ListingDetail() {
                 onClose={() => setLightboxOpen(false)}
                 altPrefix={listing.title}
               />
+
+              {/* YouTube Videos */}
+              {listing.youtubeUrls && listing.youtubeUrls.length > 0 && (
+                <div className="border-t border-border pt-6 mb-8">
+                  <h3 className="font-display font-semibold mb-4">Videos</h3>
+                  <YouTubePreview urls={listing.youtubeUrls} />
+                </div>
+              )}
 
               {/* Listing Info */}
               {!isExampleListing && (
