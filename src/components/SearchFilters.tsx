@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, MapPin, SlidersHorizontal, X } from "lucide-react";
+import { Search, MapPin, SlidersHorizontal, X, Home } from "lucide-react";
 import { provinces } from "@/data/mockListings";
 import { TagFilter } from "@/components/TagFilter";
 
@@ -16,6 +16,7 @@ export interface SearchFilters {
   search: string;
   province: string;
   suburb: string;
+  address: string;
   tags: string[];
 }
 
@@ -27,11 +28,12 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
   const [search, setSearch] = useState("");
   const [province, setProvince] = useState("");
   const [suburb, setSuburb] = useState("");
+  const [address, setAddress] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
   const handleSearch = () => {
-    onFilterChange({ search, province, suburb, tags: selectedTags });
+    onFilterChange({ search, province, suburb, address, tags: selectedTags });
   };
 
   const handleTagsChange = (tags: string[]) => {
@@ -42,14 +44,16 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
     setSearch("");
     setProvince("");
     setSuburb("");
+    setAddress("");
     setSelectedTags([]);
-    onFilterChange({ search: "", province: "", suburb: "", tags: [] });
+    onFilterChange({ search: "", province: "", suburb: "", address: "", tags: [] });
   };
 
-  const hasActiveFilters = search || province || suburb || selectedTags.length > 0;
+  const hasActiveFilters = search || province || suburb || address || selectedTags.length > 0;
   const activeFilterCount = 
     (province ? 1 : 0) + 
     (suburb ? 1 : 0) + 
+    (address ? 1 : 0) +
     selectedTags.length;
 
   return (
@@ -96,7 +100,7 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
       {/* Extended Filters */}
       {showFilters && (
         <div className="p-4 bg-secondary rounded-lg border border-border space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Province</label>
               <Select 
@@ -126,6 +130,21 @@ export function SearchFilters({ onFilterChange }: SearchFiltersProps) {
                   placeholder="Enter suburb..."
                   value={suburb}
                   onChange={(e) => setSuburb(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  className="pl-9 bg-background border-border"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Street Address</label>
+              <div className="relative">
+                <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="e.g. 11 Eland Street"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   className="pl-9 bg-background border-border"
                 />

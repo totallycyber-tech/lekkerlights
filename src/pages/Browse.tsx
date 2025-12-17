@@ -22,6 +22,7 @@ export default function Browse() {
     search: "",
     province: "",
     suburb: "",
+    address: "",
     tags: [],
   });
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -77,7 +78,9 @@ export default function Browse() {
           listing.title.toLowerCase().includes(searchLower) ||
           listing.description.toLowerCase().includes(searchLower) ||
           listing.location.suburb.toLowerCase().includes(searchLower) ||
-          listing.location.city.toLowerCase().includes(searchLower);
+          listing.location.city.toLowerCase().includes(searchLower) ||
+          listing.location.streetName.toLowerCase().includes(searchLower) ||
+          `${listing.location.streetNumber} ${listing.location.streetName}`.toLowerCase().includes(searchLower);
         if (!matchesSearch) return false;
       }
 
@@ -90,6 +93,22 @@ export default function Browse() {
       if (filters.suburb) {
         const suburbLower = filters.suburb.toLowerCase();
         if (!listing.location.suburb.toLowerCase().includes(suburbLower)) {
+          return false;
+        }
+      }
+
+      // Address filter - search by street number and street name
+      if (filters.address) {
+        const addressLower = filters.address.toLowerCase().trim();
+        const fullAddress = `${listing.location.streetNumber} ${listing.location.streetName}`.toLowerCase();
+        const streetNameOnly = listing.location.streetName.toLowerCase();
+        const streetNumberOnly = listing.location.streetNumber.toLowerCase();
+        
+        // Match if address contains the search term or vice versa
+        if (!fullAddress.includes(addressLower) && 
+            !streetNameOnly.includes(addressLower) &&
+            !streetNumberOnly.includes(addressLower) &&
+            !addressLower.includes(streetNameOnly)) {
           return false;
         }
       }
@@ -287,7 +306,7 @@ export default function Browse() {
               </p>
               <Button 
                 variant="outline"
-                onClick={() => setFilters({ search: "", province: "", suburb: "", tags: [] })}
+                onClick={() => setFilters({ search: "", province: "", suburb: "", address: "", tags: [] })}
               >
                 Clear all filters
               </Button>
