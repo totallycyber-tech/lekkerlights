@@ -414,6 +414,23 @@ export default function HowToUse() {
                     9
                   </div>
                   <div>
+                    <h3 className="font-semibold text-lg mb-2">Add Private Notes (Optional)</h3>
+                    <p className="text-muted-foreground mb-3">
+                      Add optional private notes to help you organize your listings. These notes are <strong>only visible to you</strong> in your edit link emails – they're never shown publicly on the website.
+                    </p>
+                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-christmas" />
+                      <span>Useful for identifying different listings when you've submitted multiple single or bulk listings.</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 10 */}
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-christmas text-white rounded-full flex items-center justify-center font-bold">
+                    10
+                  </div>
+                  <div>
                     <h3 className="font-semibold text-lg mb-2">Preview & Publish</h3>
                     <p className="text-muted-foreground mb-3">
                       Use the <strong>"Preview"</strong> button to see how your listing will appear to visitors. Once you're happy with everything, agree to the Terms of Service and Privacy Policy, then click <strong>"Publish Listing"</strong>.
@@ -425,10 +442,10 @@ export default function HowToUse() {
                   </div>
                 </div>
 
-                {/* Step 10 */}
+                {/* Step 11 */}
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 w-10 h-10 bg-christmas text-white rounded-full flex items-center justify-center font-bold">
-                    10
+                    11
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Edit or Delete Your Listing</h3>
@@ -776,6 +793,19 @@ export default function HowToUse() {
                       information (suburb and city) on your listing card. If you do want to add them, you can type your own 
                       or use the <strong>"Generate with AI"</strong> button to create suggestions automatically based on your 
                       display's tags.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="private-notes" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      What are private notes?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      Private notes are an optional field where you can add personal comments or reminders about your listing. 
+                      These notes are <strong>completely private</strong> – they're only shown in the edit link emails you receive 
+                      and are never displayed publicly on the website. This is especially useful if you've submitted multiple 
+                      listings (single or bulk) and want to easily identify which listing is which when you receive edit links. 
+                      For example, you might note "Grandma's house on Main Street" or "Neighbour's display with the big Santa".
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
