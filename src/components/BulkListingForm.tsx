@@ -610,7 +610,7 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
                 <div className="space-y-3">
                   <Label>Additional Photos</Label>
                   <p className="text-xs text-muted-foreground -mt-1">
-                    Up to 9 additional photos
+                    Up to 15 additional photos
                   </p>
                   <p className="text-xs text-christmas font-medium">
                     📸 Use high quality photos for the best viewing experience!
@@ -618,7 +618,7 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
                   <ImageUploader
                     images={listing.additionalImages}
                     onImagesChange={(images) => updateListing(listing.id, 'additionalImages', images)}
-                    maxImages={9}
+                    maxImages={15}
                   />
                 </div>
 

@@ -335,7 +335,7 @@ export default function HowToUse() {
                       </li>
                       <li className="flex items-start gap-2">
                         <Camera className="h-4 w-4 text-christmas mt-0.5 flex-shrink-0" />
-                        <span><strong>Additional Photos</strong> – Up to 9 more high quality photos to show different angles</span>
+                        <span><strong>Additional Photos</strong> – Up to 15 more high quality photos to show different angles</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Eye className="h-4 w-4 text-christmas mt-0.5 flex-shrink-0" />
@@ -681,7 +681,7 @@ export default function HowToUse() {
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground pb-4">
                       Photos must be in JPEG, PNG, WebP, or GIF format and no larger than 5MB each. You can upload 
-                      one cover photo (the main image on your listing card) and up to 9 additional photos. 
+                      one cover photo (the main image on your listing card) and up to 15 additional photos. 
                       <strong className="text-christmas"> For best results, upload high quality photos taken in the evening when your lights are on!</strong> Visitors 
                       can click on any photo to view it full-size and browse through your gallery using navigation arrows.
                     </AccordionContent>
@@ -735,7 +735,7 @@ export default function HowToUse() {
                       <ul className="list-disc list-inside mt-2 space-y-1">
                         <li>Title and description (optional – enable via toggle, with AI generation available)</li>
                         <li>Address details</li>
-                        <li>Cover photo and up to 9 additional photos</li>
+                        <li>Cover photo and up to 15 additional photos</li>
                         <li>Up to 3 YouTube video URLs</li>
                         <li>Operating hours (day-by-day schedule or custom text)</li>
                         <li>Tags and display features</li>
