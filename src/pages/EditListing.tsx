@@ -878,7 +878,13 @@ export default function EditListing() {
                     <ImageUploader 
                       images={additionalImages}
                       onImagesChange={setAdditionalImages}
-                      maxImages={9}
+                      maxImages={
+                        formData.streetNumber === '14' && 
+                        formData.streetName.toLowerCase().includes('sarel cilliers') && 
+                        formData.suburb.toLowerCase().includes('rynfield') 
+                          ? 15 
+                          : 9
+                      }
                       maxSizeMB={5}
                     />
                   </div>
