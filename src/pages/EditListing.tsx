@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Trash2, EyeOff, Loader2, Wand2, ImageIcon, FileText, Camera } from "lucide-react";
+import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Trash2, EyeOff, Loader2, Wand2, FileText, Camera } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
@@ -17,6 +17,7 @@ import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
 import { TagSelector } from "@/components/TagSelector";
 import { YouTubePreview } from "@/components/YouTubePreview";
 import { PhotoUploadProgress } from "@/components/PhotoUploadProgress";
+import { SortablePhotoGrid } from "@/components/SortablePhotoGrid";
 import { supabase } from "@/integrations/supabase/client";
 import { useImageUpload } from "@/hooks/use-image-upload";
 import {
@@ -822,55 +823,24 @@ export default function EditListing() {
                 <div className="bg-card rounded-xl border border-border p-6 space-y-6">
                   <div>
                     <h2 className="font-display text-lg font-semibold">Current Photos</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Click X to remove, or click "Set as Cover" to make an image the cover photo</p>
+                    <p className="text-sm text-muted-foreground mt-1">Drag to reorder, click X to remove, or "Set as Cover" to change cover photo</p>
                   </div>
                   
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {existingImageUrls.filter(url => url !== '').map((url, index) => {
-                      // Find actual index in original array for removal
-                      const actualIndex = existingImageUrls.indexOf(url);
-                      const isCover = actualIndex === 0 && existingImageUrls[0] !== '';
-                      return (
-                        <div key={actualIndex} className="relative aspect-square rounded-lg overflow-hidden group">
-                          <img src={url} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
-                          <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              type="button"
-                              onClick={() => removeExistingImage(actualIndex)}
-                              className="p-1.5 bg-destructive text-destructive-foreground rounded-full"
-                              title="Remove photo"
-                            >
-                              <X className="h-4 w-4" />
-                            </button>
-                          </div>
-                          {isCover ? (
-                            <span className="absolute bottom-2 left-2 px-2 py-1 bg-christmas text-white text-xs rounded font-medium">
-                              Cover
-                            </span>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                // Move this image to the first position
-                                const newUrls = [...existingImageUrls];
-                                const [removed] = newUrls.splice(actualIndex, 1);
-                                newUrls.unshift(removed);
-                                setExistingImageUrls(newUrls);
-                                toast({
-                                  title: "Cover photo updated",
-                                  description: "This photo will be used as your cover image.",
-                                });
-                              }}
-                              className="absolute bottom-2 left-2 px-2 py-1 bg-background/90 hover:bg-christmas hover:text-white text-xs rounded font-medium flex items-center gap-1 transition-colors opacity-0 group-hover:opacity-100"
-                            >
-                              <ImageIcon className="h-3 w-3" />
-                              Set as Cover
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <SortablePhotoGrid
+                    images={existingImageUrls}
+                    onImagesChange={setExistingImageUrls}
+                    onRemoveImage={removeExistingImage}
+                    onSetAsCover={(index) => {
+                      const newUrls = [...existingImageUrls];
+                      const [removed] = newUrls.splice(index, 1);
+                      newUrls.unshift(removed);
+                      setExistingImageUrls(newUrls);
+                      toast({
+                        title: "Cover photo updated",
+                        description: "This photo will be used as your cover image.",
+                      });
+                    }}
+                  />
                 </div>
               )}
 
