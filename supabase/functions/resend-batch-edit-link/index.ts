@@ -119,13 +119,16 @@ const handler = async (req: Request): Promise<Response> => {
         .update({ edit_token: newToken, expires_at: expiresAt })
         .eq("batch_id", token.batch_id);
 
-      // Get listings for this batch
+      // Get listings for this batch with address details
       const { data: listings } = await supabase
         .from("listings")
-        .select("title")
+        .select("title, street_number, street_name, suburb")
         .eq("batch_id", token.batch_id);
 
-      const listingTitles = listings?.map(l => `• ${escapeHtml(l.title || 'Untitled Display')}`).join("<br>") || "Your listings";
+      const listingTitles = listings?.map(l => {
+        const displayName = l.title || `${l.street_number} ${l.street_name}, ${l.suburb}`;
+        return `• ${escapeHtml(displayName)}`;
+      }).join("<br>") || "Your listings";
       const editLink = `${siteUrl}/edit-batch/${token.batch_id}?token=${newToken}`;
 
       await fetch("https://api.resend.com/emails", {
