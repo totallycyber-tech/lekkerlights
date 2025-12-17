@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -16,6 +16,7 @@ import { usePopularity } from "@/hooks/use-popularity";
 import { useListings } from "@/hooks/use-listings";
 import { useReviewStats } from "@/hooks/use-reviews";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "@/hooks/use-toast";
 
 export default function Browse() {
   const [filters, setFilters] = useState<SearchFiltersType>({
@@ -25,6 +26,7 @@ export default function Browse() {
     address: "",
     tags: [],
   });
+  const [searchPerformed, setSearchPerformed] = useState(false);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "map">(() => {
     const saved = localStorage.getItem("lekker-lights-view-mode");
@@ -71,16 +73,22 @@ export default function Browse() {
         return false;
       }
 
-      // Search filter
+      // Search filter - handle null values
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
+        const title = listing.title?.toLowerCase() || '';
+        const description = listing.description?.toLowerCase() || '';
+        const streetName = listing.location.streetName.toLowerCase();
+        const streetNumber = listing.location.streetNumber.toLowerCase();
+        const fullAddress = `${streetNumber} ${streetName}`;
+        
         const matchesSearch = 
-          listing.title.toLowerCase().includes(searchLower) ||
-          listing.description.toLowerCase().includes(searchLower) ||
+          title.includes(searchLower) ||
+          description.includes(searchLower) ||
           listing.location.suburb.toLowerCase().includes(searchLower) ||
           listing.location.city.toLowerCase().includes(searchLower) ||
-          listing.location.streetName.toLowerCase().includes(searchLower) ||
-          `${listing.location.streetNumber} ${listing.location.streetName}`.toLowerCase().includes(searchLower);
+          streetName.includes(searchLower) ||
+          fullAddress.includes(searchLower);
         if (!matchesSearch) return false;
       }
 
@@ -100,17 +108,19 @@ export default function Browse() {
       // Address filter - search by street number and street name
       if (filters.address) {
         const addressLower = filters.address.toLowerCase().trim();
-        const fullAddress = `${listing.location.streetNumber} ${listing.location.streetName}`.toLowerCase();
-        const streetNameOnly = listing.location.streetName.toLowerCase();
-        const streetNumberOnly = listing.location.streetNumber.toLowerCase();
+        const streetName = listing.location.streetName.toLowerCase();
+        const streetNumber = listing.location.streetNumber.toLowerCase();
+        const fullAddress = `${streetNumber} ${streetName}`;
         
-        // Match if address contains the search term or vice versa
-        if (!fullAddress.includes(addressLower) && 
-            !streetNameOnly.includes(addressLower) &&
-            !streetNumberOnly.includes(addressLower) &&
-            !addressLower.includes(streetNameOnly)) {
-          return false;
-        }
+        // Match if the search term is found in the full address, street name, or street number
+        const matchesAddress = 
+          fullAddress.includes(addressLower) || 
+          streetName.includes(addressLower) ||
+          streetNumber.includes(addressLower) ||
+          addressLower.includes(fullAddress) ||
+          addressLower.includes(streetName);
+          
+        if (!matchesAddress) return false;
       }
 
       // Tags filter - listing must have ALL selected tags
@@ -123,6 +133,27 @@ export default function Browse() {
       return true;
     });
   }, [filters, showFavoritesOnly, favorites, allListings]);
+
+  // Show toast when search returns no results
+  useEffect(() => {
+    if (searchPerformed && filteredListings.length === 0 && !isLoading) {
+      const hasActiveFilters = filters.search || filters.province || filters.suburb || filters.address || filters.tags.length > 0;
+      if (hasActiveFilters) {
+        toast({
+          title: "Listing not found",
+          description: "No displays match your search criteria. Try adjusting your filters.",
+          variant: "destructive",
+        });
+      }
+      setSearchPerformed(false);
+    }
+  }, [filteredListings.length, searchPerformed, isLoading, filters]);
+
+  // Handle filter change and track search
+  const handleFilterChange = useCallback((newFilters: SearchFiltersType) => {
+    setFilters(newFilters);
+    setSearchPerformed(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -161,7 +192,7 @@ export default function Browse() {
 
           {/* Filters */}
           <div className="mb-4">
-            <SearchFilters onFilterChange={setFilters} />
+            <SearchFilters onFilterChange={handleFilterChange} />
           </div>
 
           {/* Suburb Quick Chips */}
@@ -171,7 +202,7 @@ export default function Browse() {
                 listings={allListings}
                 selectedSuburb={filters.suburb}
                 selectedProvince={filters.province}
-                onSuburbSelect={(suburb) => setFilters(prev => ({ ...prev, suburb }))}
+                onSuburbSelect={(suburb) => handleFilterChange({ ...filters, suburb })}
               />
             </div>
           )}
