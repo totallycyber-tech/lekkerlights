@@ -134,16 +134,20 @@ export default function Browse() {
     });
   }, [filters, showFavoritesOnly, favorites, allListings]);
 
-  // Show toast when search returns no results
+  // Show toast when search returns no results and reset to all listings
   useEffect(() => {
     if (searchPerformed && filteredListings.length === 0 && !isLoading) {
       const hasActiveFilters = filters.search || filters.province || filters.suburb || filters.address || filters.tags.length > 0;
       if (hasActiveFilters) {
         toast({
           title: "Listing not found",
-          description: "No displays match your search criteria. Try adjusting your filters.",
+          description: "No displays match your search criteria. Returning to all listings.",
           variant: "destructive",
         });
+        // Reset filters after a short delay so user sees the message
+        setTimeout(() => {
+          setFilters({ search: "", province: "", suburb: "", address: "", tags: [] });
+        }, 2000);
       }
       setSearchPerformed(false);
     }
@@ -193,7 +197,8 @@ export default function Browse() {
           {/* Filters */}
           <div className="mb-4">
             <SearchFilters 
-              onFilterChange={handleFilterChange} 
+              onFilterChange={handleFilterChange}
+              filters={filters}
               listings={allListings.map(l => ({
                 id: l.id,
                 street_number: l.location.streetNumber,
