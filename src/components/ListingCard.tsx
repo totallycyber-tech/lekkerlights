@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera, Eye } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera, Eye, Youtube } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -128,6 +128,30 @@ export function ListingCard({
           return null;
         })()}
 
+        {/* Video Count Badge */}
+        {(() => {
+          const totalVideos = listing.youtubeUrls?.filter(url => url && url !== '').length || 0;
+          const totalPhotos = listing.photos.filter(url => url && url !== '').length;
+          if (totalVideos > 0) {
+            // Position based on whether photo badge and popular badge exist
+            const leftOffset = isPopular ? (totalPhotos > 0 ? '11rem' : '8rem') : (totalPhotos > 0 ? '3.5rem' : undefined);
+            return (
+              <Badge 
+                variant="secondary"
+                className="absolute top-3 bg-background/80 backdrop-blur-sm"
+                style={{ 
+                  right: (!isPopular && totalPhotos === 0) ? '0.75rem' : 'auto', 
+                  left: leftOffset 
+                }}
+              >
+                <Youtube className="h-3 w-3 mr-1" aria-hidden="true" />
+                {totalVideos}
+              </Badge>
+            );
+          }
+          return null;
+        })()}
+
         {/* Distance Badge - show when location is provided */}
         {distance !== undefined && distance !== null && (
           <Badge 
@@ -139,30 +163,63 @@ export function ListingCard({
           </Badge>
         )}
 
-        {/* Additional Photos Thumbnails - Full Width Row */}
+        {/* Additional Photos & Video Thumbnails - Full Width Row */}
         {(() => {
           const additionalPhotos = listing.hasCoverPhoto 
             ? listing.photos.slice(1).filter(url => url && url !== '')
             : listing.photos.filter(url => url && url !== '');
           
-          if (additionalPhotos.length > 0) {
+          // Extract YouTube video IDs for thumbnails
+          const extractYouTubeId = (url: string): string | null => {
+            if (!url) return null;
+            const patterns = [
+              /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s?]+)/,
+              /youtube\.com\/shorts\/([^&\s?]+)/,
+            ];
+            for (const pattern of patterns) {
+              const match = url.match(pattern);
+              if (match && match[1]) return match[1];
+            }
+            return null;
+          };
+          
+          const videoIds = (listing.youtubeUrls || [])
+            .map(url => extractYouTubeId(url))
+            .filter((id): id is string => id !== null);
+          
+          const hasContent = additionalPhotos.length > 0 || videoIds.length > 0;
+          
+          if (hasContent) {
             const maxDisplay = 4;
-            const displayPhotos = additionalPhotos.slice(0, maxDisplay);
-            const remainingCount = additionalPhotos.length - maxDisplay;
+            // Combine photos and video thumbnails
+            const photoItems = additionalPhotos.map(url => ({ type: 'photo' as const, url }));
+            const videoItems = videoIds.map(id => ({ 
+              type: 'video' as const, 
+              url: `https://img.youtube.com/vi/${id}/mqdefault.jpg`,
+              id 
+            }));
+            const allItems = [...photoItems, ...videoItems];
+            const displayItems = allItems.slice(0, maxDisplay);
+            const remainingCount = allItems.length - maxDisplay;
             
             return (
               <div className="absolute bottom-0 left-0 right-0 flex gap-0.5 p-1 bg-background/60 backdrop-blur-sm">
-                {displayPhotos.map((photo, idx) => (
+                {displayItems.map((item, idx) => (
                   <div 
                     key={idx} 
-                    className="flex-1 aspect-[4/3] overflow-hidden rounded-sm"
+                    className="flex-1 aspect-[4/3] overflow-hidden rounded-sm relative"
                   >
                     <img 
-                      src={photo} 
-                      alt={`Additional photo ${idx + 1}`}
+                      src={item.url} 
+                      alt={item.type === 'video' ? `Video thumbnail ${idx + 1}` : `Additional photo ${idx + 1}`}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
+                    {item.type === 'video' && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <Youtube className="h-4 w-4 text-white" aria-hidden="true" />
+                      </div>
+                    )}
                   </div>
                 ))}
                 {remainingCount > 0 && (
