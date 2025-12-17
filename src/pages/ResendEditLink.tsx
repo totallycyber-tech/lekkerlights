@@ -92,6 +92,11 @@ export default function ResendEditLink() {
                     If any {linkType === "bulk" ? "bulk listings" : "listings"} are associated with <strong className="text-foreground">{email}</strong>, 
                     we've sent the edit links to that address.
                   </p>
+                  {linkType === "bulk" && (
+                    <p className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
+                      <strong>Note:</strong> If you submitted several batches of up to 10 listings, you'll receive a <strong>separate email for each batch</strong>.
+                    </p>
+                  )}
                   <p className="text-sm text-muted-foreground">
                     Don't see the email? Please check your <strong>spam</strong>, <strong>junk</strong>, and other folders.
                   </p>
@@ -162,7 +167,7 @@ export default function ResendEditLink() {
                     </div>
                     {linkType === "bulk" && (
                       <p className="text-xs text-muted-foreground mt-2">
-                        Select this if you submitted multiple listings at once.
+                        Select this if you submitted multiple listings at once. <strong>Note:</strong> If you submitted several batches of up to 10 listings, you'll receive a separate email for each batch.
                       </p>
                     )}
                   </div>

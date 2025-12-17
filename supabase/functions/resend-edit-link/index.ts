@@ -139,7 +139,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       const editLink = `${siteUrl}/edit-listing/${listing.id}?token=${newToken}`;
-      const safeTitle = escapeHtml(listing.title);
+      const safeTitle = escapeHtml(listing.title || 'Untitled Display');
       
       listingsHtml.push(`
         <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0;">
