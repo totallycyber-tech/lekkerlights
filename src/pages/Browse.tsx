@@ -192,7 +192,19 @@ export default function Browse() {
 
           {/* Filters */}
           <div className="mb-4">
-            <SearchFilters onFilterChange={handleFilterChange} />
+            <SearchFilters 
+              onFilterChange={handleFilterChange} 
+              listings={allListings.map(l => ({
+                id: l.id,
+                street_number: l.location.streetNumber,
+                street_name: l.location.streetName,
+                suburb: l.location.suburb,
+                city: l.location.city,
+                province: l.location.province,
+                complex_name: l.location.complexName,
+                unit_no: l.location.unitNo,
+              }))}
+            />
           </div>
 
           {/* Suburb Quick Chips */}
