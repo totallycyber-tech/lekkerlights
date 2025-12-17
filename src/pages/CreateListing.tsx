@@ -17,11 +17,12 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { provinces } from "@/data/mockListings";
-import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Eye, Wand2, Loader2, Layers, AlertCircle } from "lucide-react";
+import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Eye, Wand2, Loader2, Layers, AlertCircle, Camera } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
-import { useCreateListing, uploadListingImages } from "@/hooks/use-listings";
+import { useCreateListing } from "@/hooks/use-listings";
+import { useImageUpload } from "@/hooks/use-image-upload";
 import { supabase } from "@/integrations/supabase/client";
 import { ImageUploader } from "@/components/ImageUploader";
 import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
@@ -29,6 +30,7 @@ import { TagSelector } from "@/components/TagSelector";
 import { YouTubePreview } from "@/components/YouTubePreview";
 import { ListingPreview } from "@/components/ListingPreview";
 import { BulkListingForm } from "@/components/BulkListingForm";
+import { PhotoUploadProgress } from "@/components/PhotoUploadProgress";
 
 const DAYS_OF_WEEK = [
   'Monday',
@@ -58,9 +60,10 @@ type ListingMode = "single" | "bulk";
 export default function CreateListing() {
   const navigate = useNavigate();
   const createListing = useCreateListing();
+  const { progress: uploadProgress, uploadImages, resetProgress, isUploading } = useImageUpload();
   const [mode, setMode] = useState<ListingMode>("single");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<string>('');
+  const [statusMessage, setStatusMessage] = useState<string>('');
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
   const [additionalImages, setAdditionalImages] = useState<File[]>([]);
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>(['']);
@@ -110,7 +113,8 @@ export default function CreateListing() {
     phoneVisible: boolean;
   }) => {
     setIsSubmitting(true);
-    setUploadProgress('Creating listings...');
+    setStatusMessage('Creating listings...');
+    resetProgress();
 
     try {
       // Filter youtube URLs for each listing
@@ -155,10 +159,12 @@ export default function CreateListing() {
         throw new Error(data.error || 'Failed to create listings');
       }
 
-      // Upload images for each listing
+      // Upload images for each listing with progress tracking
       const createdListings = data?.listings || [];
       let uploadedCount = 0;
-      const totalWithImages = listings.filter(l => l.coverPhoto || l.additionalImages?.length > 0).length;
+      const listingsWithImages = listings.filter(l => l.coverPhoto || l.additionalImages?.length > 0);
+      const totalWithImages = listingsWithImages.length;
+      let totalUploadErrors: string[] = [];
       
       for (let i = 0; i < listings.length; i++) {
         const listing = listings[i];
@@ -173,31 +179,42 @@ export default function CreateListing() {
         
         if (allImages.length > 0) {
           uploadedCount++;
-          setUploadProgress(`Uploading photos for listing ${uploadedCount}/${totalWithImages}...`);
+          setStatusMessage(`Uploading photos for listing ${uploadedCount}/${totalWithImages}...`);
           
           try {
-            const imageUrls = await uploadListingImages(allImages, createdListing.id);
+            const { urls: imageUrls, errors } = await uploadImages(allImages, createdListing.id);
+            if (errors.length > 0) {
+              totalUploadErrors.push(...errors.map(e => `Listing ${uploadedCount}: ${e}`));
+            }
             
-            // Update listing with image URLs via edge function
-            await supabase.functions.invoke('update-listing', {
-              body: {
-                listingId: createdListing.id,
-                updates: { image_urls: imageUrls },
-                // No edit token needed - we just created this listing
-                skipTokenVerification: true,
-              },
-            });
-          } catch (uploadError) {
+            if (imageUrls.length > 0) {
+              // Update listing with image URLs via edge function
+              await supabase.functions.invoke('update-listing', {
+                body: {
+                  listingId: createdListing.id,
+                  updates: { image_urls: imageUrls },
+                  skipTokenVerification: true,
+                },
+              });
+            }
+          } catch (uploadError: any) {
             console.error(`Failed to upload images for listing ${i + 1}:`, uploadError);
-            // Continue with other listings even if one fails
+            totalUploadErrors.push(`Listing ${uploadedCount}: ${uploadError.message || 'Upload failed'}`);
           }
         }
       }
 
-      toast({
-        title: "Listings published!",
-        description: `${listings.length} displays are now live. Check your email for the edit link.`,
-      });
+      if (totalUploadErrors.length > 0) {
+        toast({
+          title: "Listings published with some photo errors",
+          description: `${listings.length} displays are live. ${totalUploadErrors.length} photos failed to upload. Check your email for the edit link.`,
+        });
+      } else {
+        toast({
+          title: "Listings published!",
+          description: `${listings.length} displays are now live. Check your email for the edit link.`,
+        });
+      }
 
       navigate('/browse');
     } catch (error: any) {
@@ -209,7 +226,8 @@ export default function CreateListing() {
       });
     } finally {
       setIsSubmitting(false);
-      setUploadProgress('');
+      setStatusMessage('');
+      resetProgress();
     }
   };
 
@@ -364,7 +382,8 @@ export default function CreateListing() {
 
     // Check for duplicate address
     setIsSubmitting(true);
-    setUploadProgress('Checking for duplicate address...');
+    setStatusMessage('Checking for duplicate address...');
+    resetProgress();
     
     try {
       const { data: existingListings, error: checkError } = await supabase
@@ -379,7 +398,7 @@ export default function CreateListing() {
         console.error('Error checking for duplicate address:', checkError);
       } else if (existingListings && existingListings.length > 0) {
         setIsSubmitting(false);
-        setUploadProgress('');
+        setStatusMessage('');
         toast({
           title: "Address already listed",
           description: "This address has already been listed. If this is your listing, you can request an edit link to modify it.",
@@ -397,7 +416,7 @@ export default function CreateListing() {
       const filteredYoutubeUrls = youtubeUrls.filter(url => url.trim() !== '');
 
       // First create the listing to get an ID
-      setUploadProgress('Creating listing...');
+      setStatusMessage('Creating listing...');
       const listing = await createListing.mutateAsync({
         title: showTitleField ? formData.title : null,
         description: showDescriptionField ? formData.description : null,
@@ -428,7 +447,7 @@ export default function CreateListing() {
       });
 
       // Geocode the address to get lat/lng coordinates
-      setUploadProgress('Getting location coordinates...');
+      setStatusMessage('Getting location coordinates...');
       try {
         const fullAddress = [
           formData.streetNumber,
@@ -456,23 +475,24 @@ export default function CreateListing() {
       if (coverPhoto) allImages.push(coverPhoto);
       allImages.push(...additionalImages);
       
+      let uploadErrors: string[] = [];
       if (allImages.length > 0) {
-        setUploadProgress(`Uploading ${allImages.length} photo(s)...`);
-        const imageUrls = await uploadListingImages(allImages, listing.id);
+        setStatusMessage('Uploading photos...');
+        const { urls: imageUrls, errors } = await uploadImages(allImages, listing.id);
+        uploadErrors = errors;
         
-        // Update listing with image URLs
-        const { supabase } = await import('@/integrations/supabase/client');
-        await supabase
-          .from('listings')
-          .update({ image_urls: imageUrls } as any)
-          .eq('id', listing.id);
+        if (imageUrls.length > 0) {
+          // Update listing with image URLs
+          await supabase
+            .from('listings')
+            .update({ image_urls: imageUrls } as any)
+            .eq('id', listing.id);
+        }
       }
 
       // Send edit link email via edge function (which has access to the secure token table)
-      setUploadProgress('Sending edit link to your email...');
+      setStatusMessage('Sending edit link to your email...');
       try {
-        const { supabase } = await import('@/integrations/supabase/client');
-        
         // Create token in secure table first via edge function
         await supabase.functions.invoke('create-listing-token', {
           body: {
@@ -486,10 +506,17 @@ export default function CreateListing() {
         // Don't fail the whole submission, just warn the user
       }
 
-      toast({
-        title: "Listing published!",
-        description: "Your Christmas display is now live. Check your email for the edit link.",
-      });
+      if (uploadErrors.length > 0) {
+        toast({
+          title: "Listing published with some photo errors",
+          description: `Your display is live! ${uploadErrors.length} photo(s) failed to upload. Check your email for the edit link to add them later.`,
+        });
+      } else {
+        toast({
+          title: "Listing published!",
+          description: "Your Christmas display is now live. Check your email for the edit link.",
+        });
+      }
 
       navigate('/browse');
     } catch (error) {
@@ -501,7 +528,8 @@ export default function CreateListing() {
       });
     } finally {
       setIsSubmitting(false);
-      setUploadProgress('');
+      setStatusMessage('');
+      resetProgress();
     }
   };
 
@@ -1155,6 +1183,11 @@ export default function CreateListing() {
                 </div>
               </div>
 
+              {/* Upload Progress */}
+              {isUploading && (
+                <PhotoUploadProgress progress={uploadProgress} />
+              )}
+
               {/* Submit */}
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col sm:flex-row gap-4">
@@ -1167,8 +1200,8 @@ export default function CreateListing() {
                   >
                     {isSubmitting ? (
                       <>
-                        <span className="animate-spin mr-2">⏳</span>
-                        {uploadProgress || 'Submitting...'}
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                        {statusMessage || 'Submitting...'}
                       </>
                     ) : (
                       <>

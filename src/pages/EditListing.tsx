@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Trash2, EyeOff, Loader2, Wand2, ImageIcon, FileText } from "lucide-react";
+import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, Trash2, EyeOff, Loader2, Wand2, ImageIcon, FileText, Camera } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
@@ -16,7 +16,9 @@ import { ImageUploader } from "@/components/ImageUploader";
 import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
 import { TagSelector } from "@/components/TagSelector";
 import { YouTubePreview } from "@/components/YouTubePreview";
+import { PhotoUploadProgress } from "@/components/PhotoUploadProgress";
 import { supabase } from "@/integrations/supabase/client";
+import { useImageUpload } from "@/hooks/use-image-upload";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -57,6 +59,7 @@ export default function EditListing() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const { progress: uploadProgress, uploadImages, resetProgress, isUploading } = useImageUpload();
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -392,6 +395,7 @@ export default function EditListing() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    resetProgress();
 
     try {
       const filteredYoutubeUrls = youtubeUrls.filter(url => url.trim() !== '');
@@ -404,23 +408,28 @@ export default function EditListing() {
       // Determine the cover photo URL
       let coverUrl: string | null = null;
       let additionalUrls: string[] = [];
+      let uploadErrors: string[] = [];
 
       // Existing images are already in the correct order (first = cover if user used "Set as Cover")
       const existingCover = existingImageUrls.length > 0 && existingImageUrls[0] !== '' ? existingImageUrls[0] : null;
       const existingAdditional = existingImageUrls.slice(1).filter(url => url !== '');
 
       if (newImages.length > 0) {
-        const { uploadListingImages } = await import('@/hooks/use-listings');
-        const newUrls = await uploadListingImages(newImages, id!, token!);
+        const { urls: newUrls, errors } = await uploadImages(newImages, id!, token!);
+        uploadErrors = errors;
         
-        if (coverPhoto) {
+        if (coverPhoto && newUrls.length > 0) {
           // New cover photo uploaded - use it as cover
           coverUrl = newUrls[0];
           additionalUrls = [...existingAdditional, ...newUrls.slice(1)];
-        } else {
+        } else if (newUrls.length > 0) {
           // No new cover - keep existing cover (or null if removed)
           coverUrl = existingCover;
           additionalUrls = [...existingAdditional, ...newUrls];
+        } else {
+          // All uploads failed
+          coverUrl = existingCover;
+          additionalUrls = existingAdditional;
         }
       } else {
         // No new uploads - use existing order (user may have reordered via "Set as Cover")
@@ -509,10 +518,17 @@ export default function EditListing() {
         }
       }
 
-      toast({
-        title: "Listing updated!",
-        description: "Your changes have been saved successfully.",
-      });
+      if (uploadErrors.length > 0) {
+        toast({
+          title: "Listing updated with some photo errors",
+          description: `Your changes have been saved. ${uploadErrors.length} photo(s) failed to upload.`,
+        });
+      } else {
+        toast({
+          title: "Listing updated!",
+          description: "Your changes have been saved successfully.",
+        });
+      }
 
       navigate(`/listing/${id}`);
     } catch (error) {
@@ -524,6 +540,7 @@ export default function EditListing() {
       });
     } finally {
       setIsSubmitting(false);
+      resetProgress();
     }
   };
 
@@ -1216,6 +1233,11 @@ export default function EditListing() {
                 </div>
               )}
 
+              {/* Upload Progress */}
+              {isUploading && (
+                <PhotoUploadProgress progress={uploadProgress} />
+              )}
+
               {/* Actions */}
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col sm:flex-row gap-4">
@@ -1224,12 +1246,12 @@ export default function EditListing() {
                     variant="hero"
                     size="lg"
                     className="flex-1"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isUploading}
                   >
                     {isSubmitting ? (
                       <>
                         <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                        Saving...
+                        {isUploading ? 'Uploading photos...' : 'Saving...'}
                       </>
                     ) : (
                       <>
