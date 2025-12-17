@@ -93,7 +93,7 @@ export default function TermsOfService() {
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Individual title and description (optional – enable via toggle)</li>
-                <li>Cover photo and up to 9 additional photos per listing</li>
+                <li>Cover photo and up to 15 additional photos per listing</li>
                 <li>Up to 3 YouTube video URLs per listing</li>
                 <li>Operating hours (day-by-day schedule or custom text)</li>
                 <li>Tags and display features</li>

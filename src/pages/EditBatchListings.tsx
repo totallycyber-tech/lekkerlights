@@ -1096,7 +1096,7 @@ export default function EditBatchListings() {
                                 <ImageUploader 
                                   images={state.newAdditionalImages}
                                   onImagesChange={(images) => handleAdditionalImagesChange(listing.id, images)}
-                                  maxImages={9}
+                                  maxImages={15}
                                   maxSizeMB={5}
                                 />
                               </div>

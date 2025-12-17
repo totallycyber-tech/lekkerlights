@@ -850,7 +850,7 @@ export default function CreateListing() {
                     <ImageUploader 
                       images={additionalImages}
                       onImagesChange={setAdditionalImages}
-                      maxImages={9}
+                      maxImages={15}
                       maxSizeMB={5}
                     />
                   </div>
