@@ -109,6 +109,7 @@ export default function CreateListing() {
     nameVisible: boolean;
     emailVisible: boolean;
     phoneVisible: boolean;
+    submitterNotes: string;
   }) => {
     setIsSubmitting(true);
     setUploadProgress('Creating listings...');
@@ -134,7 +135,6 @@ export default function CreateListing() {
         parkingInfo: l.parkingInfo || undefined,
         maxVisitors: l.maxVisitors ? parseInt(l.maxVisitors) : undefined,
         gateAccessInfo: l.gateAccessInfo || undefined,
-        submitterNotes: l.submitterNotes || undefined,
       }));
 
       // Create listings first
@@ -147,6 +147,7 @@ export default function CreateListing() {
           nameVisible: sharedData.nameVisible,
           emailVisible: sharedData.emailVisible,
           phoneVisible: sharedData.phoneVisible,
+          submitterNotes: sharedData.submitterNotes || undefined,
         },
       });
 

@@ -24,7 +24,6 @@ interface ListingData {
   parkingInfo?: string;
   maxVisitors?: number;
   gateAccessInfo?: string;
-  submitterNotes?: string;
 }
 
 interface CreateBatchRequest {
@@ -35,6 +34,7 @@ interface CreateBatchRequest {
   nameVisible: boolean;
   emailVisible: boolean;
   phoneVisible: boolean;
+  submitterNotes?: string;
 }
 
 // HTML escape function
@@ -56,7 +56,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const body: CreateBatchRequest = await req.json();
-    const { listings, contactEmail, contactName, contactPhone, nameVisible, emailVisible, phoneVisible } = body;
+    const { listings, contactEmail, contactName, contactPhone, nameVisible, emailVisible, phoneVisible, submitterNotes } = body;
 
     // Validate
     if (!listings || !Array.isArray(listings) || listings.length === 0) {
@@ -96,7 +96,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Generate batch_id
     const batchId = crypto.randomUUID();
-    const createdListings: { id: string; title: string; submitterNotes?: string }[] = [];
+    const createdListings: { id: string; title: string }[] = [];
 
     // Check for duplicate addresses
     for (const listing of listings) {
@@ -140,7 +140,7 @@ const handler = async (req: Request): Promise<Response> => {
           parking_info: listing.parkingInfo || null,
           max_visitors: listing.maxVisitors || null,
           gate_access_info: listing.gateAccessInfo || null,
-          submitter_notes: listing.submitterNotes || null,
+          submitter_notes: submitterNotes || null,
           contact_email: contactEmail.trim(),
           contact_name: contactName || null,
           contact_phone: contactPhone || null,
@@ -161,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
         );
       }
 
-      createdListings.push({ id: newListing.id, title: newListing.title || `${listing.streetNumber} ${listing.streetName}`, submitterNotes: listing.submitterNotes });
+      createdListings.push({ id: newListing.id, title: newListing.title || `${listing.streetNumber} ${listing.streetName}` });
 
       // Geocode the address
       try {
@@ -220,10 +220,13 @@ const handler = async (req: Request): Promise<Response> => {
     const siteUrl = Deno.env.get("SITE_URL") || "https://lekkerlights.co.za";
     const editLink = `${siteUrl}/edit-batch/${batchId}?token=${tokenData.edit_token}`;
     
-    const listingTitles = createdListings.map(l => {
-      const notesText = l.submitterNotes ? ` <span style="color: #0369a1; font-size: 12px;">(${escapeHtml(l.submitterNotes)})</span>` : '';
-      return `• ${escapeHtml(l.title)}${notesText}`;
-    }).join("<br>");
+    const listingTitles = createdListings.map(l => `• ${escapeHtml(l.title)}`).join("<br>");
+    
+    const notesSection = submitterNotes 
+      ? `<div style="background: #e0f2fe; padding: 12px; border-radius: 6px; margin: 12px 0;">
+           <p style="color: #0369a1; margin: 0; font-size: 14px;"><strong>Your Notes:</strong> ${escapeHtml(submitterNotes)}</p>
+         </div>`
+      : '';
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -243,6 +246,7 @@ const handler = async (req: Request): Promise<Response> => {
             <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 20px 0;">
               ${listingTitles}
             </div>
+            ${notesSection}
             <div style="background: #fef3c7; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
               <p style="color: #92400e; font-weight: bold; margin: 0 0 8px;">⏰ This link expires in 1 hour</p>
               <p style="color: #92400e; margin: 0; font-size: 14px;">

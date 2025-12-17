@@ -112,6 +112,7 @@ interface BulkListingFormProps {
     nameVisible: boolean;
     emailVisible: boolean;
     phoneVisible: boolean;
+    submitterNotes: string;
   }) => Promise<void>;
   isSubmitting: boolean;
 }
@@ -122,6 +123,7 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
   const [contactEmail, setContactEmail] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactPhone, setContactPhone] = useState('');
+  const [submitterNotes, setSubmitterNotes] = useState('');
   const [nameVisible, setNameVisible] = useState(true);
   const [emailVisible, setEmailVisible] = useState(true);
   const [phoneVisible, setPhoneVisible] = useState(true);
@@ -344,6 +346,7 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
       nameVisible,
       emailVisible,
       phoneVisible,
+      submitterNotes: submitterNotes.trim(),
     });
   };
 
@@ -780,24 +783,6 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
                       className="bg-secondary max-w-xs"
                     />
                   </div>
-
-                  {/* Private Notes */}
-                  <div className="space-y-2">
-                    <Label className="text-sm flex items-center gap-2">
-                      Private Notes
-                      <span className="text-xs text-muted-foreground font-normal">(not shown publicly)</span>
-                    </Label>
-                    <Textarea
-                      value={listing.submitterNotes}
-                      onChange={(e) => updateListing(listing.id, 'submitterNotes', e.target.value)}
-                      placeholder="e.g., 'Blue house on corner', 'My neighbor's place'..."
-                      className="bg-secondary min-h-[60px]"
-                      maxLength={200}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Helps identify this listing in edit link emails. {listing.submitterNotes.length}/200
-                    </p>
-                  </div>
                 </div>
               </div>
             )}
@@ -876,6 +861,25 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
               placeholder="e.g., 082 123 4567"
               className="bg-secondary"
             />
+          </div>
+
+          {/* Private Notes */}
+          <div className="space-y-3 pt-4 border-t border-border">
+            <Label htmlFor="submitterNotes" className="flex items-center gap-2">
+              Private Notes
+              <span className="text-xs text-muted-foreground font-normal">(not shown publicly)</span>
+            </Label>
+            <Textarea
+              id="submitterNotes"
+              value={submitterNotes}
+              onChange={(e) => setSubmitterNotes(e.target.value)}
+              placeholder="e.g., 'Neighborhood batch from Benoni', 'Houses spotted during Dec walk'..."
+              className="bg-secondary min-h-[80px]"
+              maxLength={200}
+            />
+            <p className="text-xs text-muted-foreground">
+              Helps identify this batch of listings in the edit link email. {submitterNotes.length}/200
+            </p>
           </div>
         </div>
       </div>
