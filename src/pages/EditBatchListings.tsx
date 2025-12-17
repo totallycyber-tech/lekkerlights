@@ -44,7 +44,8 @@ import {
   Mail,
   Phone,
   Wand2,
-  FileText
+  FileText,
+  ImageIcon
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -1047,7 +1048,7 @@ export default function EditBatchListings() {
                               <div className="space-y-3">
                                 <div>
                                   <Label className="text-sm font-medium">Current Photos</Label>
-                                  <p className="text-xs text-muted-foreground mt-1">Click X to remove a photo</p>
+                                  <p className="text-xs text-muted-foreground mt-1">Click X to remove, or click "Set as Cover" to make any photo your cover</p>
                                 </div>
                                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                                   {state.existingImages.filter(url => url !== '').map((url, displayIndex) => {
@@ -1064,10 +1065,38 @@ export default function EditBatchListings() {
                                         >
                                           <X className="h-3 w-3" />
                                         </button>
-                                        {isCover && (
+                                        {isCover ? (
                                           <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-christmas text-white text-[10px] rounded">
                                             Cover
                                           </span>
+                                        ) : (
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              setMediaState(prev => {
+                                                const currentState = prev[listing.id];
+                                                if (!currentState) return prev;
+                                                const newImages = [...currentState.existingImages];
+                                                const [removed] = newImages.splice(actualIndex, 1);
+                                                newImages.unshift(removed);
+                                                return {
+                                                  ...prev,
+                                                  [listing.id]: {
+                                                    ...currentState,
+                                                    existingImages: newImages,
+                                                  },
+                                                };
+                                              });
+                                              toast({
+                                                title: "Cover photo updated",
+                                                description: "This photo will be used as your cover image.",
+                                              });
+                                            }}
+                                            className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-background/80 text-foreground text-[10px] rounded flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
+                                          >
+                                            <ImageIcon className="h-2.5 w-2.5" />
+                                            Set as Cover
+                                          </button>
                                         )}
                                       </div>
                                     );
