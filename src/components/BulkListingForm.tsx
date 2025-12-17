@@ -65,7 +65,6 @@ export interface ListingEntry {
   parkingInfo: string;
   maxVisitors: string;
   gateAccessInfo: string;
-  submitterNotes: string;
   addressSelected: boolean;
   duplicateAddressError: string | null;
   isCheckingDuplicate: boolean;
@@ -96,7 +95,6 @@ export const createEmptyListing = (): ListingEntry => ({
   parkingInfo: '',
   maxVisitors: '',
   gateAccessInfo: '',
-  submitterNotes: '',
   addressSelected: false,
   duplicateAddressError: null,
   isCheckingDuplicate: false,
@@ -113,7 +111,6 @@ interface BulkListingFormProps {
     nameVisible: boolean;
     emailVisible: boolean;
     phoneVisible: boolean;
-    submitterNotes: string;
   }) => Promise<void>;
   isSubmitting: boolean;
 }
@@ -124,7 +121,6 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
   const [contactEmail, setContactEmail] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactPhone, setContactPhone] = useState('');
-  const [submitterNotes, setSubmitterNotes] = useState('');
   const [nameVisible, setNameVisible] = useState(true);
   const [emailVisible, setEmailVisible] = useState(true);
   const [phoneVisible, setPhoneVisible] = useState(true);
@@ -347,7 +343,6 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
       nameVisible,
       emailVisible,
       phoneVisible,
-      submitterNotes: submitterNotes.trim(),
     });
   };
 
@@ -864,29 +859,6 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
             />
           </div>
         </div>
-      </div>
-
-      {/* Private Notes - Separate Card */}
-      <div className="bg-card rounded-xl border border-border p-6 space-y-4">
-        <div>
-          <h2 className="font-display text-lg font-semibold flex items-center gap-2">
-            <Eye className="h-5 w-5" />
-            Private Notes (Optional)
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Add notes to help you identify this batch in your edit link emails. These notes are private and will not be shown publicly.
-          </p>
-        </div>
-        <Textarea
-          value={submitterNotes}
-          onChange={(e) => setSubmitterNotes(e.target.value)}
-          placeholder="e.g., 'My house', 'Neighbor on Oak Street', 'The big display with inflatables'..."
-          className="bg-secondary min-h-[100px]"
-          maxLength={200}
-        />
-        <p className="text-xs text-muted-foreground">
-          {submitterNotes.length}/200 characters
-        </p>
       </div>
 
       {/* Submit */}

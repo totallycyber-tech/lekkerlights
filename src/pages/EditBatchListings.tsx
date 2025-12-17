@@ -99,7 +99,6 @@ interface BatchListing {
   name_visible?: boolean;
   email_visible?: boolean;
   phone_visible?: boolean;
-  submitter_notes?: string;
   revision?: number;
 }
 
@@ -134,7 +133,6 @@ interface ListingMediaState {
   showDescriptionField: boolean;
   isGeneratingTitle: boolean;
   isGeneratingDescription: boolean;
-  submitterNotes: string;
 }
 
 function parseOperatingHours(hours: Record<string, any> | undefined): { operatingHours: OperatingHours; operatingHoursOther: string } {
@@ -175,7 +173,6 @@ export default function EditBatchListings() {
   const [deletingListingId, setDeletingListingId] = useState<string | null>(null);
   const [editedListings, setEditedListings] = useState<Record<string, Partial<BatchListing>>>({});
   const [mediaState, setMediaState] = useState<Record<string, ListingMediaState>>({});
-  const [batchSubmitterNotes, setBatchSubmitterNotes] = useState('');
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -245,15 +242,9 @@ export default function EditBatchListings() {
         showDescriptionField: !!listing.description,
         isGeneratingTitle: false,
         isGeneratingDescription: false,
-        submitterNotes: listing.submitter_notes || '',
       };
     });
     setMediaState(initialMediaState);
-    
-    // Set shared batch notes from first listing (all listings share same notes)
-    if (fetchedListings.length > 0 && fetchedListings[0].submitter_notes) {
-      setBatchSubmitterNotes(fetchedListings[0].submitter_notes);
-    }
     
     if (fetchedListings.length > 0) {
       setExpandedListing(fetchedListings[0].id);
@@ -528,9 +519,7 @@ export default function EditBatchListings() {
           state.province !== (listing.province || '') ||
           state.postalCode !== (listing.postal_code || '') ||
           state.complexName !== (listing.complex_name || '') ||
-          state.unitNo !== (listing.unit_no || '') ||
-          // Private notes
-          state.submitterNotes !== (listing.submitter_notes || '')
+          state.unitNo !== (listing.unit_no || '')
         );
 
         if (!hasTextChanges && !hasMediaChanges) continue;
@@ -636,7 +625,6 @@ export default function EditBatchListings() {
           postal_code: state?.postalCode || listing.postal_code,
           complex_name: state?.complexName || null,
           unit_no: state?.unitNo || null,
-          submitter_notes: batchSubmitterNotes || null,
         };
 
         const { error } = await supabase.functions.invoke("update-listing", {
@@ -744,9 +732,7 @@ export default function EditBatchListings() {
         state.province !== (listing.province || '') ||
         state.postalCode !== (listing.postal_code || '') ||
         state.complexName !== (listing.complex_name || '') ||
-        state.unitNo !== (listing.unit_no || '') ||
-        // Private notes
-        state.submitterNotes !== (listing.submitter_notes || '')
+        state.unitNo !== (listing.unit_no || '')
       );
     });
     
@@ -1357,25 +1343,6 @@ export default function EditBatchListings() {
                               </div>
                             </div>
 
-                            {/* Private Notes */}
-                            <div className="space-y-3">
-                              <div className="flex items-center gap-2">
-                                <FileText className="h-5 w-5 text-christmas" />
-                                <div>
-                                  <Label className="text-sm font-medium">Private Notes</Label>
-                                  <p className="text-xs text-muted-foreground">
-                                    Only visible to you in edit link emails
-                                  </p>
-                                </div>
-                              </div>
-                              <Textarea
-                                placeholder="e.g., Neighbour's display on Main Street..."
-                                value={state.submitterNotes}
-                                onChange={(e) => updateMediaState(listing.id, { submitterNotes: e.target.value })}
-                                className="bg-secondary min-h-[60px]"
-                              />
-                            </div>
-
                             {/* Delete Listing */}
                             <div className="pt-4 border-t border-destructive/30">
                               <AlertDialog>
@@ -1422,31 +1389,6 @@ export default function EditBatchListings() {
                       </div>
                     );
                   })}
-                </div>
-
-                {/* Shared Private Notes */}
-                <div className="bg-card rounded-xl border border-border p-6 mb-8">
-                  <h2 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Private Notes
-                  </h2>
-                  <div className="space-y-3">
-                    <Label htmlFor="batchSubmitterNotes" className="flex items-center gap-2">
-                      Batch Notes
-                      <span className="text-xs text-muted-foreground font-normal">(not shown publicly)</span>
-                    </Label>
-                    <Textarea
-                      id="batchSubmitterNotes"
-                      value={batchSubmitterNotes}
-                      onChange={(e) => setBatchSubmitterNotes(e.target.value)}
-                      placeholder="e.g., 'Neighborhood batch from Benoni', 'Houses spotted during Dec walk'..."
-                      className="bg-secondary min-h-[80px]"
-                      maxLength={200}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Helps identify this batch of listings. {batchSubmitterNotes.length}/200
-                    </p>
-                  </div>
                 </div>
 
                 {/* Save Button */}

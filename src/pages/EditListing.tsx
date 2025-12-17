@@ -78,7 +78,6 @@ export default function EditListing() {
   const [showDescriptionField, setShowDescriptionField] = useState(false);
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
-  const [submitterNotes, setSubmitterNotes] = useState('');
   const [currentRevision, setCurrentRevision] = useState(1);
   const [revisionHistory, setRevisionHistory] = useState<Array<{
     revision: number;
@@ -210,7 +209,6 @@ export default function EditListing() {
         setExistingImageUrls(listing.image_urls || []);
         setYoutubeUrls(listing.youtube_urls?.length ? listing.youtube_urls : ['']);
         setSelectedTags(listing.tags || []);
-        setSubmitterNotes(listing.submitter_notes || '');
         setCurrentRevision(listing.revision || 1);
 
         // Fetch revision history
@@ -471,7 +469,6 @@ export default function EditListing() {
               ? operatingHours 
               : { other: operatingHoursOther },
             tags: selectedTags,
-            submitter_notes: submitterNotes || null,
           },
         },
       });
@@ -1179,23 +1176,6 @@ export default function EditListing() {
                     />
                   </div>
                 </div>
-              </div>
-
-              {/* Private Notes */}
-              <div className="bg-card rounded-xl border border-border p-6 space-y-4">
-                <div>
-                  <h2 className="font-display text-lg font-semibold">Private Notes</h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Only visible to you in edit link emails – never shown publicly
-                  </p>
-                </div>
-                <Textarea
-                  id="submitterNotes"
-                  placeholder="e.g., My display in Rynfield, submitted Dec 2024..."
-                  value={submitterNotes}
-                  onChange={(e) => setSubmitterNotes(e.target.value)}
-                  className="bg-secondary min-h-[80px]"
-                />
               </div>
 
               {/* Revision History */}
