@@ -75,10 +75,25 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
+    // Fetch the listing data since client can't access listings table directly
+    const { data: listing, error: listingError } = await supabase
+      .from("listings")
+      .select("*")
+      .eq("id", listingId)
+      .single();
+
+    if (listingError || !listing) {
+      console.log("Listing not found:", listingId);
+      return new Response(
+        JSON.stringify({ success: false, error: "Listing not found" }),
+        { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     console.log("Token verified successfully for listing:", listingId);
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, listing }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   } catch (error: any) {
