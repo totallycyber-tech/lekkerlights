@@ -304,13 +304,21 @@ export default function ListingDetail() {
                 altPrefix={listing.title}
               />
 
-              {/* Last Updated Info */}
-              {!isExampleListing && listing.updatedAt && (
-                <div className="border-t border-border pt-4 mb-4">
-                  <p className="text-sm text-muted-foreground flex items-center gap-2">
-                    <RefreshCw className="h-4 w-4" />
-                    Last updated: {format(new Date(listing.updatedAt), "d MMM yyyy 'at' HH:mm")}
-                  </p>
+              {/* Listing Info */}
+              {!isExampleListing && (
+                <div className="border-t border-border pt-4 mb-4 flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
+                  {listing.createdAt && (
+                    <p className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Created: {format(new Date(listing.createdAt), "d MMM yyyy 'at' HH:mm")}
+                    </p>
+                  )}
+                  {listing.updatedAt && (
+                    <p className="flex items-center gap-2">
+                      <RefreshCw className="h-4 w-4" />
+                      Updated: {format(new Date(listing.updatedAt), "d MMM yyyy 'at' HH:mm")}
+                    </p>
+                  )}
                 </div>
               )}
 
