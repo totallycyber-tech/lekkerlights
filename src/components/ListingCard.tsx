@@ -203,11 +203,11 @@ export function ListingCard({
             const remainingCount = allItems.length - maxDisplay;
             
             return (
-              <div className="absolute bottom-0 left-0 right-0 flex gap-0.5 p-1 bg-background/60 backdrop-blur-sm">
+              <div className="absolute bottom-0 left-0 right-0 flex gap-1 p-1.5 bg-background/70 backdrop-blur-sm">
                 {displayItems.map((item, idx) => (
                   <div 
                     key={idx} 
-                    className="flex-1 aspect-[4/3] overflow-hidden rounded-sm relative"
+                    className="w-12 h-9 shrink-0 overflow-hidden rounded-sm relative"
                   >
                     <img 
                       src={item.url} 
@@ -217,15 +217,15 @@ export function ListingCard({
                     />
                     {item.type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
-                          <Play className="h-3 w-3 text-white fill-white ml-0.5" aria-hidden="true" />
+                        <div className="w-5 h-5 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
+                          <Play className="h-2.5 w-2.5 text-white fill-white ml-0.5" aria-hidden="true" />
                         </div>
                       </div>
                     )}
                   </div>
                 ))}
                 {remainingCount > 0 && (
-                  <div className="flex-1 aspect-[4/3] rounded-sm bg-background/90 flex items-center justify-center text-sm font-medium">
+                  <div className="w-12 h-9 shrink-0 rounded-sm bg-background/90 flex items-center justify-center text-xs font-medium">
                     +{remainingCount}
                   </div>
                 )}
