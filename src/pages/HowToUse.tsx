@@ -749,6 +749,23 @@ export default function HowToUse() {
                     </AccordionContent>
                   </AccordionItem>
 
+                  <AccordionItem value="multiple-batches" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      I submitted several batches of listings. How do I get edit links for all of them?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      If you submitted multiple batches of up to 10 listings each (using "Bulk Listings" mode several times), 
+                      each batch has its own unique edit link. When you request a new edit link using the{" "}
+                      <Link to="/resend-edit-link" className="text-primary hover:underline">Lost Edit Link?</Link> page 
+                      and select "Bulk Listings", you'll receive a <strong>separate email for each batch</strong> you submitted.
+                      <p className="mt-2">
+                        For example, if you submitted 3 separate batches of displays at different times, you'll receive 3 emails 
+                        – each containing the edit link for that specific batch. Make sure to check your inbox (and spam folder) 
+                        for all the emails.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+
                   <AccordionItem value="title-description-optional" className="border-b-0">
                     <AccordionTrigger className="hover:no-underline py-3">
                       Do I need to add a title and description?
