@@ -15,6 +15,7 @@ import { useListing } from "@/hooks/use-listings";
 import { ListingReviews } from "@/components/ListingReviews";
 import { ReportListingDialog } from "@/components/ReportListingDialog";
 import { PhotoLightbox } from "@/components/PhotoLightbox";
+import { EditListingDialog } from "@/components/EditListingDialog";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 export default function ListingDetail() {
@@ -302,22 +303,30 @@ export default function ListingDetail() {
                 altPrefix={listing.title}
               />
 
-              {/* Report Button */}
-              <div className="border-t border-border pt-6 flex justify-end">
-                <ReportListingDialog
-                  listingId={listing.id}
-                  listingTitle={listing.title}
-                  trigger={
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      className="text-muted-foreground hover:text-destructive"
-                    >
-                      <Flag className="h-4 w-4 mr-1" />
-                      Report Listing
-                    </Button>
-                  }
-                />
+              {/* Edit & Report Buttons */}
+              <div className="border-t border-border pt-6 flex justify-between items-center">
+                {!isExampleListing && (
+                  <EditListingDialog 
+                    listingId={listing.id} 
+                    listingTitle={listing.title} 
+                  />
+                )}
+                <div className={!isExampleListing ? "" : "ml-auto"}>
+                  <ReportListingDialog
+                    listingId={listing.id}
+                    listingTitle={listing.title}
+                    trigger={
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        <Flag className="h-4 w-4 mr-1" />
+                        Report Listing
+                      </Button>
+                    }
+                  />
+                </div>
               </div>
             </div>
 
