@@ -27,6 +27,7 @@ export interface Listing {
   };
   tags?: string[];
   createdAt: string;
+  updatedAt: string;
   featured?: boolean;
 }
 
@@ -52,6 +53,7 @@ type DbListingInput = {
   contact_email: string | null;
   contact_phone: string | null;
   created_at: string;
+  updated_at: string;
   directions_clicks: number;
   favorites_count: number;
   tags: string[] | null;
@@ -121,6 +123,7 @@ export function transformDbListing(dbListing: DbListingInput): Listing {
     },
     tags: dbListing.tags || [],
     createdAt: dbListing.created_at,
+    updatedAt: dbListing.updated_at,
   };
 }
 
