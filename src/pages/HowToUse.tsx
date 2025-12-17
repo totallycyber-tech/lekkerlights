@@ -171,7 +171,11 @@ export default function HowToUse() {
                     <ul className="space-y-2 text-muted-foreground">
                       <li className="flex items-center gap-2">
                         <Camera className="h-4 w-4 text-primary" />
-                        <span>Photos and videos – <strong>click any photo to view it enlarged</strong>, then use arrows to browse through all photos</span>
+                        <span>Photos – <strong>click any photo to view it enlarged</strong>, then use arrows to browse through all photos</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Camera className="h-4 w-4 text-primary" />
+                        <span>Videos – YouTube videos are embedded directly in the listing page in a dedicated <strong>"Videos" section</strong></span>
                       </li>
                       <li className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-primary" />
@@ -188,6 +192,10 @@ export default function HowToUse() {
                       <li className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-primary" />
                         <span>Visitor guidance (parking, capacity, access)</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <RefreshCw className="h-4 w-4 text-primary" />
+                        <span><strong>Timestamps</strong> – See when the listing was created and last updated for transparency</span>
                       </li>
                     </ul>
                   </div>
@@ -516,13 +524,17 @@ export default function HowToUse() {
                 <Accordion type="single" collapsible className="space-y-2">
                   <AccordionItem value="view-photos" className="border-b-0">
                     <AccordionTrigger className="hover:no-underline py-3">
-                      How do I view photos in full size?
+                      How do I view photos and videos?
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground pb-4">
-                      When viewing a listing's detail page, click on any photo in the gallery to open it in a full-size 
+                      <strong>Photos:</strong> When viewing a listing's detail page, click on any photo in the gallery to open it in a full-size 
                       lightbox view. Use the left and right arrow buttons (or keyboard arrows) to navigate between photos. 
-                      Press Escape or click outside the photo to close the lightbox. This makes it easy to see all the 
-                      beautiful details of each Christmas display!
+                      Press Escape or click outside the photo to close the lightbox.
+                      <br /><br />
+                      <strong>Videos:</strong> YouTube videos are displayed in a dedicated "Videos" section on each listing page. 
+                      Videos are embedded directly so you can watch them without leaving the site. On listing cards in Grid View, 
+                      you'll see video thumbnails with a <strong>red play button</strong> overlay (displayed before photo thumbnails) 
+                      and a video count badge showing how many videos are available.
                     </AccordionContent>
                   </AccordionItem>
 
@@ -699,7 +711,10 @@ export default function HowToUse() {
                         <li><strong>Copy the sharing link</strong> from YouTube (click Share button on your video)</li>
                         <li><strong>Paste the link</strong> in the YouTube Videos section of your listing form</li>
                       </ol>
-                      <p className="mt-2">You can add up to 3 YouTube video URLs per listing. Videos are embedded directly in your listing page so visitors can watch without leaving the site.</p>
+                      <p className="mt-2">You can add up to 3 YouTube video URLs per listing. Videos are embedded directly in your listing page 
+                      in a dedicated "Videos" section so visitors can watch without leaving the site. On your listing card in Grid View, 
+                      video thumbnails will appear with a <strong>red play button</strong> overlay (shown before photo thumbnails), 
+                      and a video count badge will show visitors how many videos you've added.</p>
                     </AccordionContent>
                   </AccordionItem>
 

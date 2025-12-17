@@ -11,7 +11,7 @@ export default function TermsOfService() {
           <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
             Lekker Lights - Terms of Service
           </h1>
-          <p className="text-muted-foreground mb-8">Last updated: 14 December 2025</p>
+          <p className="text-muted-foreground mb-8">Last updated: 17 December 2025</p>
 
           <section className="space-y-6">
             <div>
@@ -66,14 +66,14 @@ export default function TermsOfService() {
                 <li>Visitor limits or guidance (such as maximum visitors at a time or "no buses")</li>
                 <li>Access instructions and gate/complex rules (such as security gate procedures, ID or licence requirements, dial-in codes, or calling ahead)</li>
                 <li>Tags that describe your display (for example, KidFriendly, Walkthrough, Synced)</li>
-                <li>Photos and other images you upload directly to the Service (high quality photos taken in the evening when lights are on are recommended) – you can upload 1 cover photo and up to 15 additional photos per listing</li>
-                <li>Links to external videos (for example, YouTube) – videos must be uploaded to YouTube first, then the sharing link pasted into your listing</li>
+                <li>Photos and other images you upload directly to the Service (high quality photos taken in the evening when lights are on are recommended) – you can upload 1 cover photo and up to 15 additional photos per listing; thumbnails appear on your listing card in Grid View</li>
+                <li>Links to external videos (for example, YouTube) – videos must be uploaded to YouTube first, then the sharing link pasted into your listing; video thumbnails with play button overlays appear on your listing card, and videos are embedded in a "Videos" section on your listing detail page</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
                 When you edit your listing, each change creates a new revision with a version number. This revision history helps you track changes over time and is only visible to you on the edit page.
               </p>
               <p className="text-muted-foreground leading-relaxed mt-4">
-                You acknowledge that your listing details (including all information you choose to display publicly, such as address or approximate location, description, dates/hours, tags, and images) may be displayed publicly on the Website and on maps so that Visitors can find and visit your display. Some contact details or your name may also be displayed publicly if you choose that visibility option.
+                You acknowledge that your listing details (including all information you choose to display publicly, such as address or approximate location, description, dates/hours, tags, images, YouTube video thumbnails, and the created/last updated timestamps) may be displayed publicly on the Website and on maps so that Visitors can find and visit your display. Some contact details or your name may also be displayed publicly if you choose that visibility option.
               </p>
             </div>
 
