@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera, Eye, Youtube } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera, Eye, Youtube, Play } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -191,14 +191,14 @@ export function ListingCard({
           
           if (hasContent) {
             const maxDisplay = 4;
-            // Combine photos and video thumbnails
+            // Combine video thumbnails first, then photos
             const photoItems = additionalPhotos.map(url => ({ type: 'photo' as const, url }));
             const videoItems = videoIds.map(id => ({ 
               type: 'video' as const, 
               url: `https://img.youtube.com/vi/${id}/mqdefault.jpg`,
               id 
             }));
-            const allItems = [...photoItems, ...videoItems];
+            const allItems = [...videoItems, ...photoItems];
             const displayItems = allItems.slice(0, maxDisplay);
             const remainingCount = allItems.length - maxDisplay;
             
@@ -216,8 +216,10 @@ export function ListingCard({
                       loading="lazy"
                     />
                     {item.type === 'video' && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                        <Youtube className="h-4 w-4 text-white" aria-hidden="true" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
+                          <Play className="h-3 w-3 text-white fill-white ml-0.5" aria-hidden="true" />
+                        </div>
                       </div>
                     )}
                   </div>
