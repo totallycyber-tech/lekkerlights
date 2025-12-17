@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
 import {
   Sheet,
   SheetContent,
@@ -9,6 +10,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Route,
   X,
@@ -21,11 +33,16 @@ import {
   Loader2,
   Clock,
   MapPin,
+  Save,
+  FolderOpen,
+  Pencil,
+  Check,
 } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { calculateDistance } from "@/lib/geo-utils";
+import { SavedTour } from "@/hooks/use-tour";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 interface TourPanelProps {
@@ -37,6 +54,13 @@ interface TourPanelProps {
   onOptimize: (startLat?: number, startLng?: number) => void;
   generateGoogleMapsUrl: (userLat?: number, userLng?: number) => string | null;
   generateShareUrl: () => string;
+  // Saved tours
+  savedTours: SavedTour[];
+  onSaveTour: (name: string) => boolean;
+  onLoadSavedTour: (tourId: string, allListings: Listing[]) => boolean;
+  onDeleteSavedTour: (tourId: string) => void;
+  onRenameSavedTour: (tourId: string, newName: string) => void;
+  allListings: Listing[];
 }
 
 // Estimate driving time based on distance (average 40 km/h in suburban areas + 2 min per stop)
@@ -62,10 +86,21 @@ export function TourPanel({
   onOptimize,
   generateGoogleMapsUrl,
   generateShareUrl,
+  savedTours,
+  onSaveTour,
+  onLoadSavedTour,
+  onDeleteSavedTour,
+  onRenameSavedTour,
+  allListings,
 }: TourPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [showSavedTours, setShowSavedTours] = useState(false);
+  const [saveTourName, setSaveTourName] = useState("");
+  const [showSaveInput, setShowSaveInput] = useState(false);
+  const [editingTourId, setEditingTourId] = useState<string | null>(null);
+  const [editingTourName, setEditingTourName] = useState("");
 
   // Calculate total distance between all stops
   const tourStats = useMemo(() => {
@@ -165,11 +200,179 @@ export function TourPanel({
     if (index < tourListings.length - 1) onReorder(index, index + 1);
   };
 
+  const handleSaveTour = () => {
+    if (!saveTourName.trim()) {
+      toast({
+        title: "Name required",
+        description: "Please enter a name for your tour.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const success = onSaveTour(saveTourName);
+    if (success) {
+      toast({
+        title: "Tour saved!",
+        description: `"${saveTourName}" has been saved.`,
+      });
+      setSaveTourName("");
+      setShowSaveInput(false);
+    }
+  };
+
+  const handleLoadTour = (tourId: string) => {
+    const success = onLoadSavedTour(tourId, allListings);
+    if (success) {
+      const tour = savedTours.find((t) => t.id === tourId);
+      toast({
+        title: "Tour loaded!",
+        description: `"${tour?.name}" has been loaded.`,
+      });
+      setShowSavedTours(false);
+    } else {
+      toast({
+        title: "Error loading tour",
+        description: "Some displays may no longer exist.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleStartRename = (tour: SavedTour) => {
+    setEditingTourId(tour.id);
+    setEditingTourName(tour.name);
+  };
+
+  const handleFinishRename = () => {
+    if (editingTourId && editingTourName.trim()) {
+      onRenameSavedTour(editingTourId, editingTourName);
+      toast({
+        title: "Tour renamed",
+        description: `Tour renamed to "${editingTourName.trim()}"`,
+      });
+    }
+    setEditingTourId(null);
+    setEditingTourName("");
+  };
+
+  const SavedToursView = () => (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="font-medium">Saved Tours</h4>
+        <Button variant="ghost" size="sm" onClick={() => setShowSavedTours(false)}>
+          Back
+        </Button>
+      </div>
+
+      {savedTours.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+          <FolderOpen className="h-12 w-12 text-muted-foreground mb-3" />
+          <h4 className="font-medium mb-1">No saved tours</h4>
+          <p className="text-sm text-muted-foreground">
+            Save your current tour to access it later
+          </p>
+        </div>
+      ) : (
+        <ScrollArea className="flex-1 -mx-4 px-4">
+          <div className="space-y-2 pb-4">
+            {savedTours.map((tour) => (
+              <div
+                key={tour.id}
+                className="p-3 rounded-lg bg-muted/50 border border-border"
+              >
+                {editingTourId === tour.id ? (
+                  <div className="flex items-center gap-2 mb-2">
+                    <Input
+                      value={editingTourName}
+                      onChange={(e) => setEditingTourName(e.target.value)}
+                      className="h-8"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleFinishRename();
+                        if (e.key === "Escape") {
+                          setEditingTourId(null);
+                          setEditingTourName("");
+                        }
+                      }}
+                    />
+                    <Button size="icon" className="h-8 w-8" onClick={handleFinishRename}>
+                      <Check className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium truncate">{tour.name}</span>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => handleStartRename(tour)}
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete tour?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{tour.name}"? This cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => {
+                                onDeleteSavedTour(tour.id);
+                                toast({
+                                  title: "Tour deleted",
+                                  description: `"${tour.name}" has been deleted.`,
+                                });
+                              }}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{tour.listingIds.length} stops</span>
+                  <span>{new Date(tour.createdAt).toLocaleDateString()}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full mt-2"
+                  onClick={() => handleLoadTour(tour.id)}
+                >
+                  Load Tour
+                </Button>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      )}
+    </div>
+  );
+
   const TourContent = () => (
     <div className="flex flex-col h-full">
       {/* Header Stats */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Badge variant="secondary" className="text-sm">
             {tourListings.length} / {maxStops} stops
           </Badge>
@@ -201,6 +404,19 @@ export function TourPanel({
         )}
       </div>
 
+      {/* Saved Tours Button */}
+      <div className="flex gap-2 mb-4">
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex-1"
+          onClick={() => setShowSavedTours(true)}
+        >
+          <FolderOpen className="h-4 w-4 mr-1" />
+          Saved Tours ({savedTours.length})
+        </Button>
+      </div>
+
       {tourListings.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
           <Route className="h-12 w-12 text-muted-foreground mb-3" />
@@ -211,6 +427,48 @@ export function TourPanel({
         </div>
       ) : (
         <>
+          {/* Save Tour Input */}
+          {showSaveInput ? (
+            <div className="flex gap-2 mb-4">
+              <Input
+                placeholder="Enter tour name..."
+                value={saveTourName}
+                onChange={(e) => setSaveTourName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSaveTour();
+                  if (e.key === "Escape") {
+                    setShowSaveInput(false);
+                    setSaveTourName("");
+                  }
+                }}
+                autoFocus
+              />
+              <Button size="icon" onClick={handleSaveTour}>
+                <Check className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => {
+                  setShowSaveInput(false);
+                  setSaveTourName("");
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mb-4"
+              onClick={() => setShowSaveInput(true)}
+            >
+              <Save className="h-4 w-4 mr-1" />
+              Save This Tour
+            </Button>
+          )}
+
           {/* Tour Stops List */}
           <ScrollArea className="flex-1 -mx-4 px-4">
             <div className="space-y-2 pb-4">
@@ -356,7 +614,7 @@ export function TourPanel({
           </SheetTitle>
         </SheetHeader>
         <div className="flex-1 overflow-hidden mt-4">
-          <TourContent />
+          {showSavedTours ? <SavedToursView /> : <TourContent />}
         </div>
       </SheetContent>
     </Sheet>

@@ -136,11 +136,26 @@ export default function PrivacyPolicy() {
               <p className="text-muted-foreground leading-relaxed">We use cookies and similar technologies to:</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Remember your basic preferences (such as search filters, selected suburb chips, view mode preference between Grid View and Map View, and favourites)</li>
+                <li>Store your Tour Planner data (current tour stops, saved tours with custom names)</li>
                 <li>Understand how the Service is used</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-2">
                 The suburb chip selections allow you to quickly filter displays by clicking on suburb names. Your filter preferences, including any selected suburb chips and street address searches, may be stored locally to improve your browsing experience. You may disable cookies in your browser settings, but some features of the Service may not function properly if you do so.
               </p>
+
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.4 Tour Planner Data</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                The Tour Planner feature allows you to create driving routes to visit multiple Christmas light displays. When you use this feature:
+              </p>
+              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
+                <li>Your current tour (up to 10 stops) and saved tours (up to 10 named tours) are stored locally in your browser using localStorage</li>
+                <li>Tour data includes listing IDs, tour names, and creation dates – no personal information is collected</li>
+                <li>When you click "Start Tour in Google Maps" or share a tour link, this data may be processed by Google Maps</li>
+                <li>If you use the "Optimize Route" feature, your device's location (with your permission) may be used to calculate the optimal order</li>
+                <li>Shareable tour links contain listing IDs in the URL – anyone with this link can load and view the same tour</li>
+              </ul>
+              <p className="text-muted-foreground leading-relaxed mt-2">
+                Tour data is stored entirely on your device and is not transmitted to our servers. Clearing your browser data will remove all saved tours.</p>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.4 Street Address Display</h3>
               <p className="text-muted-foreground leading-relaxed">

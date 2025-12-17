@@ -3,10 +3,15 @@ import { Listing } from "@/data/mockListings";
 import { calculateDistance } from "@/lib/geo-utils";
 
 const TOUR_STORAGE_KEY = "lekker-lights-tour";
+const SAVED_TOURS_KEY = "lekker-lights-saved-tours";
 const MAX_TOUR_STOPS = 10;
+const MAX_SAVED_TOURS = 10;
 
-interface TourState {
-  listings: Listing[];
+export interface SavedTour {
+  id: string;
+  name: string;
+  listingIds: string[];
+  createdAt: string;
 }
 
 export function useTour() {
@@ -22,10 +27,27 @@ export function useTour() {
     return [];
   });
 
-  // Persist to localStorage whenever tour changes
+  const [savedTours, setSavedTours] = useState<SavedTour[]>(() => {
+    try {
+      const saved = localStorage.getItem(SAVED_TOURS_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error("Failed to load saved tours from localStorage:", e);
+    }
+    return [];
+  });
+
+  // Persist current tour to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem(TOUR_STORAGE_KEY, JSON.stringify(tourListings));
   }, [tourListings]);
+
+  // Persist saved tours to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(SAVED_TOURS_KEY, JSON.stringify(savedTours));
+  }, [savedTours]);
 
   const addToTour = useCallback((listing: Listing) => {
     setTourListings((prev) => {
@@ -166,6 +188,56 @@ export function useTour() {
     setTourListings(listings);
   }, []);
 
+  // Save current tour with a name
+  const saveTour = useCallback((name: string) => {
+    if (tourListings.length === 0) return false;
+    
+    const newTour: SavedTour = {
+      id: `tour-${Date.now()}`,
+      name: name.trim(),
+      listingIds: tourListings.map((l) => l.id),
+      createdAt: new Date().toISOString(),
+    };
+    
+    setSavedTours((prev) => {
+      // Limit to MAX_SAVED_TOURS, remove oldest if needed
+      const updated = [newTour, ...prev];
+      if (updated.length > MAX_SAVED_TOURS) {
+        return updated.slice(0, MAX_SAVED_TOURS);
+      }
+      return updated;
+    });
+    
+    return true;
+  }, [tourListings]);
+
+  // Load a saved tour
+  const loadSavedTour = useCallback((tourId: string, allListings: Listing[]) => {
+    const tour = savedTours.find((t) => t.id === tourId);
+    if (!tour) return false;
+    
+    const listings = tour.listingIds
+      .map((id) => allListings.find((l) => l.id === id))
+      .filter((l): l is Listing => l != null);
+    
+    setTourListings(listings);
+    return true;
+  }, [savedTours]);
+
+  // Delete a saved tour
+  const deleteSavedTour = useCallback((tourId: string) => {
+    setSavedTours((prev) => prev.filter((t) => t.id !== tourId));
+  }, []);
+
+  // Rename a saved tour
+  const renameSavedTour = useCallback((tourId: string, newName: string) => {
+    setSavedTours((prev) =>
+      prev.map((t) =>
+        t.id === tourId ? { ...t, name: newName.trim() } : t
+      )
+    );
+  }, []);
+
   return {
     tourListings,
     tourCount: tourListings.length,
@@ -180,5 +252,12 @@ export function useTour() {
     generateGoogleMapsUrl,
     generateShareUrl,
     loadTourFromIds,
+    // Saved tours
+    savedTours,
+    maxSavedTours: MAX_SAVED_TOURS,
+    saveTour,
+    loadSavedTour,
+    deleteSavedTour,
+    renameSavedTour,
   };
 }

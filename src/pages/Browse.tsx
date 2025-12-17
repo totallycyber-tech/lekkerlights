@@ -55,6 +55,11 @@ export default function Browse() {
     generateGoogleMapsUrl,
     generateShareUrl,
     loadTourFromIds,
+    savedTours,
+    saveTour,
+    loadSavedTour,
+    deleteSavedTour,
+    renameSavedTour,
   } = useTour();
 
   // Refresh map handler
@@ -318,6 +323,12 @@ export default function Browse() {
                 onOptimize={optimizeRoute}
                 generateGoogleMapsUrl={generateGoogleMapsUrl}
                 generateShareUrl={generateShareUrl}
+                savedTours={savedTours}
+                onSaveTour={saveTour}
+                onLoadSavedTour={loadSavedTour}
+                onDeleteSavedTour={deleteSavedTour}
+                onRenameSavedTour={renameSavedTour}
+                allListings={allListings}
               />
               
               {/* Favourites Filter */}

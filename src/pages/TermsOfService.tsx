@@ -27,6 +27,9 @@ export default function TermsOfService() {
                 Lekker Lights allows property owners or residents ("Hosts") to list their festive light displays and allows visitors ("Visitors") to search for, view, rate, review, and report these displays. The Service displays listings in a Grid View and on an interactive Map View based on information submitted by Hosts. Visitors can click on map markers to view listing details (including the street address as a title), use the Refresh button to reload the latest data, and filter displays by location (province, suburb, street address, and quick-filter suburb chips) and tags. In Grid View, visitors can reveal the exact street address by hovering over (or tapping on mobile) the "Address" button on listing cards. The suburb chips provide a convenient way to instantly filter displays by clicking on suburb names, with each chip showing the number of displays in that area. The Service may show ratings and reviews submitted by Visitors.
               </p>
               <p className="text-muted-foreground leading-relaxed mt-4">
+                The Service includes a Tour Planner feature that allows Visitors to create custom driving routes to visit multiple displays. Visitors can add up to 10 stops per tour, optimize the route order, save multiple named tours for later use, and share tour links with others. Tours open in Google Maps for turn-by-turn navigation.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mt-4">
                 We also provide a How to Use page with step-by-step guides and a Frequently Asked Questions (FAQ) section to help Hosts and Visitors understand how to use the Service effectively.
               </p>
             </div>
@@ -227,6 +230,18 @@ export default function TermsOfService() {
                 <li>You will follow any reasonable rules, time windows, and instructions provided in the listing or by the Host, including parking and access guidance.</li>
                 <li>You will comply with local laws and bylaws, including traffic and parking rules, and any rules imposed by estates or complexes.</li>
                 <li>You will respect privacy and obtain consent before photographing or filming people or private areas of the property.</li>
+              </ul>
+
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">8.4 Tour Planner Feature</h3>
+              <p className="text-muted-foreground leading-relaxed">The Tour Planner allows you to create and share custom driving routes to visit multiple displays. By using this feature, you agree that:</p>
+              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
+                <li>You may add up to 10 displays to a single tour and save up to 10 named tours locally on your device.</li>
+                <li>Tour data (including listing IDs and tour names) is stored in your browser's local storage and is not backed up by Lekker Lights – clearing your browser data will delete all saved tours.</li>
+                <li>When you use "Start Tour in Google Maps", your tour will open in Google Maps, which is subject to Google's own Terms of Service and Privacy Policy.</li>
+                <li>The "Optimize Route" feature may request access to your device's location to calculate the optimal driving order; this is optional and requires your permission.</li>
+                <li>Tour links you share contain listing IDs and can be accessed by anyone with the link – do not share tour links if you wish to keep your planned route private.</li>
+                <li>Estimated driving times and distances are approximations based on average speeds and may not reflect actual road conditions, traffic, or routing.</li>
+                <li>You are solely responsible for safe driving and navigation when following a tour route.</li>
               </ul>
             </div>
 
