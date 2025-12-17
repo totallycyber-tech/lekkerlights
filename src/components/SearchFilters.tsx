@@ -34,9 +34,10 @@ interface ListingForSearch {
 interface SearchFiltersProps {
   onFilterChange: (filters: SearchFilters) => void;
   listings?: ListingForSearch[];
+  filters?: SearchFilters;
 }
 
-export function SearchFilters({ onFilterChange, listings = [] }: SearchFiltersProps) {
+export function SearchFilters({ onFilterChange, listings = [], filters: controlledFilters }: SearchFiltersProps) {
   const [search, setSearch] = useState("");
   const [province, setProvince] = useState("");
   const [suburb, setSuburb] = useState("");
@@ -45,6 +46,16 @@ export function SearchFilters({ onFilterChange, listings = [] }: SearchFiltersPr
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  // Sync internal state with controlled filters (for external reset)
+  useEffect(() => {
+    if (controlledFilters) {
+      setSearch(controlledFilters.search);
+      setProvince(controlledFilters.province);
+      setSuburb(controlledFilters.suburb);
+      setSelectedTags(controlledFilters.tags);
+    }
+  }, [controlledFilters]);
 
   // Filter listings for address suggestions based on main search input
   const addressSuggestions = useMemo(() => {
