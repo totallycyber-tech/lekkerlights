@@ -125,7 +125,7 @@ const handler = async (req: Request): Promise<Response> => {
         .select("title")
         .eq("batch_id", token.batch_id);
 
-      const listingTitles = listings?.map(l => `• ${escapeHtml(l.title)}`).join("<br>") || "Your listings";
+      const listingTitles = listings?.map(l => `• ${escapeHtml(l.title || 'Untitled Display')}`).join("<br>") || "Your listings";
       const editLink = `${siteUrl}/edit-batch/${token.batch_id}?token=${newToken}`;
 
       await fetch("https://api.resend.com/emails", {
