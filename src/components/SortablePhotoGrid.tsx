@@ -4,6 +4,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -48,46 +49,54 @@ function SortablePhoto({ id, url, index, isCover, onRemove, onSetAsCover }: Sort
       ref={setNodeRef}
       style={style}
       className={cn(
-        "relative aspect-square rounded-lg overflow-hidden group",
-        isDragging && "z-50 opacity-90 ring-2 ring-christmas shadow-lg"
+        "relative aspect-square rounded-lg overflow-hidden group touch-none",
+        isDragging && "z-50 opacity-90 ring-2 ring-christmas shadow-lg scale-105"
       )}
     >
       <img src={url} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
       
-      {/* Drag handle */}
+      {/* Drag handle - larger touch target on mobile */}
       <div
         {...attributes}
         {...listeners}
-        className="absolute top-2 left-2 p-1.5 bg-background/80 rounded-full cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
-        title="Drag to reorder"
+        className={cn(
+          "absolute top-2 left-2 p-2 sm:p-1.5 bg-background/90 rounded-full cursor-grab active:cursor-grabbing transition-all",
+          "opacity-100 sm:opacity-0 sm:group-hover:opacity-100",
+          "touch-none select-none"
+        )}
+        title="Hold and drag to reorder"
       >
-        <GripVertical className="h-4 w-4 text-foreground" />
+        <GripVertical className="h-5 w-5 sm:h-4 sm:w-4 text-foreground" />
       </div>
       
-      {/* Remove button */}
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      {/* Remove button - larger touch target on mobile */}
+      <div className="absolute top-2 right-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
         <button
           type="button"
           onClick={onRemove}
-          className="p-1.5 bg-destructive text-destructive-foreground rounded-full"
+          className="p-2 sm:p-1.5 bg-destructive text-destructive-foreground rounded-full"
           title="Remove photo"
         >
-          <X className="h-4 w-4" />
+          <X className="h-5 w-5 sm:h-4 sm:w-4" />
         </button>
       </div>
       
-      {/* Cover badge or Set as Cover button */}
+      {/* Cover badge or Set as Cover button - larger touch target on mobile */}
       {isCover ? (
-        <span className="absolute bottom-2 left-2 px-2 py-1 bg-christmas text-white text-xs rounded font-medium">
+        <span className="absolute bottom-2 left-2 px-3 py-1.5 sm:px-2 sm:py-1 bg-christmas text-white text-sm sm:text-xs rounded font-medium">
           Cover
         </span>
       ) : (
         <button
           type="button"
           onClick={onSetAsCover}
-          className="absolute bottom-2 left-2 px-2 py-1 bg-background/90 hover:bg-christmas hover:text-white text-xs rounded font-medium flex items-center gap-1 transition-colors opacity-0 group-hover:opacity-100"
+          className={cn(
+            "absolute bottom-2 left-2 px-3 py-1.5 sm:px-2 sm:py-1 bg-background/90 hover:bg-christmas hover:text-white",
+            "text-sm sm:text-xs rounded font-medium flex items-center gap-1.5 sm:gap-1 transition-colors",
+            "opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+          )}
         >
-          <ImageIcon className="h-3 w-3" />
+          <ImageIcon className="h-4 w-4 sm:h-3 sm:w-3" />
           Set as Cover
         </button>
       )}
@@ -114,6 +123,12 @@ export function SortablePhotoGrid({
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 8,
       },
     }),
     useSensor(KeyboardSensor, {

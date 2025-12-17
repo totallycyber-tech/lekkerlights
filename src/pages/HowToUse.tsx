@@ -384,6 +384,11 @@ export default function HowToUse() {
                         </div>
                       </li>
                     </ul>
+                    <div className="bg-christmas/10 rounded-lg p-3 mt-3">
+                      <p className="text-sm text-christmas font-medium">
+                        💡 <strong>Photo Management:</strong> When editing your listing, you can drag photos to reorder them, click "Set as Cover" on any photo to make it your main image, or remove photos you no longer want. On mobile, hold and drag to reorder.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -782,6 +787,24 @@ export default function HowToUse() {
                       one cover photo (the main image on your listing card) and up to 15 additional photos. 
                       <strong className="text-christmas"> For best results, upload high quality photos taken in the evening when your lights are on!</strong> Visitors 
                       can click on any photo to view it full-size and browse through your gallery using navigation arrows.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="photo-management" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      How do I reorder my photos or change my cover photo?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      When editing your listing, you have full control over your photo gallery:
+                      <ul className="list-disc list-inside mt-2 space-y-1">
+                        <li><strong>Drag to reorder</strong> – Use the grip handle (⋮⋮) on any photo to drag and drop it to a new position. On mobile, hold the handle briefly then drag.</li>
+                        <li><strong>Set as Cover</strong> – Click the "Set as Cover" button on any additional photo to make it your main cover image. The first photo in your gallery is always the cover.</li>
+                        <li><strong>Remove photos</strong> – Click the X button on any photo to remove it from your listing.</li>
+                      </ul>
+                      <p className="mt-2">
+                        These controls are available on both desktop (hover to reveal) and mobile (always visible). 
+                        Changes take effect when you save your listing.
+                      </p>
                     </AccordionContent>
                   </AccordionItem>
 

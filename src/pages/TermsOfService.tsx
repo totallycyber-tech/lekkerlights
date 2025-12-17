@@ -69,7 +69,7 @@ export default function TermsOfService() {
                 <li>Visitor limits or guidance (such as maximum visitors at a time or "no buses")</li>
                 <li>Access instructions and gate/complex rules (such as security gate procedures, ID or licence requirements, dial-in codes, or calling ahead)</li>
                 <li>Tags that describe your display (for example, KidFriendly, Walkthrough, Synced)</li>
-                <li>Photos and other images you upload directly to the Service (high quality photos taken in the evening when lights are on are recommended) – you can upload 1 cover photo and up to 15 additional photos per listing; thumbnails appear on your listing card in Grid View</li>
+                <li>Photos and other images you upload directly to the Service (high quality photos taken in the evening when lights are on are recommended) – you can upload 1 cover photo and up to 15 additional photos per listing; thumbnails appear on your listing card in Grid View; when editing, you can drag photos to reorder them or click "Set as Cover" on any photo to change your main image</li>
                 <li>Links to external videos (for example, YouTube) – videos must be uploaded to YouTube first, then the sharing link pasted into your listing; video thumbnails with play button overlays appear on your listing card, and videos are embedded in a "Videos" section on your listing detail page</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
