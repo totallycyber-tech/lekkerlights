@@ -127,9 +127,17 @@ const handler = async (req: Request): Promise<Response> => {
 
       const listingTitles = listings?.map(l => {
         const displayName = l.title || `${l.street_number} ${l.street_name}, ${l.suburb}`;
-        const notesText = l.submitter_notes ? ` <span style="color: #0369a1; font-size: 12px;">(${escapeHtml(l.submitter_notes)})</span>` : '';
-        return `• ${escapeHtml(displayName)}${notesText}`;
+        return `• ${escapeHtml(displayName)}`;
       }).join("<br>") || "Your listings";
+      
+      // Get shared notes from first listing (all listings in batch share the same notes)
+      const sharedNotes = listings?.[0]?.submitter_notes;
+      const notesSection = sharedNotes 
+        ? `<div style="background: #e0f2fe; padding: 12px; border-radius: 6px; margin: 12px 0;">
+             <p style="color: #0369a1; margin: 0; font-size: 14px;"><strong>Your Notes:</strong> ${escapeHtml(sharedNotes)}</p>
+           </div>`
+        : '';
+      
       const editLink = `${siteUrl}/edit-batch/${token.batch_id}?token=${newToken}`;
 
       await fetch("https://api.resend.com/emails", {
@@ -150,6 +158,7 @@ const handler = async (req: Request): Promise<Response> => {
               <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 20px 0;">
                 ${listingTitles}
               </div>
+              ${notesSection}
               <div style="background: #fef3c7; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
                 <p style="color: #92400e; font-weight: bold; margin: 0 0 8px;">⏰ This link expires in 1 hour</p>
                 <p style="color: #92400e; margin: 0; font-size: 14px;">
