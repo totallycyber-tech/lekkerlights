@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect, useCallback, useRef } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
@@ -8,6 +8,7 @@ import { SuburbChips } from "@/components/SuburbChips";
 import { ListingCard } from "@/components/ListingCard";
 import { ListingsMap } from "@/components/ListingsMap";
 import { MapListingDetail } from "@/components/MapListingDetail";
+import { TourPanel } from "@/components/TourPanel";
 import { Button } from "@/components/ui/button";
 import { mockListings, transformDbListing, Listing } from "@/data/mockListings";
 import { Sparkles, Heart, Loader2, LayoutGrid, Map, RefreshCw, MousePointerClick } from "lucide-react";
@@ -15,6 +16,7 @@ import { useFavorites } from "@/hooks/use-favorites";
 import { usePopularity } from "@/hooks/use-popularity";
 import { useListings } from "@/hooks/use-listings";
 import { useReviewStats } from "@/hooks/use-reviews";
+import { useTour } from "@/hooks/use-tour";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 
@@ -36,6 +38,24 @@ export default function Browse() {
   const [selectedMapListing, setSelectedMapListing] = useState<Listing | null>(null);
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  
+  // Tour functionality
+  const {
+    tourListings,
+    tourCount,
+    maxStops,
+    isFull: tourIsFull,
+    addToTour,
+    removeFromTour,
+    clearTour,
+    isInTour,
+    reorderTour,
+    optimizeRoute,
+    generateGoogleMapsUrl,
+    generateShareUrl,
+    loadTourFromIds,
+  } = useTour();
 
   // Refresh map handler
   const handleRefreshMap = useCallback(() => {
@@ -159,6 +179,19 @@ export default function Browse() {
     setSearchPerformed(true);
   }, []);
 
+  // Load tour from URL params (for shared tour links)
+  useEffect(() => {
+    const tourIds = searchParams.get("tour");
+    if (tourIds && allListings.length > 0) {
+      const ids = tourIds.split(",").filter(Boolean);
+      if (ids.length > 0) {
+        loadTourFromIds(ids, allListings);
+        // Switch to map view when loading a shared tour
+        setViewMode("map");
+      }
+    }
+  }, [searchParams, allListings, loadTourFromIds]);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -275,6 +308,20 @@ export default function Browse() {
                 </Button>
               )}
               
+              {/* Tour Panel - only shown in map view */}
+              {viewMode === "map" && (
+                <TourPanel
+                  tourListings={tourListings}
+                  maxStops={maxStops}
+                  onRemove={removeFromTour}
+                  onClear={clearTour}
+                  onReorder={reorderTour}
+                  onOptimize={optimizeRoute}
+                  generateGoogleMapsUrl={generateGoogleMapsUrl}
+                  generateShareUrl={generateShareUrl}
+                />
+              )}
+              
               {/* Favourites Filter */}
               <Button
                 variant={showFavoritesOnly ? 'default' : 'outline'}
@@ -325,6 +372,10 @@ export default function Browse() {
                   onDirectionsClick={trackDirectionsClick}
                   onClose={() => setSelectedMapListing(null)}
                   reviewStats={reviewStats?.[selectedMapListing.id] || null}
+                  isInTour={isInTour(selectedMapListing.id)}
+                  tourIsFull={tourIsFull}
+                  onAddToTour={() => addToTour(selectedMapListing)}
+                  onRemoveFromTour={() => removeFromTour(selectedMapListing.id)}
                 />
               )}
             </div>

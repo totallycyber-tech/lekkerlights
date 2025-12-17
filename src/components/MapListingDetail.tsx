@@ -7,6 +7,7 @@ import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { ReportListingDialog } from "@/components/ReportListingDialog";
+import { AddToTourButton } from "@/components/AddToTourButton";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 interface MapListingDetailProps {
@@ -17,6 +18,10 @@ interface MapListingDetailProps {
   onDirectionsClick: (listingId: string) => void;
   onClose: () => void;
   reviewStats?: { average_rating: number; review_count: number } | null;
+  isInTour?: boolean;
+  tourIsFull?: boolean;
+  onAddToTour?: () => void;
+  onRemoveFromTour?: () => void;
 }
 
 export function MapListingDetail({
@@ -27,6 +32,10 @@ export function MapListingDetail({
   onDirectionsClick,
   onClose,
   reviewStats,
+  isInTour = false,
+  tourIsFull = false,
+  onAddToTour,
+  onRemoveFromTour,
 }: MapListingDetailProps) {
   const getDirectionsUrl = () => {
     const address = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}, ${listing.location.postalCode}`;
@@ -196,6 +205,17 @@ export function MapListingDetail({
                 <Heart className={cn("h-4 w-4 mr-1.5", isFavorite && "fill-current")} />
                 {isFavorite ? "Favourited" : "Favourite"}
               </Button>
+
+              {/* Add to Tour Button */}
+              {onAddToTour && onRemoveFromTour && (
+                <AddToTourButton
+                  isInTour={isInTour}
+                  isFull={tourIsFull}
+                  onAdd={onAddToTour}
+                  onRemove={onRemoveFromTour}
+                  listingTitle={listing.title}
+                />
+              )}
 
               <Button
                 size="sm"
