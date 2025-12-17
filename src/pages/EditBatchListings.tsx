@@ -13,6 +13,7 @@ import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
 import { YouTubePreview } from "@/components/YouTubePreview";
 import { TagSelector } from "@/components/TagSelector";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { SortablePhotoGrid } from "@/components/SortablePhotoGrid";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,8 +45,7 @@ import {
   Mail,
   Phone,
   Wand2,
-  FileText,
-  ImageIcon
+  FileText
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -1048,60 +1048,42 @@ export default function EditBatchListings() {
                               <div className="space-y-3">
                                 <div>
                                   <Label className="text-sm font-medium">Current Photos</Label>
-                                  <p className="text-xs text-muted-foreground mt-1">Click X to remove, or click "Set as Cover" to make any photo your cover</p>
+                                  <p className="text-xs text-muted-foreground mt-1">Drag to reorder, click X to remove, or "Set as Cover" to change cover</p>
                                 </div>
-                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                                  {state.existingImages.filter(url => url !== '').map((url, displayIndex) => {
-                                    // Find actual index in original array for removal
-                                    const actualIndex = state.existingImages.indexOf(url);
-                                    const isCover = actualIndex === 0;
-                                    return (
-                                      <div key={actualIndex} className="relative aspect-square rounded-lg overflow-hidden group">
-                                        <img src={url} alt={`Photo ${displayIndex + 1}`} className="w-full h-full object-cover" />
-                                        <button
-                                          type="button"
-                                          onClick={() => handleRemoveExistingImage(listing.id, actualIndex)}
-                                          className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </button>
-                                        {isCover ? (
-                                          <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-christmas text-white text-[10px] rounded">
-                                            Cover
-                                          </span>
-                                        ) : (
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              setMediaState(prev => {
-                                                const currentState = prev[listing.id];
-                                                if (!currentState) return prev;
-                                                const newImages = [...currentState.existingImages];
-                                                const [removed] = newImages.splice(actualIndex, 1);
-                                                newImages.unshift(removed);
-                                                return {
-                                                  ...prev,
-                                                  [listing.id]: {
-                                                    ...currentState,
-                                                    existingImages: newImages,
-                                                  },
-                                                };
-                                              });
-                                              toast({
-                                                title: "Cover photo updated",
-                                                description: "This photo will be used as your cover image.",
-                                              });
-                                            }}
-                                            className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-background/80 text-foreground text-[10px] rounded flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
-                                          >
-                                            <ImageIcon className="h-2.5 w-2.5" />
-                                            Set as Cover
-                                          </button>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
+                                <SortablePhotoGrid
+                                  images={state.existingImages}
+                                  onImagesChange={(newImages) => {
+                                    setMediaState(prev => ({
+                                      ...prev,
+                                      [listing.id]: {
+                                        ...prev[listing.id],
+                                        existingImages: newImages,
+                                      },
+                                    }));
+                                  }}
+                                  onRemoveImage={(index) => handleRemoveExistingImage(listing.id, index)}
+                                  onSetAsCover={(index) => {
+                                    setMediaState(prev => {
+                                      const currentState = prev[listing.id];
+                                      if (!currentState) return prev;
+                                      const newImages = [...currentState.existingImages];
+                                      const [removed] = newImages.splice(index, 1);
+                                      newImages.unshift(removed);
+                                      return {
+                                        ...prev,
+                                        [listing.id]: {
+                                          ...currentState,
+                                          existingImages: newImages,
+                                        },
+                                      };
+                                    });
+                                    toast({
+                                      title: "Cover photo updated",
+                                      description: "This photo will be used as your cover image.",
+                                    });
+                                  }}
+                                  compact
+                                />
                               </div>
                             )}
 
