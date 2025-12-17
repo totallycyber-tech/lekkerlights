@@ -155,14 +155,10 @@ export default function EditListing() {
           return;
         }
 
-        // Fetch listing data (without edit_token - that's in secure table)
-        const { data: listing, error } = await supabase
-          .from('listings')
-          .select('*')
-          .eq('id', id)
-          .maybeSingle();
+        // Get listing data from the verify response (returned by edge function with service_role)
+        const listing = verifyResponse.data.listing;
 
-        if (error || !listing) {
+        if (!listing) {
           toast({
             title: "Error",
             description: "Failed to load listing data.",
