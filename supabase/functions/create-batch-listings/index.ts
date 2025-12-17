@@ -24,6 +24,7 @@ interface ListingData {
   parkingInfo?: string;
   maxVisitors?: number;
   gateAccessInfo?: string;
+  submitterNotes?: string;
 }
 
 interface CreateBatchRequest {
@@ -95,7 +96,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Generate batch_id
     const batchId = crypto.randomUUID();
-    const createdListings: { id: string; title: string }[] = [];
+    const createdListings: { id: string; title: string; submitterNotes?: string }[] = [];
 
     // Check for duplicate addresses
     for (const listing of listings) {
@@ -139,6 +140,7 @@ const handler = async (req: Request): Promise<Response> => {
           parking_info: listing.parkingInfo || null,
           max_visitors: listing.maxVisitors || null,
           gate_access_info: listing.gateAccessInfo || null,
+          submitter_notes: listing.submitterNotes || null,
           contact_email: contactEmail.trim(),
           contact_name: contactName || null,
           contact_phone: contactPhone || null,
@@ -159,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
         );
       }
 
-      createdListings.push({ id: newListing.id, title: newListing.title || `${listing.streetNumber} ${listing.streetName}` });
+      createdListings.push({ id: newListing.id, title: newListing.title || `${listing.streetNumber} ${listing.streetName}`, submitterNotes: listing.submitterNotes });
 
       // Geocode the address
       try {
@@ -218,7 +220,10 @@ const handler = async (req: Request): Promise<Response> => {
     const siteUrl = Deno.env.get("SITE_URL") || "https://lekkerlights.co.za";
     const editLink = `${siteUrl}/edit-batch/${batchId}?token=${tokenData.edit_token}`;
     
-    const listingTitles = createdListings.map(l => `• ${escapeHtml(l.title)}`).join("<br>");
+    const listingTitles = createdListings.map(l => {
+      const notesText = l.submitterNotes ? ` <span style="color: #0369a1; font-size: 12px;">(${escapeHtml(l.submitterNotes)})</span>` : '';
+      return `• ${escapeHtml(l.title)}${notesText}`;
+    }).join("<br>");
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",

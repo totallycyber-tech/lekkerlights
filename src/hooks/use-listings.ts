@@ -75,6 +75,7 @@ export interface ListingInsert {
   operating_hours?: Record<string, { enabled: boolean; startTime: string; endTime: string }> | { other: string };
   tags?: string[];
   has_cover_photo?: boolean;
+  submitter_notes?: string | null;
 }
 
 export function useListings() {

@@ -99,6 +99,7 @@ export default function CreateListing() {
     parkingInfo: '',
     maxVisitors: '',
     gateAccessInfo: '',
+    submitterNotes: '',
   });
 
   const handleBulkSubmit = async (listings: any[], sharedData: {
@@ -133,6 +134,7 @@ export default function CreateListing() {
         parkingInfo: l.parkingInfo || undefined,
         maxVisitors: l.maxVisitors ? parseInt(l.maxVisitors) : undefined,
         gateAccessInfo: l.gateAccessInfo || undefined,
+        submitterNotes: l.submitterNotes || undefined,
       }));
 
       // Create listings first
@@ -425,6 +427,7 @@ export default function CreateListing() {
           : { other: operatingHoursOther },
         tags: selectedTags,
         has_cover_photo: !!coverPhoto,
+        submitter_notes: formData.submitterNotes || null,
       });
 
       // Geocode the address to get lat/lng coordinates
@@ -478,7 +481,8 @@ export default function CreateListing() {
           body: {
             listingId: listing.id,
             email: formData.contactEmail.trim(),
-            listingTitle: formData.title,
+            listingTitle: formData.title || `${formData.streetNumber} ${formData.streetName}, ${formData.suburb}`,
+            submitterNotes: formData.submitterNotes || null,
           },
         });
       } catch (emailError) {
@@ -1153,6 +1157,29 @@ export default function CreateListing() {
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Private Notes */}
+              <div className="bg-card rounded-xl border border-border p-6 space-y-6">
+                <div>
+                  <h2 className="font-display text-xl font-semibold flex items-center gap-2">
+                    <Eye className="h-5 w-5 text-muted-foreground" />
+                    Private Notes (Optional)
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Add notes to help you identify this listing in your edit link emails. These notes are private and will not be shown publicly.
+                  </p>
+                </div>
+                <Textarea
+                  value={formData.submitterNotes}
+                  onChange={(e) => handleChange('submitterNotes', e.target.value)}
+                  placeholder="e.g., 'My house', 'Neighbor on Oak Street', 'The big display with inflatables'..."
+                  className="bg-secondary min-h-[80px]"
+                  maxLength={200}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {formData.submitterNotes.length}/200 characters
+                </p>
               </div>
 
               {/* Submit */}
