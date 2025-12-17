@@ -68,13 +68,6 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "listing_edit_tokens_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: true
-            referencedRelation: "listings_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       listing_revisions: {
@@ -215,6 +208,108 @@ export type Database = {
         }
         Relationships: []
       }
+      listings_public_data: {
+        Row: {
+          city: string | null
+          complex_name: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string | null
+          directions_clicks: number | null
+          email_visible: boolean | null
+          favorites_count: number | null
+          gate_access_info: string | null
+          has_cover_photo: boolean | null
+          id: string
+          image_urls: string[] | null
+          lat: number | null
+          lng: number | null
+          max_visitors: number | null
+          name_visible: boolean | null
+          operating_hours: Json | null
+          parking_info: string | null
+          phone_visible: boolean | null
+          postal_code: string | null
+          province: string | null
+          street_name: string | null
+          street_number: string | null
+          suburb: string | null
+          tags: string[] | null
+          title: string | null
+          unit_no: string | null
+          updated_at: string | null
+          youtube_urls: string[] | null
+        }
+        Insert: {
+          city?: string | null
+          complex_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          directions_clicks?: number | null
+          email_visible?: boolean | null
+          favorites_count?: number | null
+          gate_access_info?: string | null
+          has_cover_photo?: boolean | null
+          id: string
+          image_urls?: string[] | null
+          lat?: number | null
+          lng?: number | null
+          max_visitors?: number | null
+          name_visible?: boolean | null
+          operating_hours?: Json | null
+          parking_info?: string | null
+          phone_visible?: boolean | null
+          postal_code?: string | null
+          province?: string | null
+          street_name?: string | null
+          street_number?: string | null
+          suburb?: string | null
+          tags?: string[] | null
+          title?: string | null
+          unit_no?: string | null
+          updated_at?: string | null
+          youtube_urls?: string[] | null
+        }
+        Update: {
+          city?: string | null
+          complex_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          directions_clicks?: number | null
+          email_visible?: boolean | null
+          favorites_count?: number | null
+          gate_access_info?: string | null
+          has_cover_photo?: boolean | null
+          id?: string
+          image_urls?: string[] | null
+          lat?: number | null
+          lng?: number | null
+          max_visitors?: number | null
+          name_visible?: boolean | null
+          operating_hours?: Json | null
+          parking_info?: string | null
+          phone_visible?: boolean | null
+          postal_code?: string | null
+          province?: string | null
+          street_name?: string | null
+          street_number?: string | null
+          suburb?: string | null
+          tags?: string[] | null
+          title?: string | null
+          unit_no?: string | null
+          updated_at?: string | null
+          youtube_urls?: string[] | null
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           comment: string | null
@@ -249,13 +344,6 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings_public"
             referencedColumns: ["id"]
           },
         ]
@@ -299,9 +387,9 @@ export type Database = {
         Insert: {
           city?: string | null
           complex_name?: string | null
-          contact_email?: never
-          contact_name?: never
-          contact_phone?: never
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           description?: string | null
           directions_clicks?: number | null
@@ -332,9 +420,9 @@ export type Database = {
         Update: {
           city?: string | null
           complex_name?: string | null
-          contact_email?: never
-          contact_name?: never
-          contact_phone?: never
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           description?: string | null
           directions_clicks?: number | null
