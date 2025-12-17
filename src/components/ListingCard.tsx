@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera, Eye, Youtube, Play, Route, Check } from "lucide-react";
 import { Listing } from "@/data/mockListings";
@@ -43,9 +43,20 @@ export function ListingCard({
   onAddToTour,
   onRemoveFromTour,
 }: ListingCardProps) {
+  const navigate = useNavigate();
+
   const getDirectionsUrl = () => {
     const address = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}, ${listing.location.postalCode}`;
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on interactive elements
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('a') || target.closest('[role="dialog"]')) {
+      return;
+    }
+    navigate(`/listing/${listing.id}`);
   };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -105,10 +116,10 @@ export function ListingCard({
   };
 
   return (
-    <Link 
-      to={`/listing/${listing.id}`}
+    <div 
+      onClick={handleCardClick}
       className={cn(
-        "group block bg-card rounded-xl overflow-hidden border border-border",
+        "group block bg-card rounded-xl overflow-hidden border border-border cursor-pointer",
         "transition-all duration-300 hover:border-christmas/50 card-glow",
         className
       )}
@@ -400,7 +411,7 @@ export function ListingCard({
             <ExternalLink className="h-4 w-4" aria-hidden="true" />
             Get Directions
           </a>
-          <div onClick={(e) => e.preventDefault()}>
+          <div onClick={(e) => e.stopPropagation()}>
             <ReportListingDialog
               listingId={listing.id}
               listingTitle={listing.title}
@@ -417,6 +428,6 @@ export function ListingCard({
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
