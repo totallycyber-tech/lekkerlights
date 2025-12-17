@@ -9,6 +9,8 @@ export interface Listing {
     city: string;
     province: string;
     postalCode: string;
+    complexName?: string | null;
+    unitNo?: string | null;
     lat: number;
     lng: number;
   };
@@ -39,6 +41,8 @@ type DbListingInput = {
   city: string;
   province: string;
   postal_code: string;
+  complex_name?: string | null;
+  unit_no?: string | null;
   lat: number | null;
   lng: number | null;
   image_urls: string[];
@@ -99,6 +103,8 @@ export function transformDbListing(dbListing: DbListingInput): Listing {
       city: dbListing.city,
       province: dbListing.province,
       postalCode: dbListing.postal_code,
+      complexName: dbListing.complex_name,
+      unitNo: dbListing.unit_no,
       lat: dbListing.lat || 0,
       lng: dbListing.lng || 0,
     },

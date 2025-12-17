@@ -52,16 +52,24 @@ export function MapListingDetail({
     });
   };
 
+  const streetAddress = `${listing.location.streetNumber} ${listing.location.streetName}${listing.location.complexName ? `, ${listing.location.complexName}` : ''}${listing.location.unitNo ? ` Unit ${listing.location.unitNo}` : ''}`;
+
   return (
     <Card className="border-christmas/30 bg-card/95 backdrop-blur-sm animate-in slide-in-from-bottom-4 duration-300">
       <CardContent className="p-4">
-        {/* Close Button */}
-        <div className="flex justify-end mb-2">
+        {/* Header with Street Address and Close Button */}
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <MapPin className="h-4 w-4 text-christmas shrink-0" />
+            <h2 className="font-semibold text-base truncate" title={streetAddress}>
+              {streetAddress}
+            </h2>
+          </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="h-8 w-8 p-0"
+            className="h-8 w-8 p-0 shrink-0"
             aria-label="Close listing details"
           >
             <X className="h-4 w-4" />
