@@ -77,6 +77,33 @@ export type Database = {
           },
         ]
       }
+      listing_revisions: {
+        Row: {
+          changed_at: string
+          changed_fields: string[]
+          changes_summary: string
+          id: string
+          listing_id: string
+          revision: number
+        }
+        Insert: {
+          changed_at?: string
+          changed_fields?: string[]
+          changes_summary: string
+          id?: string
+          listing_id: string
+          revision: number
+        }
+        Update: {
+          changed_at?: string
+          changed_fields?: string[]
+          changes_summary?: string
+          id?: string
+          listing_id?: string
+          revision?: number
+        }
+        Relationships: []
+      }
       listings: {
         Row: {
           batch_id: string | null
@@ -103,6 +130,7 @@ export type Database = {
           phone_visible: boolean
           postal_code: string
           province: string
+          revision: number
           street_name: string
           street_number: string
           submitter_notes: string | null
@@ -138,6 +166,7 @@ export type Database = {
           phone_visible?: boolean
           postal_code: string
           province: string
+          revision?: number
           street_name: string
           street_number: string
           submitter_notes?: string | null
@@ -173,6 +202,7 @@ export type Database = {
           phone_visible?: boolean
           postal_code?: string
           province?: string
+          revision?: number
           street_name?: string
           street_number?: string
           submitter_notes?: string | null

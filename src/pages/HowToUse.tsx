@@ -806,6 +806,24 @@ export default function HowToUse() {
                       and are never displayed publicly on the website. This is especially useful if you've submitted multiple 
                       listings (single or bulk) and want to easily identify which listing is which when you receive edit links. 
                       For example, you might note "Grandma's house on Main Street" or "Neighbour's display with the big Santa".
+                      You can <strong>edit your private notes</strong> at any time using your edit link.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="revision-history" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      What is revision history?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      Every time you make changes to your listing, a new revision is created. On the edit page, you can see:
+                      <ul className="list-disc list-inside mt-2 space-y-1">
+                        <li><strong>Current version number</strong> – Shows which revision you're on (e.g., v3)</li>
+                        <li><strong>Change history</strong> – A list of previous changes with what was updated and when</li>
+                      </ul>
+                      <p className="mt-2">
+                        This helps you track what changes you've made over time and when they were made. Revision history 
+                        is private and only visible when editing your listing.
+                      </p>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
