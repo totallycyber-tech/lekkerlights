@@ -112,6 +112,10 @@ export default function HowToUse() {
                         <span><strong>Suburb</strong> – Type a suburb name to search in that area</span>
                       </li>
                       <li className="flex items-center gap-2">
+                        <Eye className="h-4 w-4 text-primary" />
+                        <span><strong>Street Address</strong> – Search by exact street address (e.g., "11 Eland Street")</span>
+                      </li>
+                      <li className="flex items-center gap-2">
                         <Filter className="h-4 w-4 text-primary" />
                         <span><strong>Suburb Chips</strong> – Use the quick-filter suburb chips below the search filters to instantly filter by popular suburbs. Each chip shows the number of displays in that area.</span>
                       </li>
@@ -176,6 +180,10 @@ export default function HowToUse() {
                       <li className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-primary" />
                         <span>Address and directions</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Eye className="h-4 w-4 text-primary" />
+                        <span><strong>Quick address reveal</strong> – hover over (or tap on mobile) the "Address" button on any listing card to see the exact street address without opening the full listing</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-primary" />
@@ -562,9 +570,27 @@ export default function HowToUse() {
                     <AccordionContent className="text-muted-foreground pb-4">
                       On the Browse Displays page, click the "Map" button next to the "Grid" button to switch to Map View. 
                       You'll see all displays as Christmas tree markers on an interactive map of South Africa. Click on any 
-                      marker to view the display details in a panel below the map – from there you can favourite, get directions, 
+                      marker to view the display details in a panel below the map – the street address is shown as a title 
+                      at the top of the panel for easy identification. From there you can favourite, get directions, 
                       or view the full listing. Use the "Refresh" button to reload the latest displays. All your filters 
-                      (province, suburb, tags) also apply to the map view.
+                      (province, suburb, tags, and street address) also apply to the map view.
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="view-street-address" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      How do I see the exact street address of a display?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      <strong>In Grid View:</strong> Each listing card shows the suburb and city. To see the exact street address, 
+                      hover over (or tap on mobile) the small "Address" button with the eye icon next to the location. 
+                      A tooltip will appear showing the full street address including any complex name or unit number.
+                      <br /><br />
+                      <strong>In Map View:</strong> When you click on a marker, the display details panel appears below the map 
+                      with the full street address shown as the title at the top for easy identification.
+                      <br /><br />
+                      <strong>Search by Address:</strong> You can also search for a specific address using the "Street Address" 
+                      filter in the Filters panel. Enter the street number and name (e.g., "11 Eland Street") to find a specific display.
                     </AccordionContent>
                   </AccordionItem>
 

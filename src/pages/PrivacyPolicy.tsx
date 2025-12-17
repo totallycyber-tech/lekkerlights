@@ -137,7 +137,12 @@ export default function PrivacyPolicy() {
                 <li>Understand how the Service is used</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-2">
-                The suburb chip selections allow you to quickly filter displays by clicking on suburb names. Your filter preferences, including any selected suburb chips, may be stored locally to improve your browsing experience. You may disable cookies in your browser settings, but some features of the Service may not function properly if you do so.
+                The suburb chip selections allow you to quickly filter displays by clicking on suburb names. Your filter preferences, including any selected suburb chips and street address searches, may be stored locally to improve your browsing experience. You may disable cookies in your browser settings, but some features of the Service may not function properly if you do so.
+              </p>
+
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.4 Street Address Display</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Street addresses of listed properties are displayed publicly on the Service to enable visitors to locate and visit displays. In Grid View, visitors can reveal the exact street address by hovering over (or tapping on mobile) the "Address" button on listing cards. In Map View, the full street address is shown as a title when a listing is selected. Visitors can also search for displays by street address using the search filters. By listing a property, you consent to the public display of its street address in these ways.
               </p>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.4 Third-Party Services and Google Maps</h3>

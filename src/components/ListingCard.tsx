@@ -1,10 +1,17 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera, Eye } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { ReportListingDialog } from "@/components/ReportListingDialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 interface ListingCardProps {
@@ -224,12 +231,36 @@ export function ListingCard({
           </p>
         )}
 
-        {/* Location */}
+        {/* Location with Street Address Reveal */}
         <div className="flex items-start gap-2 text-sm">
           <MapPin className="h-4 w-4 text-christmas shrink-0 mt-0.5" aria-hidden="true" />
-          <span className="text-muted-foreground">
+          <span className="text-muted-foreground flex items-center gap-1.5 flex-wrap">
             <span className="sr-only">Location: </span>
             {listing.location.suburb}, {listing.location.city}
+            <TooltipProvider delayDuration={100}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    className="inline-flex items-center gap-1 text-xs text-christmas hover:text-christmas/80 transition-colors bg-christmas/10 hover:bg-christmas/20 rounded px-1.5 py-0.5"
+                    aria-label="View street address"
+                  >
+                    <Eye className="h-3 w-3" aria-hidden="true" />
+                    <span className="hidden sm:inline">Address</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-xs">
+                  <p className="font-medium text-sm">
+                    {listing.location.streetNumber} {listing.location.streetName}
+                    {listing.location.complexName && `, ${listing.location.complexName}`}
+                    {listing.location.unitNo && ` Unit ${listing.location.unitNo}`}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </span>
         </div>
 
