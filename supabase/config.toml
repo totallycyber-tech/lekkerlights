@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.batch-geocode]
 verify_jwt = false
+
+[functions.create-single-listing]
+verify_jwt = false

@@ -21,7 +21,7 @@ import { Sparkles, ArrowLeft, Check, Youtube, Plus, X, Link as LinkIcon, Tags, E
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
-import { useCreateListing } from "@/hooks/use-listings";
+// useCreateListing removed - now using create-single-listing edge function
 import { useImageUpload } from "@/hooks/use-image-upload";
 import { supabase } from "@/integrations/supabase/client";
 import { ImageUploader } from "@/components/ImageUploader";
@@ -59,7 +59,7 @@ type ListingMode = "single" | "bulk";
 
 export default function CreateListing() {
   const navigate = useNavigate();
-  const createListing = useCreateListing();
+  // Using create-single-listing edge function instead of hook
   const { progress: uploadProgress, uploadImages, resetProgress, isUploading } = useImageUpload();
   const [mode, setMode] = useState<ListingMode>("single");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -380,94 +380,65 @@ export default function CreateListing() {
       return;
     }
 
-    // Check for duplicate address
-    setIsSubmitting(true);
-    setStatusMessage('Checking for duplicate address...');
-    resetProgress();
-    
-    try {
-      const { data: existingListings, error: checkError } = await supabase
-        .from('listings')
-        .select('id, street_number, street_name, suburb, city')
-        .ilike('street_number', formData.streetNumber.trim())
-        .ilike('street_name', formData.streetName.trim())
-        .ilike('suburb', formData.suburb.trim())
-        .ilike('city', formData.city.trim());
-      
-      if (checkError) {
-        console.error('Error checking for duplicate address:', checkError);
-      } else if (existingListings && existingListings.length > 0) {
-        setIsSubmitting(false);
-        setStatusMessage('');
-        toast({
-          title: "Address already listed",
-          description: "This address has already been listed. If this is your listing, you can request an edit link to modify it.",
-          variant: "destructive",
-        });
-        return;
-      }
-    } catch (checkError) {
-      console.error('Error checking for duplicate address:', checkError);
-      // Continue with submission even if check fails
+    // Check if there's already a duplicate detected
+    if (duplicateAddressError) {
+      toast({
+        title: "Address already listed",
+        description: "This address has already been listed. If this is your listing, you can request an edit link to modify it.",
+        variant: "destructive",
+      });
+      return;
     }
 
+    setIsSubmitting(true);
+    setStatusMessage('Creating listing...');
+    resetProgress();
+    
     try {
       // Filter out empty YouTube URLs
       const filteredYoutubeUrls = youtubeUrls.filter(url => url.trim() !== '');
 
-      // First create the listing to get an ID
-      setStatusMessage('Creating listing...');
-      const listing = await createListing.mutateAsync({
-        title: showTitleField ? formData.title : null,
-        description: showDescriptionField ? formData.description : null,
-        complex_name: formData.complexName || null,
-        unit_no: formData.unitNo || null,
-        street_number: formData.streetNumber,
-        street_name: formData.streetName,
-        suburb: formData.suburb,
-        city: formData.city,
-        province: formData.province,
-        postal_code: formData.postalCode,
-        contact_name: formData.contactName || null,
-        contact_email: formData.contactEmail.trim(),
-        contact_phone: formData.contactPhone || null,
-        name_visible: nameVisible,
-        email_visible: emailVisible,
-        phone_visible: phoneVisible,
-        parking_info: formData.parkingInfo || null,
-        max_visitors: formData.maxVisitors ? parseInt(formData.maxVisitors) : null,
-        gate_access_info: formData.gateAccessInfo || null,
-        youtube_urls: filteredYoutubeUrls,
-        image_urls: [],
-        operating_hours: DAYS_OF_WEEK.some(day => operatingHours[day].enabled) 
-          ? operatingHours 
-          : { other: operatingHoursOther },
-        tags: selectedTags,
-        has_cover_photo: !!coverPhoto,
+      // Create the listing via edge function (handles duplicate check, geocoding, and email)
+      const { data, error } = await supabase.functions.invoke('create-single-listing', {
+        body: {
+          title: showTitleField ? formData.title : null,
+          description: showDescriptionField ? formData.description : null,
+          complexName: formData.complexName || null,
+          unitNo: formData.unitNo || null,
+          streetNumber: formData.streetNumber,
+          streetName: formData.streetName,
+          suburb: formData.suburb,
+          city: formData.city,
+          province: formData.province,
+          postalCode: formData.postalCode,
+          contactName: formData.contactName || null,
+          contactEmail: formData.contactEmail.trim(),
+          contactPhone: formData.contactPhone || null,
+          nameVisible: nameVisible,
+          emailVisible: emailVisible,
+          phoneVisible: phoneVisible,
+          parkingInfo: formData.parkingInfo || null,
+          maxVisitors: formData.maxVisitors ? parseInt(formData.maxVisitors) : null,
+          gateAccessInfo: formData.gateAccessInfo || null,
+          youtubeUrls: filteredYoutubeUrls,
+          operatingHours: DAYS_OF_WEEK.some(day => operatingHours[day].enabled) 
+            ? operatingHours 
+            : { other: operatingHoursOther },
+          tags: selectedTags,
+          hasCoverPhoto: !!coverPhoto,
+        },
       });
 
-      // Geocode the address to get lat/lng coordinates
-      setStatusMessage('Getting location coordinates...');
-      try {
-        const fullAddress = [
-          formData.streetNumber,
-          formData.streetName,
-          formData.suburb,
-          formData.city,
-          formData.province,
-          formData.postalCode,
-          'South Africa'
-        ].filter(Boolean).join(', ');
+      if (error) throw error;
+      
+      // Check for application-level errors from edge function
+      if (data && !data.success) {
+        throw new Error(data.error || 'Failed to create listing');
+      }
 
-        await supabase.functions.invoke('geocode-address', {
-          body: {
-            listingId: listing.id,
-            address: fullAddress,
-          },
-        });
-      } catch (geocodeError) {
-        console.error('Failed to geocode address:', geocodeError);
-        // Don't fail the submission, just continue without coordinates
+      const listingId = data?.listingId;
+      if (!listingId) {
+        throw new Error('No listing ID returned');
       }
 
       // Upload images if any (cover photo first, then additional)
@@ -478,32 +449,19 @@ export default function CreateListing() {
       let uploadErrors: string[] = [];
       if (allImages.length > 0) {
         setStatusMessage('Uploading photos...');
-        const { urls: imageUrls, errors } = await uploadImages(allImages, listing.id);
+        const { urls: imageUrls, errors } = await uploadImages(allImages, listingId);
         uploadErrors = errors;
         
         if (imageUrls.length > 0) {
-          // Update listing with image URLs
-          await supabase
-            .from('listings')
-            .update({ image_urls: imageUrls } as any)
-            .eq('id', listing.id);
+          // Update listing with image URLs via edge function
+          await supabase.functions.invoke('update-listing', {
+            body: {
+              listingId: listingId,
+              updates: { image_urls: imageUrls },
+              skipTokenVerification: true,
+            },
+          });
         }
-      }
-
-      // Send edit link email via edge function (which has access to the secure token table)
-      setStatusMessage('Sending edit link to your email...');
-      try {
-        // Create token in secure table first via edge function
-        await supabase.functions.invoke('create-listing-token', {
-          body: {
-            listingId: listing.id,
-            email: formData.contactEmail.trim(),
-            listingTitle: formData.title || `${formData.streetNumber} ${formData.streetName}, ${formData.suburb}`,
-          },
-        });
-      } catch (emailError) {
-        console.error('Failed to send edit link email:', emailError);
-        // Don't fail the whole submission, just warn the user
       }
 
       if (uploadErrors.length > 0) {
@@ -519,11 +477,11 @@ export default function CreateListing() {
       }
 
       navigate('/browse');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating listing:', error);
       toast({
         title: "Error",
-        description: "Failed to publish your listing. Please try again.",
+        description: error.message || "Failed to publish your listing. Please try again.",
         variant: "destructive",
       });
     } finally {
