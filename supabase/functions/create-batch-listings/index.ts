@@ -271,6 +271,7 @@ const handler = async (req: Request): Promise<Response> => {
       JSON.stringify({ 
         success: true, 
         batchId,
+        editToken: tokenData.edit_token,
         listings: createdListings,
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
