@@ -153,7 +153,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       const siteUrl = Deno.env.get('SITE_URL') || 'https://lekkerlights.co.za';
-      editUrl = `${siteUrl}/edit/${listingId}?token=${newToken}`;
+      editUrl = `${siteUrl}/edit-listing/${listingId}?token=${newToken}`;
     }
 
     // Send email in background (don't wait for it)
