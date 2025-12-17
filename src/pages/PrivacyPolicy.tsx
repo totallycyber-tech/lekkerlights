@@ -60,9 +60,8 @@ export default function PrivacyPolicy() {
                 <li>Visitor limits or guidance (such as maximum visitors at a time, "no buses", or group-size preferences)</li>
                 <li>Access instructions and gate/complex rules (for example, security gate procedures, ID or driver's licence requirements, dial-in or intercom codes, calling ahead for access, or estate rules)</li>
                 <li>Tags that describe the display (such as KidFriendly, Walkthrough, Synced, etc.); these are optional but help visitors find relevant listings</li>
-                <li>Photos and other images you upload directly to the Website (we recommend high quality photos taken in the evening when lights are on)</li>
+                <li>Photos and other images you upload directly to the Website (we recommend high quality photos taken in the evening when lights are on) – you can upload 1 cover photo and up to 15 additional photos per listing</li>
                 <li>Links to external media such as YouTube videos (videos must be uploaded to YouTube first, then the sharing link pasted into your listing)</li>
-                <li>Private notes (optional personal comments to help you organize and identify your listings – these are never displayed publicly and only appear in your edit link emails)</li>
                 <li>Revision history (a record of changes made to your listing over time, including timestamps and what fields were modified – this is stored for transparency and is visible only to you when editing)</li>
                 <li>Any additional information you voluntarily include in your submission</li>
               </ul>

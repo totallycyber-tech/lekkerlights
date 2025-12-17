@@ -66,9 +66,8 @@ export default function TermsOfService() {
                 <li>Visitor limits or guidance (such as maximum visitors at a time or "no buses")</li>
                 <li>Access instructions and gate/complex rules (such as security gate procedures, ID or licence requirements, dial-in codes, or calling ahead)</li>
                 <li>Tags that describe your display (for example, KidFriendly, Walkthrough, Synced)</li>
-                <li>Photos and other images you upload directly to the Service (high quality photos taken in the evening when lights are on are recommended)</li>
+                <li>Photos and other images you upload directly to the Service (high quality photos taken in the evening when lights are on are recommended) – you can upload 1 cover photo and up to 15 additional photos per listing</li>
                 <li>Links to external videos (for example, YouTube) – videos must be uploaded to YouTube first, then the sharing link pasted into your listing</li>
-                <li>Private notes (optional personal comments to help you organize your listings – never displayed publicly)</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
                 When you edit your listing, each change creates a new revision with a version number. This revision history helps you track changes over time and is only visible to you on the edit page.
