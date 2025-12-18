@@ -34,7 +34,7 @@ export default function PrivacyPolicy() {
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Website: <a href="https://lekkerlights.co.za" className="text-christmas hover:underline">https://lekkerlights.co.za</a></li>
-                <li>Email: <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a></li>
+                <li>Email: <a href="mailto:lekkerlights.za@gmail.com" className="text-christmas hover:underline">lekkerlights.za@gmail.com</a></li>
               </ul>
             </div>
 
@@ -61,7 +61,7 @@ export default function PrivacyPolicy() {
                 <li>Access instructions and gate/complex rules (for example, security gate procedures, ID or driver's licence requirements, dial-in or intercom codes, calling ahead for access, or estate rules)</li>
                 <li>Tags that describe the display (such as KidFriendly, Walkthrough, Synced, etc.); these are optional but help visitors find relevant listings</li>
                 <li>Photos and other images you upload directly to the Website (we recommend high quality photos taken in the evening when lights are on) – you can upload 1 cover photo and up to 15 additional photos per listing; thumbnails of your photos appear on listing cards in Grid View; when editing, you can drag photos to reorder them or click "Set as Cover" on any photo to make it your main image</li>
-                <li>Links to external media such as YouTube videos (videos must be uploaded to YouTube first, then the sharing link pasted into your listing); YouTube video thumbnails with play button overlays appear on listing cards in Grid View, and videos are embedded in a "Videos" section on your listing detail page</li>
+                <li>Links to external media such as YouTube videos (videos must be uploaded to YouTube first, then the sharing link pasted into your listing); YouTube video thumbnails with play button overlays appear on listing cards in Grid View, and videos are embedded in a "Videos" section on your listing detail page. You may also submit videos to be featured on the official <a href="https://www.youtube.com/@LekkerLights" target="_blank" rel="noopener noreferrer" className="text-christmas hover:underline">Lekker Lights YouTube Channel</a> by emailing <a href="mailto:lekkerlights.za@gmail.com" className="text-christmas hover:underline">lekkerlights.za@gmail.com</a></li>
                 <li>Revision history (a record of changes made to your listing over time, including timestamps and what fields were modified – this is stored for transparency and is visible only to you when editing)</li>
                 <li>Created and updated timestamps – the date and time your listing was created and last updated are displayed publicly on your listing detail page for transparency</li>
                 <li>Any additional information you voluntarily include in your submission</li>
@@ -105,7 +105,7 @@ export default function PrivacyPolicy() {
                 <li>The date and time of the report</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
-                Report information (including your contact details and the content of your report) may be emailed to totallycyber.tech@gmail.com and stored in our systems so that we can investigate and respond to your concern. We may contact you if we need more information about the report.
+                Report information (including your contact details and the content of your report) may be emailed to lekkerlights.za@gmail.com and stored in our systems so that we can investigate and respond to your concern. We may contact you if we need more information about the report.
               </p>
 
               <h4 className="font-display text-lg font-medium text-foreground mt-4 mb-2">d) Communication Data</h4>
@@ -239,7 +239,7 @@ export default function PrivacyPolicy() {
                 <li>Lodge a complaint with the Information Regulator (South Africa) if you believe we are not complying with POPIA.</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
-                To exercise your rights, please contact us at <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a>.
+                To exercise your rights, please contact us at <a href="mailto:lekkerlights.za@gmail.com" className="text-christmas hover:underline">lekkerlights.za@gmail.com</a>.
               </p>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">6.4 Hosts', Reviewers', and Reporters' Responsibilities under POPIA</h3>
@@ -344,7 +344,7 @@ export default function PrivacyPolicy() {
                 <li><strong>Withdrawal of consent:</strong> Where processing is based on consent, you may withdraw your consent at any time.</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
-                To exercise your rights, please contact us at <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a>. We may need to verify your identity before responding to your request.
+                To exercise your rights, please contact us at <a href="mailto:lekkerlights.za@gmail.com" className="text-christmas hover:underline">lekkerlights.za@gmail.com</a>. We may need to verify your identity before responding to your request.
               </p>
             </div>
 
@@ -360,7 +360,7 @@ export default function PrivacyPolicy() {
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Using the "Report Listing" feature on the listing page and selecting "Privacy concern" as the reason;</li>
-                <li>Contacting us directly at <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a> with the address and details of the property.</li>
+                <li>Contacting us directly at <a href="mailto:lekkerlights.za@gmail.com" className="text-christmas hover:underline">lekkerlights.za@gmail.com</a> with the address and details of the property.</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
                 The website developer will review all removal requests and take appropriate action. We aim to process requests within 1-2 business days. We may contact you to verify that you are the legitimate homeowner or occupier before taking action. Please note that only the website developer can remove listings created by others – homeowners cannot self-remove such listings.
@@ -409,7 +409,7 @@ export default function PrivacyPolicy() {
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Website: <a href="https://lekkerlights.co.za" className="text-christmas hover:underline">https://lekkerlights.co.za</a></li>
-                <li>Email: <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a></li>
+                <li>Email: <a href="mailto:lekkerlights.za@gmail.com" className="text-christmas hover:underline">lekkerlights.za@gmail.com</a></li>
               </ul>
             </div>
           </section>

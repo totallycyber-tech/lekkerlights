@@ -34,7 +34,8 @@ import {
   Map,
   MousePointerClick,
   RefreshCw,
-  LayoutGrid
+  LayoutGrid,
+  Youtube
 } from "lucide-react";
 
 export default function HowToUse() {
@@ -824,6 +825,18 @@ export default function HowToUse() {
                       in a dedicated "Videos" section so visitors can watch without leaving the site. On your listing card in Grid View, 
                       video thumbnails will appear with a <strong>red play button</strong> overlay (shown before photo thumbnails), 
                       and a video count badge will show visitors how many videos you've added.</p>
+                      <div className="mt-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
+                        <p className="text-sm text-primary font-medium">🌟 Get featured on our YouTube channel!</p>
+                        <p className="text-sm mt-1">
+                          Want your display video to be featured on the official{" "}
+                          <a href="https://www.youtube.com/@LekkerLights" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
+                            Lekker Lights YouTube Channel
+                          </a>
+                          ? Email your video link or video file to{" "}
+                          <a href="mailto:lekkerlights.za@gmail.com" className="text-primary hover:underline font-medium">lekkerlights.za@gmail.com</a>{" "}
+                          with your listing address!
+                        </p>
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
 
@@ -1069,6 +1082,33 @@ export default function HowToUse() {
                             Make a Donation
                           </Button>
                         </Link>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="youtube-channel" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      Does Lekker Lights have a YouTube channel?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      Yes! We have an official{" "}
+                      <a href="https://www.youtube.com/@LekkerLights" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
+                        Lekker Lights YouTube Channel
+                      </a>{" "}
+                      where we feature the best Christmas light displays from across South Africa. Subscribe to stay 
+                      updated with new videos!
+                      <p className="mt-2">
+                        <strong>Want your display featured?</strong> Email your video link or video file to{" "}
+                        <a href="mailto:lekkerlights.za@gmail.com" className="text-primary hover:underline">lekkerlights.za@gmail.com</a>{" "}
+                        with your listing address and we may feature it on our channel!
+                      </p>
+                      <div className="mt-3">
+                        <a href="https://www.youtube.com/@LekkerLights" target="_blank" rel="noopener noreferrer">
+                          <Button variant="outline" size="sm" className="bg-destructive/10 border-destructive/30 text-destructive hover:bg-destructive/20">
+                            <Youtube className="h-4 w-4 mr-2" />
+                            Subscribe to YouTube
+                          </Button>
+                        </a>
                       </div>
                     </AccordionContent>
                   </AccordionItem>

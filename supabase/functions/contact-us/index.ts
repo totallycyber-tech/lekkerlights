@@ -110,7 +110,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         from: "Lekker Lights Contact <noreply@lekkerlights.co.za>",
-        to: ["totallycyber.tech@gmail.com"],
+        to: ["lekkerlights.za@gmail.com"],
         subject: `💬 Contact Form: Message from ${safeName}`,
         reply_to: email,
         html: `

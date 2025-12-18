@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Sparkles, Heart, Mail } from "lucide-react";
+import { Sparkles, Heart, Mail, Youtube } from "lucide-react";
 import { ContactUsDialog } from "@/components/ContactUsDialog";
 import { Button } from "@/components/ui/button";
 
@@ -7,6 +7,33 @@ export function Footer() {
   return (
     <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-12">
+        {/* YouTube Channel Banner */}
+        <div className="mb-10 p-6 bg-gradient-to-r from-destructive/20 via-destructive/10 to-destructive/20 rounded-xl border border-destructive/30">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-destructive/20 rounded-full">
+                <Youtube className="h-8 w-8 text-destructive" />
+              </div>
+              <div>
+                <h3 className="font-display text-lg font-bold">Follow us on YouTube!</h3>
+                <p className="text-sm text-muted-foreground">
+                  Subscribe for festive display videos from across South Africa
+                </p>
+              </div>
+            </div>
+            <a
+              href="https://www.youtube.com/@LekkerLights"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button size="lg" className="bg-destructive hover:bg-destructive/90 text-white">
+                <Youtube className="h-5 w-5 mr-2" />
+                Subscribe Now
+              </Button>
+            </a>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div className="space-y-4">
