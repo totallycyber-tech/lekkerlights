@@ -654,6 +654,27 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
                       <li>Copy the video's sharing link and paste it below</li>
                     </ol>
                   </div>
+                  <div className="bg-primary/10 rounded-lg p-3 border border-primary/20">
+                    <p className="text-xs text-primary font-medium">
+                      🌟 <strong>Get featured on our YouTube channel!</strong>
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Would you like your video featured on the{" "}
+                      <a 
+                        href="https://www.youtube.com/@LekkerLights" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-primary hover:underline font-medium"
+                      >
+                        Lekker Lights YouTube Channel
+                      </a>
+                      ? Email your video or link to{" "}
+                      <a href="mailto:lekkerlights.za@gmail.com" className="text-primary hover:underline font-medium">
+                        lekkerlights.za@gmail.com
+                      </a>
+                      {" "}with your listing address!
+                    </p>
+                  </div>
                   <div className="space-y-2">
                     {listing.youtubeUrls.map((url, urlIndex) => (
                       <div key={urlIndex} className="flex items-center gap-2">

@@ -885,6 +885,27 @@ export default function CreateListing() {
                     <p className="text-xs text-muted-foreground mb-2">
                       Add YouTube video URLs to showcase your display (up to 3)
                     </p>
+                    <div className="bg-primary/10 rounded-lg p-3 mb-3 border border-primary/20">
+                      <p className="text-xs text-primary font-medium">
+                        🌟 <strong>Get featured on our YouTube channel!</strong>
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Would you like your video to be featured on the official{" "}
+                        <a 
+                          href="https://www.youtube.com/@LekkerLights" 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-primary hover:underline font-medium"
+                        >
+                          Lekker Lights YouTube Channel
+                        </a>
+                        ? Send a link to your video or email your video to{" "}
+                        <a href="mailto:lekkerlights.za@gmail.com" className="text-primary hover:underline font-medium">
+                          lekkerlights.za@gmail.com
+                        </a>
+                        {" "}with your listing address!
+                      </p>
+                    </div>
                     {youtubeUrls.map((url, index) => (
                       <div key={index} className="flex gap-2">
                         <div className="relative flex-1">

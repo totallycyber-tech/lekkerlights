@@ -117,7 +117,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         from: "Lekker Lights Reports <noreply@lekkerlights.co.za>",
-        to: ["totallycyber.tech@gmail.com"],
+        to: ["lekkerlights.za@gmail.com"],
         subject: `🚨 Listing Report: ${safeReason} - ${safeTitle}`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

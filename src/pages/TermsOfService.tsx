@@ -70,7 +70,7 @@ export default function TermsOfService() {
                 <li>Access instructions and gate/complex rules (such as security gate procedures, ID or licence requirements, dial-in codes, or calling ahead)</li>
                 <li>Tags that describe your display (for example, KidFriendly, Walkthrough, Synced)</li>
                 <li>Photos and other images you upload directly to the Service (high quality photos taken in the evening when lights are on are recommended) – you can upload 1 cover photo and up to 15 additional photos per listing; thumbnails appear on your listing card in Grid View; when editing, you can drag photos to reorder them or click "Set as Cover" on any photo to change your main image</li>
-                <li>Links to external videos (for example, YouTube) – videos must be uploaded to YouTube first, then the sharing link pasted into your listing; video thumbnails with play button overlays appear on your listing card, and videos are embedded in a "Videos" section on your listing detail page</li>
+                <li>Links to external videos (for example, YouTube) – videos must be uploaded to YouTube first, then the sharing link pasted into your listing; video thumbnails with play button overlays appear on your listing card, and videos are embedded in a "Videos" section on your listing detail page. You may also submit videos to be featured on the official <a href="https://www.youtube.com/@LekkerLights" target="_blank" rel="noopener noreferrer" className="text-christmas hover:underline">Lekker Lights YouTube Channel</a> by emailing <a href="mailto:lekkerlights.za@gmail.com" className="text-christmas hover:underline">lekkerlights.za@gmail.com</a></li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
                 When you edit your listing, each change creates a new revision with a version number. This revision history helps you track changes over time and is only visible to you on the edit page.
@@ -194,7 +194,7 @@ export default function TermsOfService() {
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Use the "Report Listing" feature on the listing page and select "Privacy concern" or an appropriate reason;</li>
-                <li>Contact us directly at <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a> with details of the property.</li>
+                <li>Contact us directly at <a href="mailto:lekkerlights.za@gmail.com" className="text-christmas hover:underline">lekkerlights.za@gmail.com</a> with details of the property.</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
                 The website developer will review all removal requests and take appropriate action. We aim to process removal requests within 1-2 business days. Please note that only the website developer can remove listings – homeowners cannot self-remove listings created by others.
@@ -316,7 +316,7 @@ export default function TermsOfService() {
                 <li>Is otherwise inappropriate for the Service or our audience.</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
-                If you believe your content was removed or moderated in error, you may contact us at <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a> to request a review.
+                If you believe your content was removed or moderated in error, you may contact us at <a href="mailto:lekkerlights.za@gmail.com" className="text-christmas hover:underline">lekkerlights.za@gmail.com</a> to request a review.
               </p>
             </div>
 
@@ -331,7 +331,7 @@ export default function TermsOfService() {
                 <li>We may collect your name, contact details, and the date and time of the report to investigate and, where necessary, contact you for additional information.</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
-                Reports may be emailed to <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a> and handled internally. Reports are not displayed publicly.
+                Reports may be emailed to <a href="mailto:lekkerlights.za@gmail.com" className="text-christmas hover:underline">lekkerlights.za@gmail.com</a> and handled internally. Reports are not displayed publicly.
               </p>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">11.2 Our Response to Reports</h3>
@@ -472,7 +472,7 @@ export default function TermsOfService() {
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Website: <a href="https://lekkerlights.co.za" className="text-christmas hover:underline">https://lekkerlights.co.za</a></li>
-                <li>Email: <a href="mailto:totallycyber.tech@gmail.com" className="text-christmas hover:underline">totallycyber.tech@gmail.com</a></li>
+                <li>Email: <a href="mailto:lekkerlights.za@gmail.com" className="text-christmas hover:underline">lekkerlights.za@gmail.com</a></li>
               </ul>
             </div>
           </section>
