@@ -1,17 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera, Eye, Youtube, Play, Route, Check } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera, Youtube, Play, Route, Check } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { ReportListingDialog } from "@/components/ReportListingDialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 interface ListingCardProps {
@@ -325,27 +319,21 @@ export function ListingCard({
 
       {/* Content */}
       <div className="p-4 space-y-3">
-        {listing.title && (
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="font-display font-semibold text-lg group-hover:text-christmas transition-colors line-clamp-1">
-              {listing.title}
-            </h3>
-            {reviewStats && reviewStats.review_count > 0 && (
-              <div className="flex items-center gap-1 shrink-0" aria-label={`Rating: ${reviewStats.average_rating} out of 5 from ${reviewStats.review_count} reviews`}>
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" aria-hidden="true" />
-                <span className="text-sm font-medium">{reviewStats.average_rating}</span>
-                <span className="text-xs text-muted-foreground">({reviewStats.review_count})</span>
-              </div>
-            )}
-          </div>
-        )}
-        {!listing.title && reviewStats && reviewStats.review_count > 0 && (
-          <div className="flex items-center gap-1" aria-label={`Rating: ${reviewStats.average_rating} out of 5 from ${reviewStats.review_count} reviews`}>
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" aria-hidden="true" />
-            <span className="text-sm font-medium">{reviewStats.average_rating}</span>
-            <span className="text-xs text-muted-foreground">({reviewStats.review_count})</span>
-          </div>
-        )}
+        {/* Full Address as Title */}
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-display font-semibold text-lg group-hover:text-christmas transition-colors line-clamp-2">
+            {listing.location.streetNumber} {listing.location.streetName}
+            {listing.location.complexName && `, ${listing.location.complexName}`}
+            {listing.location.unitNo && ` Unit ${listing.location.unitNo}`}
+          </h3>
+          {reviewStats && reviewStats.review_count > 0 && (
+            <div className="flex items-center gap-1 shrink-0" aria-label={`Rating: ${reviewStats.average_rating} out of 5 from ${reviewStats.review_count} reviews`}>
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" aria-hidden="true" />
+              <span className="text-sm font-medium">{reviewStats.average_rating}</span>
+              <span className="text-xs text-muted-foreground">({reviewStats.review_count})</span>
+            </div>
+          )}
+        </div>
         
         {listing.description && (
           <p className="text-sm text-muted-foreground line-clamp-2">
@@ -353,36 +341,12 @@ export function ListingCard({
           </p>
         )}
 
-        {/* Location with Street Address Reveal */}
+        {/* Suburb/City Location */}
         <div className="flex items-start gap-2 text-sm">
           <MapPin className="h-4 w-4 text-christmas shrink-0 mt-0.5" aria-hidden="true" />
-          <span className="text-muted-foreground flex items-center gap-1.5 flex-wrap">
+          <span className="text-muted-foreground">
             <span className="sr-only">Location: </span>
             {listing.location.suburb}, {listing.location.city}
-            <TooltipProvider delayDuration={100}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                    className="inline-flex items-center gap-1 text-xs text-christmas hover:text-christmas/80 transition-colors bg-christmas/10 hover:bg-christmas/20 rounded px-1.5 py-0.5"
-                    aria-label="View street address"
-                  >
-                    <Eye className="h-3 w-3" aria-hidden="true" />
-                    <span className="hidden sm:inline">Address</span>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-xs">
-                  <p className="font-medium text-sm">
-                    {listing.location.streetNumber} {listing.location.streetName}
-                    {listing.location.complexName && `, ${listing.location.complexName}`}
-                    {listing.location.unitNo && ` Unit ${listing.location.unitNo}`}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
           </span>
         </div>
 
