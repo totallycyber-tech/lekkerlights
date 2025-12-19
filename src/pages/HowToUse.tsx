@@ -20,7 +20,6 @@ import {
   Camera, 
   Clock, 
   Tags, 
-  Eye, 
   Edit, 
   AlertTriangle,
   FileText,
@@ -113,7 +112,7 @@ export default function HowToUse() {
                         <span><strong>Suburb</strong> – Type a suburb name to search in that area</span>
                       </li>
                       <li className="flex items-center gap-2">
-                        <Eye className="h-4 w-4 text-primary" />
+                        <MapPin className="h-4 w-4 text-primary" />
                         <span><strong>Street Address</strong> – Search by exact street address (e.g., "11 Eland Street")</span>
                       </li>
                       <li className="flex items-center gap-2">
@@ -141,7 +140,7 @@ export default function HowToUse() {
                     <ul className="space-y-2 text-muted-foreground">
                       <li className="flex items-center gap-2">
                         <LayoutGrid className="h-4 w-4 text-primary" />
-                        <span><strong>Grid View</strong> – Browse displays as cards with photos and details</span>
+                        <span><strong>Grid View</strong> – Browse displays as cards with photos and the full street address displayed as the title</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <Map className="h-4 w-4 text-primary" />
@@ -187,8 +186,8 @@ export default function HowToUse() {
                         <span>Address and directions</span>
                       </li>
                       <li className="flex items-center gap-2">
-                        <Eye className="h-4 w-4 text-primary" />
-                        <span><strong>Quick address reveal</strong> – hover over (or tap on mobile) the "Address" button on any listing card to see the exact street address without opening the full listing</span>
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <span><strong>Full address displayed</strong> – Each listing card shows the complete street address as the title, so you can see exactly where the display is located at a glance</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-primary" />
@@ -374,7 +373,7 @@ export default function HowToUse() {
                         <span><strong>Additional Photos</strong> – Up to 15 more high quality photos to show different angles</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <Eye className="h-4 w-4 text-christmas mt-0.5 flex-shrink-0" />
+                        <Youtube className="h-4 w-4 text-christmas mt-0.5 flex-shrink-0" />
                         <div>
                           <span><strong>YouTube Videos</strong> – To add videos:</span>
                           <ol className="list-decimal list-inside mt-1 ml-2 text-sm">
