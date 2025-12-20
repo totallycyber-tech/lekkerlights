@@ -126,7 +126,15 @@ export default function ListingDetail() {
 
           {/* Action Buttons */}
           <div className="absolute top-24 right-4 sm:right-8 z-10 flex gap-2">
-            <ShareButtons shortCode={listing.shortCode} title={listing.title} compact />
+            <ShareButtons 
+              shortCode={listing.shortCode} 
+              title={listing.title} 
+              compact 
+              fullAddress={fullAddress}
+              suburb={listing.location.suburb}
+              city={listing.location.city}
+              province={listing.location.province}
+            />
             <Button 
               variant="secondary" 
               size="icon"
@@ -252,9 +260,16 @@ export default function ListingDetail() {
                     Share This Display
                   </h3>
                   <p className="text-muted-foreground text-sm mb-3">
-                    Share this display on social media, copy the link, or download a QR code to print:
+                    Share this display on social media, copy the link, or print a QR code:
                   </p>
-                  <ShareButtons shortCode={listing.shortCode} title={listing.title} />
+                  <ShareButtons 
+                    shortCode={listing.shortCode} 
+                    title={listing.title}
+                    fullAddress={fullAddress}
+                    suburb={listing.location.suburb}
+                    city={listing.location.city}
+                    province={listing.location.province}
+                  />
                 </div>
               )}
               {additionalPhotos.length > 0 && (
