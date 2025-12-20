@@ -124,6 +124,7 @@ export type Database = {
           postal_code: string
           province: string
           revision: number
+          short_code: string
           street_name: string
           street_number: string
           submitter_notes: string | null
@@ -160,6 +161,7 @@ export type Database = {
           postal_code: string
           province: string
           revision?: number
+          short_code?: string
           street_name: string
           street_number: string
           submitter_notes?: string | null
@@ -196,6 +198,7 @@ export type Database = {
           postal_code?: string
           province?: string
           revision?: number
+          short_code?: string
           street_name?: string
           street_number?: string
           submitter_notes?: string | null
@@ -233,6 +236,7 @@ export type Database = {
           phone_visible: boolean | null
           postal_code: string | null
           province: string | null
+          short_code: string | null
           street_name: string | null
           street_number: string | null
           suburb: string | null
@@ -266,6 +270,7 @@ export type Database = {
           phone_visible?: boolean | null
           postal_code?: string | null
           province?: string | null
+          short_code?: string | null
           street_name?: string | null
           street_number?: string | null
           suburb?: string | null
@@ -299,6 +304,7 @@ export type Database = {
           phone_visible?: boolean | null
           postal_code?: string | null
           province?: string | null
+          short_code?: string | null
           street_name?: string | null
           street_number?: string | null
           suburb?: string | null
@@ -454,7 +460,7 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      generate_short_code: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never

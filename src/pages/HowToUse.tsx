@@ -34,7 +34,8 @@ import {
   MousePointerClick,
   RefreshCw,
   LayoutGrid,
-  Youtube
+  Youtube,
+  Link2
 } from "lucide-react";
 
 export default function HowToUse() {
@@ -244,10 +245,37 @@ export default function HowToUse() {
                   </div>
                 </div>
 
-                {/* Step 8 */}
+                {/* Step 8 - Share with Short Links */}
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">
                     8
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Share Displays with Short Links</h3>
+                    <p className="text-muted-foreground mb-3">
+                      Every listing has a unique, easy-to-share short link. Use it to share displays with friends and family:
+                    </p>
+                    <ul className="space-y-2 text-muted-foreground">
+                      <li className="flex items-center gap-2">
+                        <Link2 className="h-4 w-4 text-primary" />
+                        <span><strong>Copy Link button</strong> – Click the link icon on any listing card or the "Copy Link" button on the listing page</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Link2 className="h-4 w-4 text-primary" />
+                        <span><strong>Short URL format</strong> – Links look like <code className="bg-muted px-1 rounded text-xs">lekkerlights.co.za/s/LL-A1B2C3</code></span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Link2 className="h-4 w-4 text-primary" />
+                        <span>Share via WhatsApp, text, email, or social media</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Step 9 */}
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">
+                    9
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Plan Your Lights Tour</h3>
@@ -684,6 +712,24 @@ export default function HowToUse() {
                         These badges help you quickly identify listings with rich media content. At the bottom of each card, 
                         you'll also see thumbnail previews – <strong>video thumbnails appear first</strong> (with a red play button overlay) 
                         followed by photo thumbnails. This lets you preview the content before opening the full listing.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="short-links" className="border-b-0">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      What are short links and how do I use them?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">
+                      Every listing has a unique short link (e.g., <code className="bg-muted px-1 rounded text-xs">lekkerlights.co.za/s/LL-A1B2C3</code>) 
+                      that makes sharing displays easy. To copy a short link:
+                      <ul className="list-disc list-inside mt-2 space-y-1">
+                        <li>Click the <strong>link icon</strong> on any listing card in Grid or Map view</li>
+                        <li>Or click <strong>"Copy Link"</strong> on the listing detail page</li>
+                      </ul>
+                      <p className="mt-2">
+                        Short links are automatically generated for all listings and never expire. Share them via WhatsApp, 
+                        text, email, or social media – recipients will be taken directly to the listing page.
                       </p>
                     </AccordionContent>
                   </AccordionItem>

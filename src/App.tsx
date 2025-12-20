@@ -17,6 +17,7 @@ import Donate from "./pages/Donate";
 import DonateSuccess from "./pages/DonateSuccess";
 import DonateCancelled from "./pages/DonateCancelled";
 import HowToUse from "./pages/HowToUse";
+import ShortUrlRedirect from "./pages/ShortUrlRedirect";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/donate/success" element={<DonateSuccess />} />
           <Route path="/donate/cancelled" element={<DonateCancelled />} />
           <Route path="/how-to-use" element={<HowToUse />} />
+          <Route path="/s/:shortCode" element={<ShortUrlRedirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
