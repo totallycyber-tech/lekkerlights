@@ -417,6 +417,12 @@ export default function HowToUse() {
                         💡 <strong>Photo Management:</strong> When editing your listing, you can drag photos to reorder them, click "Set as Cover" on any photo to make it your main image, or remove photos you no longer want. On mobile, hold and drag to reorder.
                       </p>
                     </div>
+                    <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mt-3">
+                      <p className="text-sm text-amber-600 dark:text-amber-400 font-medium mb-1">⚠️ Media Consent Notice</p>
+                      <p className="text-sm text-muted-foreground">
+                        By submitting a picture or video, you confirm you own it or have the copyright holder's permission to share it publicly. You also confirm that any identifiable people shown have consented to being featured online (and that a parent/guardian has consented where a child is identifiable). Please avoid including personal or sensitive details such as children's faces, vehicle number plates, house numbers, security features, or anything else you wouldn't want visible publicly. Lekker Lights may edit or decline submissions, and we will remove content where a legitimate privacy concern is raised in line with our <a href="/privacy-policy" className="text-christmas hover:underline font-medium">Privacy Policy</a> and <a href="/terms-of-service" className="text-christmas hover:underline font-medium">Terms of Service</a>.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -833,6 +839,12 @@ export default function HowToUse() {
                       one cover photo (the main image on your listing card) and up to 15 additional photos. 
                       <strong className="text-christmas"> For best results, upload high quality photos taken in the evening when your lights are on!</strong> Visitors 
                       can click on any photo to view it full-size and browse through your gallery using navigation arrows.
+                      <div className="mt-3 p-3 bg-amber-500/10 rounded-lg border border-amber-500/30">
+                        <p className="text-sm text-amber-600 dark:text-amber-400 font-medium mb-1">⚠️ Media Consent Notice</p>
+                        <p className="text-sm">
+                          By submitting a picture or video, you confirm you own it or have the copyright holder's permission to share it publicly. You also confirm that any identifiable people shown have consented to being featured online (and that a parent/guardian has consented where a child is identifiable). Please avoid including personal or sensitive details such as children's faces, vehicle number plates, house numbers, security features, or anything else you wouldn't want visible publicly. Lekker Lights may edit or decline submissions, and we will remove content where a legitimate privacy concern is raised.
+                        </p>
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
 

@@ -31,6 +31,7 @@ import { YouTubePreview } from "@/components/YouTubePreview";
 import { ListingPreview } from "@/components/ListingPreview";
 import { BulkListingForm } from "@/components/BulkListingForm";
 import { PhotoUploadProgress } from "@/components/PhotoUploadProgress";
+import { MediaConsentNotice } from "@/components/MediaConsentNotice";
 
 const DAYS_OF_WEEK = [
   'Monday',
@@ -808,6 +809,8 @@ export default function CreateListing() {
               {/* Photos & Videos */}
               <div className="bg-card rounded-xl border border-border p-6 space-y-6">
                 <h2 className="font-display text-lg font-semibold">Photos & Videos</h2>
+                
+                <MediaConsentNotice />
                 
                 <div className="space-y-6">
                   {/* Cover Photo Upload */}

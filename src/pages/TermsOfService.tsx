@@ -252,6 +252,12 @@ export default function TermsOfService() {
               <h2 className="font-display text-2xl font-semibold text-foreground mt-8 mb-4">9. Photography, Images, Filming and Drones</h2>
 
               <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">9.1 Images Uploaded by Hosts</h3>
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mb-4">
+                <h4 className="font-medium text-amber-600 dark:text-amber-400 mb-2">Media Consent Notice</h4>
+                <p className="text-muted-foreground leading-relaxed">
+                  By submitting a picture or video, you confirm you own it or have the copyright holder's permission to share it publicly. You also confirm that any identifiable people shown have consented to being featured online (and that a parent/guardian has consented where a child is identifiable). Please avoid including personal or sensitive details such as children's faces, vehicle number plates, house numbers, security features, or anything else you wouldn't want visible publicly. Lekker Lights may edit or decline submissions, and we will remove content where a legitimate privacy concern is raised in line with our Privacy Policy and Terms of Service.
+                </p>
+              </div>
               <p className="text-muted-foreground leading-relaxed">If you upload photos or other images as part of your listing, you agree that:</p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>You have obtained appropriate consent from any identifiable individuals depicted in the content, especially children, or you have taken reasonable steps to avoid capturing identifiable individuals.</li>
