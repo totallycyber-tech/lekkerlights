@@ -168,14 +168,17 @@ export function ShareButtons({
               padding-bottom: 20px;
               border-bottom: 2px solid #e5e5e5;
             }
-            .brand {
-              font-size: 14px;
-              color: #666;
-              margin-bottom: 8px;
-              letter-spacing: 1px;
-              text-transform: uppercase;
+            .logo {
+              max-width: 200px;
+              height: auto;
+              margin-bottom: 20px;
             }
             .title {
+              font-size: 28px;
+              font-weight: 700;
+              color: #1a1a1a;
+              margin-bottom: 8px;
+            }
               font-size: 28px;
               font-weight: 700;
               color: #1a1a1a;
@@ -250,7 +253,7 @@ export function ShareButtons({
         </head>
         <body>
           <div class="header">
-            <div class="brand">🎄 Lekker Lights</div>
+            <img src="${window.location.origin}/images/lekkerlights-logo.png" alt="Lekker Lights" class="logo" />
             <h1 class="title">${displayName}</h1>
             ${fullAddress ? `<div class="address">${fullAddress}</div>` : ''}
             ${locationLine ? `<div class="location">${locationLine}</div>` : ''}
