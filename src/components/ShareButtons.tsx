@@ -21,6 +21,7 @@ import {
   Download,
   Mail,
   Smartphone,
+  Printer,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { generateShortUrl, copyShortUrl } from "@/lib/short-url";
@@ -68,9 +69,23 @@ interface ShareButtonsProps {
   title: string | null | undefined;
   compact?: boolean;
   className?: string;
+  // Additional details for print view
+  fullAddress?: string;
+  suburb?: string;
+  city?: string;
+  province?: string;
 }
 
-export function ShareButtons({ shortCode, title, compact = false, className }: ShareButtonsProps) {
+export function ShareButtons({ 
+  shortCode, 
+  title, 
+  compact = false, 
+  className,
+  fullAddress,
+  suburb,
+  city,
+  province,
+}: ShareButtonsProps) {
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
   const shortUrl = generateShortUrl(shortCode);
   const shareText = title 
@@ -109,6 +124,163 @@ export function ShareButtons({ shortCode, title, compact = false, className }: S
     const subject = encodeURIComponent(title || "Check out this Christmas light display!");
     const body = encodeURIComponent(`${shareText}\n\n${shortUrl}`);
     window.open(`mailto:?subject=${subject}&body=${body}`, "_self");
+  };
+
+  const handlePrintQRCode = () => {
+    const displayName = title || "Christmas Light Display";
+    const locationLine = [suburb, city, province].filter(Boolean).join(", ");
+    
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      toast({
+        title: "Unable to open print view",
+        description: "Please allow popups for this site.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const svgElement = document.getElementById("qr-code-svg-print") || document.getElementById("qr-code-svg");
+    const svgData = svgElement ? new XMLSerializer().serializeToString(svgElement) : "";
+    const svgBase64 = svgData ? "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData))) : "";
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Print QR Code - ${displayName}</title>
+          <style>
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            body {
+              font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+              padding: 40px;
+              max-width: 600px;
+              margin: 0 auto;
+              color: #1a1a1a;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+              padding-bottom: 20px;
+              border-bottom: 2px solid #e5e5e5;
+            }
+            .brand {
+              font-size: 14px;
+              color: #666;
+              margin-bottom: 8px;
+              letter-spacing: 1px;
+              text-transform: uppercase;
+            }
+            .title {
+              font-size: 28px;
+              font-weight: 700;
+              color: #1a1a1a;
+              margin-bottom: 8px;
+            }
+            .address {
+              font-size: 16px;
+              color: #444;
+              margin-bottom: 4px;
+            }
+            .location {
+              font-size: 14px;
+              color: #666;
+            }
+            .qr-section {
+              text-align: center;
+              padding: 30px 0;
+            }
+            .qr-container {
+              display: inline-block;
+              padding: 20px;
+              border: 3px solid #1a1a1a;
+              border-radius: 12px;
+              background: white;
+            }
+            .qr-code {
+              width: 200px;
+              height: 200px;
+            }
+            .scan-text {
+              margin-top: 20px;
+              font-size: 16px;
+              font-weight: 600;
+              color: #1a1a1a;
+            }
+            .url-section {
+              text-align: center;
+              margin-top: 20px;
+              padding: 15px;
+              background: #f5f5f5;
+              border-radius: 8px;
+            }
+            .url-label {
+              font-size: 12px;
+              color: #666;
+              margin-bottom: 6px;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            .url {
+              font-size: 18px;
+              font-weight: 600;
+              color: #1a1a1a;
+              font-family: monospace;
+              word-break: break-all;
+            }
+            .footer {
+              margin-top: 30px;
+              text-align: center;
+              font-size: 12px;
+              color: #888;
+            }
+            @media print {
+              body {
+                padding: 20px;
+              }
+              .no-print {
+                display: none !important;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="brand">🎄 Lekker Lights</div>
+            <h1 class="title">${displayName}</h1>
+            ${fullAddress ? `<div class="address">${fullAddress}</div>` : ''}
+            ${locationLine ? `<div class="location">${locationLine}</div>` : ''}
+          </div>
+          
+          <div class="qr-section">
+            <div class="qr-container">
+              ${svgBase64 ? `<img src="${svgBase64}" alt="QR Code" class="qr-code" />` : '<div class="qr-code" style="background:#eee;display:flex;align-items:center;justify-content:center;">QR Code</div>'}
+            </div>
+            <p class="scan-text">Scan to view this display</p>
+          </div>
+          
+          <div class="url-section">
+            <div class="url-label">Short URL</div>
+            <div class="url">${shortUrl}</div>
+          </div>
+          
+          <div class="footer">
+            <p>Find more amazing Christmas light displays at lekkerlights.co.za</p>
+          </div>
+          
+          <div class="no-print" style="margin-top: 30px; text-align: center;">
+            <button onclick="window.print()" style="padding: 12px 24px; font-size: 16px; background: #1a1a1a; color: white; border: none; border-radius: 8px; cursor: pointer;">
+              Print This Page
+            </button>
+          </div>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const downloadQRCode = () => {
@@ -353,7 +525,7 @@ export function ShareButtons({ shortCode, title, compact = false, className }: S
             <DialogHeader>
               <DialogTitle>QR Code for This Display</DialogTitle>
               <DialogDescription>
-                Scan this QR code to view the display, or download it to print and share.
+                Scan this QR code to view the display, or download/print it to share.
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col items-center gap-4 py-4">
@@ -367,16 +539,39 @@ export function ShareButtons({ shortCode, title, compact = false, className }: S
                 />
               </div>
               <code className="text-sm bg-muted px-3 py-1.5 rounded">{shortUrl}</code>
-              <Button onClick={downloadQRCode} variant="default">
-                <Download className="h-4 w-4 mr-2" />
-                Download QR Code
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={downloadQRCode} variant="outline">
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </Button>
+                <Button onClick={handlePrintQRCode} variant="default">
+                  <Printer className="h-4 w-4 mr-2" />
+                  Print
+                </Button>
+              </div>
               <p className="text-xs text-muted-foreground text-center max-w-xs">
                 Print this QR code and display it at your property so visitors can easily access your listing.
               </p>
             </div>
           </DialogContent>
         </Dialog>
+        
+        {/* Direct Print Button */}
+        <Button variant="outline" size="sm" onClick={handlePrintQRCode}>
+          <Printer className="h-4 w-4 mr-1.5" />
+          <span className="hidden sm:inline">Print QR</span>
+        </Button>
+      </div>
+      
+      {/* Hidden QR code for print function */}
+      <div className="hidden">
+        <QRCodeSVG
+          id="qr-code-svg-print"
+          value={shortUrl}
+          size={200}
+          level="H"
+          includeMargin
+        />
       </div>
     </div>
   );
