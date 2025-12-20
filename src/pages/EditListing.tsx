@@ -18,6 +18,7 @@ import { TagSelector } from "@/components/TagSelector";
 import { YouTubePreview } from "@/components/YouTubePreview";
 import { PhotoUploadProgress } from "@/components/PhotoUploadProgress";
 import { SortablePhotoGrid } from "@/components/SortablePhotoGrid";
+import { MediaConsentNotice } from "@/components/MediaConsentNotice";
 import { supabase } from "@/integrations/supabase/client";
 import { useImageUpload } from "@/hooks/use-image-upload";
 import {
@@ -847,6 +848,8 @@ export default function EditListing() {
               {/* New Photos & Videos */}
               <div className="bg-card rounded-xl border border-border p-6 space-y-6">
                 <h2 className="font-display text-lg font-semibold">Add New Photos & Videos</h2>
+                
+                <MediaConsentNotice />
                 
                 <div className="space-y-6">
                   {/* Cover Photo Upload */}

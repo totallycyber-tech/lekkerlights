@@ -78,9 +78,12 @@ export default function PrivacyPolicy() {
                 When submitting bulk listings (up to 10 at a time), the same contact information is shared across all listings in the batch. Each listing can have its own photos, YouTube videos, operating hours, tags, and visit guidance details. You will receive a single edit link that provides access to edit or delete all listings submitted together. The same data collection and visibility preferences apply to each listing in the batch.
               </p>
               
-              <p className="text-muted-foreground leading-relaxed mt-4 italic">
-                Please note that photos and videos may include personal information (for example, images of people, vehicles, or neighbouring properties). You are responsible for ensuring you have the necessary consent before uploading such content.
-              </p>
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mt-4">
+                <h5 className="font-medium text-amber-600 dark:text-amber-400 mb-2">Media Consent Notice</h5>
+                <p className="text-muted-foreground leading-relaxed">
+                  By submitting a picture or video, you confirm you own it or have the copyright holder's permission to share it publicly. You also confirm that any identifiable people shown have consented to being featured online (and that a parent/guardian has consented where a child is identifiable). Please avoid including personal or sensitive details such as children's faces, vehicle number plates, house numbers, security features, or anything else you wouldn't want visible publicly. Lekker Lights may edit or decline submissions, and we will remove content where a legitimate privacy concern is raised in line with our Privacy Policy and Terms of Service.
+                </p>
+              </div>
 
               <h4 className="font-display text-lg font-medium text-foreground mt-4 mb-2">b) Reviews and Ratings</h4>
               <p className="text-muted-foreground leading-relaxed">When Visitors submit reviews or ratings about a display, we may collect:</p>

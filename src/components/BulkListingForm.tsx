@@ -27,6 +27,7 @@ import { CoverPhotoUploader } from "@/components/CoverPhotoUploader";
 import { ImageUploader } from "@/components/ImageUploader";
 import { YouTubePreview } from "@/components/YouTubePreview";
 import { supabase } from "@/integrations/supabase/client";
+import { MediaConsentNotice } from "@/components/MediaConsentNotice";
 
 const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const;
 
@@ -591,6 +592,9 @@ export function BulkListingForm({ onSubmit, isSubmitting }: BulkListingFormProps
                     />
                   )}
                 </div>
+
+                {/* Media Consent Notice */}
+                <MediaConsentNotice />
 
                 {/* Cover Photo */}
                 <div className="space-y-3">
