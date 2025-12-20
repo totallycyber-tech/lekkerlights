@@ -19,9 +19,8 @@ import {
   Share2, 
   QrCode, 
   Download,
-  MessageCircle,
-  Send,
-  Linkedin,
+  Mail,
+  Smartphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { generateShortUrl, copyShortUrl } from "@/lib/short-url";
@@ -78,8 +77,38 @@ export function ShareButtons({ shortCode, title, compact = false, className }: S
     ? `Check out this Christmas light display: ${title}` 
     : "Check out this amazing Christmas light display!";
 
+  // Check if Web Share API is available
+  const canUseWebShare = typeof navigator !== "undefined" && !!navigator.share;
+
   const handleCopyLink = () => {
     copyShortUrl(shortCode, title);
+  };
+
+  const handleNativeShare = async () => {
+    if (!canUseWebShare) return;
+    
+    try {
+      await navigator.share({
+        title: title || "Christmas Light Display",
+        text: shareText,
+        url: shortUrl,
+      });
+    } catch (error) {
+      // User cancelled or share failed - only show error if it's not a cancel
+      if (error instanceof Error && error.name !== "AbortError") {
+        toast({
+          title: "Share failed",
+          description: "Unable to share. Try copying the link instead.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleEmailShare = () => {
+    const subject = encodeURIComponent(title || "Check out this Christmas light display!");
+    const body = encodeURIComponent(`${shareText}\n\n${shortUrl}`);
+    window.open(`mailto:?subject=${subject}&body=${body}`, "_self");
   };
 
   const downloadQRCode = () => {
@@ -198,6 +227,19 @@ export function ShareButtons({ shortCode, title, compact = false, className }: S
               </Dialog>
             </div>
             
+            {/* Native Share Button (mobile) */}
+            {canUseWebShare && (
+              <Button 
+                variant="default" 
+                size="sm" 
+                className="w-full justify-start"
+                onClick={handleNativeShare}
+              >
+                <Smartphone className="h-4 w-4 mr-2" />
+                Share...
+              </Button>
+            )}
+
             {/* Copy Link Button */}
             <Button 
               variant="outline" 
@@ -207,6 +249,17 @@ export function ShareButtons({ shortCode, title, compact = false, className }: S
             >
               <Link2 className="h-4 w-4 mr-2" />
               Copy Link
+            </Button>
+
+            {/* Email Share Button */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full justify-start"
+              onClick={handleEmailShare}
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Email
             </Button>
             
             {/* Social Share Grid */}
@@ -249,6 +302,28 @@ export function ShareButtons({ shortCode, title, compact = false, className }: S
       
       {/* Social Share Buttons */}
       <div className="flex flex-wrap items-center gap-2">
+        {/* Native Share Button (mobile) */}
+        {canUseWebShare && (
+          <Button 
+            variant="default" 
+            size="sm"
+            onClick={handleNativeShare}
+          >
+            <Smartphone className="h-4 w-4 mr-1.5" />
+            <span className="hidden sm:inline">Share...</span>
+          </Button>
+        )}
+
+        {/* Email Share Button */}
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleEmailShare}
+        >
+          <Mail className="h-4 w-4 mr-1.5" />
+          <span className="hidden sm:inline">Email</span>
+        </Button>
+
         {shareLinks.map((link) => (
           <a
             key={link.name}
