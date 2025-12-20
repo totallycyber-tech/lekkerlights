@@ -157,7 +157,12 @@ export default function PrivacyPolicy() {
               <p className="text-muted-foreground leading-relaxed mt-2">
                 Tour data is stored entirely on your device and is not transmitted to our servers. Clearing your browser data will remove all saved tours.</p>
 
-              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.4 Street Address Display</h3>
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.4 Short URL Codes</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Each listing is automatically assigned a unique short URL code (e.g., LL-A1B2C3) when created. These short codes are used to generate easy-to-share links for listings. Short codes are stored with listing data and are publicly visible when users share listing links. No personal information is associated with short codes.
+              </p>
+
+              <h3 className="font-display text-xl font-semibold text-foreground mt-6 mb-3">3.5 Street Address Display</h3>
               <p className="text-muted-foreground leading-relaxed">
                 Street addresses of listed properties are displayed publicly on the Service to enable visitors to locate and visit displays. In Grid View, the full street address is displayed as the title of each listing card, allowing visitors to see the exact location at a glance. In Map View, the full street address is shown as a title when a listing is selected. Visitors can also search for displays by street address using the search filters. By listing a property, you consent to the public display of its street address in these ways.
               </p>

@@ -27,6 +27,9 @@ export default function TermsOfService() {
                 Lekker Lights allows property owners or residents ("Hosts") to list their festive light displays and allows visitors ("Visitors") to search for, view, rate, review, and report these displays. The Service displays listings in a Grid View and on an interactive Map View based on information submitted by Hosts. Visitors can click on map markers to view listing details, use the Refresh button to reload the latest data, and filter displays by location (province, suburb, street address, and quick-filter suburb chips) and tags. In Grid View, the full street address is displayed as the title of each listing card, allowing visitors to see the exact location at a glance. In Map View, the full street address is shown as a title when a listing is selected. The suburb chips provide a convenient way to instantly filter displays by clicking on suburb names, with each chip showing the number of displays in that area. The Service may show ratings and reviews submitted by Visitors.
               </p>
               <p className="text-muted-foreground leading-relaxed mt-4">
+                Each listing is automatically assigned a unique short URL code (e.g., LL-A1B2C3) for easy sharing. These short links allow visitors to quickly share listings with friends and family via messaging apps, email, or social media. Short links never expire and redirect directly to the listing page.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mt-4">
                 The Service includes a Tour Planner feature that allows Visitors to create custom driving routes to visit multiple displays. Visitors can add up to 10 stops per tour, optimize the route order, save multiple named tours for later use, and share tour links with others. Tours open in Google Maps for turn-by-turn navigation.
               </p>
               <p className="text-muted-foreground leading-relaxed mt-4">

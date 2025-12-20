@@ -29,6 +29,7 @@ export interface Listing {
   createdAt: string;
   updatedAt: string;
   featured?: boolean;
+  shortCode?: string | null;
 }
 
 // Input type for transformDbListing that's compatible with both useListings and direct DB queries
@@ -57,6 +58,7 @@ type DbListingInput = {
   directions_clicks: number;
   favorites_count: number;
   tags: string[] | null;
+  short_code?: string | null;
 };
 
 // Transform database listing to UI format
@@ -124,6 +126,7 @@ export function transformDbListing(dbListing: DbListingInput): Listing {
     tags: dbListing.tags || [],
     createdAt: dbListing.created_at,
     updatedAt: dbListing.updated_at,
+    shortCode: dbListing.short_code || null,
   };
 }
 

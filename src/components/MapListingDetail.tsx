@@ -2,12 +2,13 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Star, Share2, Flag, X, Eye } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Star, Flag, X, Eye, Link2 } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { ReportListingDialog } from "@/components/ReportListingDialog";
 import { AddToTourButton } from "@/components/AddToTourButton";
+import { copyShortUrl } from "@/lib/short-url";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 interface MapListingDetailProps {
@@ -52,13 +53,8 @@ export function MapListingDetail({
     });
   };
 
-  const handleShareClick = () => {
-    const listingUrl = `${window.location.origin}/listing/${listing.id}`;
-    navigator.clipboard.writeText(listingUrl);
-    toast({
-      title: "Link copied!",
-      description: "Share this display with friends and family.",
-    });
+  const handleCopyLinkClick = () => {
+    copyShortUrl(listing.shortCode, listing.title);
   };
 
   const streetAddress = `${listing.location.streetNumber} ${listing.location.streetName}${listing.location.complexName ? `, ${listing.location.complexName}` : ''}${listing.location.unitNo ? ` Unit ${listing.location.unitNo}` : ''}`;
@@ -219,11 +215,12 @@ export function MapListingDetail({
 
               <Button
                 size="sm"
-                variant="ghost"
-                onClick={handleShareClick}
+                variant="outline"
+                onClick={handleCopyLinkClick}
+                title="Copy Short Link"
               >
-                <Share2 className="h-4 w-4 mr-1.5" />
-                Share
+                <Link2 className="h-4 w-4 mr-1.5" />
+                Copy Link
               </Button>
 
               <ReportListingDialog

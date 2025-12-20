@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Share2, Flag, Camera, Youtube, Play, Route, Check } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Flag, Camera, Youtube, Play, Route, Check, Link2 } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { ReportListingDialog } from "@/components/ReportListingDialog";
+import { copyShortUrl } from "@/lib/short-url";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 interface ListingCardProps {
@@ -67,15 +68,10 @@ export function ListingCard({
     }
   };
 
-  const handleShareClick = (e: React.MouseEvent) => {
+  const handleCopyLinkClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const listingUrl = `${window.location.origin}/listing/${listing.id}`;
-    navigator.clipboard.writeText(listingUrl);
-    toast({
-      title: "Link copied!",
-      description: "Share this display with friends and family.",
-    });
+    copyShortUrl(listing.shortCode, listing.title);
   };
 
   const formatDistance = (km: number) => {
@@ -296,10 +292,11 @@ export function ListingCard({
           )}
           <button 
             className="p-2 rounded-full backdrop-blur-sm transition-all bg-background/50 hover:bg-background/80"
-            onClick={handleShareClick}
-            aria-label={`Share ${listing.title}`}
+            onClick={handleCopyLinkClick}
+            aria-label={`Copy short link for ${listing.title}`}
+            title="Copy Short Link"
           >
-            <Share2 className="h-5 w-5" aria-hidden="true" />
+            <Link2 className="h-5 w-5" aria-hidden="true" />
           </button>
           <button 
             className={cn(

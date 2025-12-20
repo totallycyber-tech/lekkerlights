@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { mockListings, transformDbListing } from "@/data/mockListings";
 import { 
   MapPin, Clock, Mail, Phone, ExternalLink, 
-  ArrowLeft, Share2, Heart, Flag, Calendar, Loader2, RefreshCw
+  ArrowLeft, Heart, Flag, Calendar, Loader2, RefreshCw, Link2
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useListing } from "@/hooks/use-listings";
@@ -17,6 +17,7 @@ import { ReportListingDialog } from "@/components/ReportListingDialog";
 import { PhotoLightbox } from "@/components/PhotoLightbox";
 import { EditListingDialog } from "@/components/EditListingDialog";
 import { YouTubePreview } from "@/components/YouTubePreview";
+import { copyShortUrl, generateShortUrl } from "@/lib/short-url";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 import { format } from "date-fns";
 
@@ -82,25 +83,8 @@ export default function ListingDetail() {
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
   };
 
-  const handleShare = async () => {
-    const shareTitle = listing.title || `Christmas Display in ${listing.location.suburb}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: shareTitle,
-          text: `Check out this amazing Christmas display!`,
-          url: window.location.href,
-        });
-      } catch (err) {
-        console.log('Share cancelled');
-      }
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast({
-        title: "Link copied!",
-        description: "Share this link with friends and family.",
-      });
-    }
+  const handleCopyShortLink = () => {
+    copyShortUrl(listing.shortCode, listing.title);
   };
 
   const fullAddress = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}, ${listing.location.postalCode}`;
@@ -147,11 +131,13 @@ export default function ListingDetail() {
           <div className="absolute top-24 right-4 sm:right-8 z-10 flex gap-2">
             <Button 
               variant="secondary" 
-              size="icon"
-              onClick={handleShare}
-              aria-label="Share this listing"
+              size="sm"
+              onClick={handleCopyShortLink}
+              aria-label="Copy short link"
+              title="Copy Short Link"
             >
-              <Share2 className="h-4 w-4" />
+              <Link2 className="h-4 w-4 mr-1.5" />
+              Copy Link
             </Button>
             <Button 
               variant="secondary" 
@@ -270,7 +256,31 @@ export default function ListingDetail() {
                 </div>
               )}
 
-              {/* Photo Gallery */}
+              {/* Share This Display - Short Link */}
+              {!isExampleListing && listing.shortCode && (
+                <div className="border-t border-border pt-6 mb-8">
+                  <h3 className="font-display font-semibold flex items-center gap-2 mb-3">
+                    <Link2 className="h-5 w-5 text-christmas" />
+                    Share This Display
+                  </h3>
+                  <p className="text-muted-foreground text-sm mb-3">
+                    Copy and share this short link with friends and family:
+                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <code className="bg-muted px-3 py-1.5 rounded text-sm font-mono">
+                      {generateShortUrl(listing.shortCode)}
+                    </code>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopyShortLink}
+                    >
+                      <Link2 className="h-4 w-4 mr-1.5" />
+                      Copy Link
+                    </Button>
+                  </div>
+                </div>
+              )}
               {additionalPhotos.length > 0 && (
                 <div className="border-t border-border pt-6 mb-8">
                   <h3 className="font-display font-semibold mb-4">More Photos</h3>
