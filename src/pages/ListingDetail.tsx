@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { mockListings, transformDbListing } from "@/data/mockListings";
 import { 
   MapPin, Clock, Mail, Phone, ExternalLink, 
-  ArrowLeft, Heart, Flag, Calendar, Loader2, RefreshCw, Link2
+  ArrowLeft, Heart, Flag, Calendar, Loader2, RefreshCw, Share2
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useListing } from "@/hooks/use-listings";
@@ -17,7 +17,7 @@ import { ReportListingDialog } from "@/components/ReportListingDialog";
 import { PhotoLightbox } from "@/components/PhotoLightbox";
 import { EditListingDialog } from "@/components/EditListingDialog";
 import { YouTubePreview } from "@/components/YouTubePreview";
-import { copyShortUrl, generateShortUrl } from "@/lib/short-url";
+import { ShareButtons } from "@/components/ShareButtons";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 import { format } from "date-fns";
 
@@ -83,9 +83,6 @@ export default function ListingDetail() {
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
   };
 
-  const handleCopyShortLink = () => {
-    copyShortUrl(listing.shortCode, listing.title);
-  };
 
   const fullAddress = `${listing.location.streetNumber} ${listing.location.streetName}, ${listing.location.suburb}, ${listing.location.city}, ${listing.location.province}, ${listing.location.postalCode}`;
   
@@ -129,16 +126,7 @@ export default function ListingDetail() {
 
           {/* Action Buttons */}
           <div className="absolute top-24 right-4 sm:right-8 z-10 flex gap-2">
-            <Button 
-              variant="secondary" 
-              size="sm"
-              onClick={handleCopyShortLink}
-              aria-label="Copy short link"
-              title="Copy Short Link"
-            >
-              <Link2 className="h-4 w-4 mr-1.5" />
-              Copy Link
-            </Button>
+            <ShareButtons shortCode={listing.shortCode} title={listing.title} compact />
             <Button 
               variant="secondary" 
               size="icon"
@@ -256,29 +244,17 @@ export default function ListingDetail() {
                 </div>
               )}
 
-              {/* Share This Display - Short Link */}
+              {/* Share This Display */}
               {!isExampleListing && listing.shortCode && (
                 <div className="border-t border-border pt-6 mb-8">
                   <h3 className="font-display font-semibold flex items-center gap-2 mb-3">
-                    <Link2 className="h-5 w-5 text-christmas" />
+                    <Share2 className="h-5 w-5 text-christmas" />
                     Share This Display
                   </h3>
                   <p className="text-muted-foreground text-sm mb-3">
-                    Copy and share this short link with friends and family:
+                    Share this display on social media, copy the link, or download a QR code to print:
                   </p>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <code className="bg-muted px-3 py-1.5 rounded text-sm font-mono">
-                      {generateShortUrl(listing.shortCode)}
-                    </code>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCopyShortLink}
-                    >
-                      <Link2 className="h-4 w-4 mr-1.5" />
-                      Copy Link
-                    </Button>
-                  </div>
+                  <ShareButtons shortCode={listing.shortCode} title={listing.title} />
                 </div>
               )}
               {additionalPhotos.length > 0 && (

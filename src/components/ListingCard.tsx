@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Flag, Camera, Youtube, Play, Route, Check, Link2 } from "lucide-react";
+import { MapPin, Clock, Heart, ExternalLink, TrendingUp, Navigation, Star, Flag, Camera, Youtube, Play, Route, Check, Share2 } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { ReportListingDialog } from "@/components/ReportListingDialog";
-import { copyShortUrl } from "@/lib/short-url";
+import { ShareButtons } from "@/components/ShareButtons";
 import defaultCoverPhoto from "@/assets/default-cover-photo.png";
 
 interface ListingCardProps {
@@ -66,12 +66,6 @@ export function ListingCard({
           : `${listing.title} has been added to your favourites.`,
       });
     }
-  };
-
-  const handleCopyLinkClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    copyShortUrl(listing.shortCode, listing.title);
   };
 
   const formatDistance = (km: number) => {
@@ -290,14 +284,9 @@ export function ListingCard({
               )}
             </button>
           )}
-          <button 
-            className="p-2 rounded-full backdrop-blur-sm transition-all bg-background/50 hover:bg-background/80"
-            onClick={handleCopyLinkClick}
-            aria-label={`Copy short link for ${listing.title}`}
-            title="Copy Short Link"
-          >
-            <Link2 className="h-5 w-5" aria-hidden="true" />
-          </button>
+          <div onClick={(e) => e.stopPropagation()}>
+            <ShareButtons shortCode={listing.shortCode} title={listing.title} compact />
+          </div>
           <button 
             className={cn(
               "p-2 rounded-full backdrop-blur-sm transition-all",
