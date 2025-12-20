@@ -68,6 +68,13 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "listing_edit_tokens_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: true
+            referencedRelation: "listings_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       listing_revisions: {
@@ -352,6 +359,13 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "reviews_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -381,6 +395,7 @@ export type Database = {
           phone_visible: boolean | null
           postal_code: string | null
           province: string | null
+          short_code: string | null
           street_name: string | null
           street_number: string | null
           suburb: string | null
@@ -393,9 +408,9 @@ export type Database = {
         Insert: {
           city?: string | null
           complex_name?: string | null
-          contact_email?: string | null
-          contact_name?: string | null
-          contact_phone?: string | null
+          contact_email?: never
+          contact_name?: never
+          contact_phone?: never
           created_at?: string | null
           description?: string | null
           directions_clicks?: number | null
@@ -414,6 +429,7 @@ export type Database = {
           phone_visible?: boolean | null
           postal_code?: string | null
           province?: string | null
+          short_code?: string | null
           street_name?: string | null
           street_number?: string | null
           suburb?: string | null
@@ -426,9 +442,9 @@ export type Database = {
         Update: {
           city?: string | null
           complex_name?: string | null
-          contact_email?: string | null
-          contact_name?: string | null
-          contact_phone?: string | null
+          contact_email?: never
+          contact_name?: never
+          contact_phone?: never
           created_at?: string | null
           description?: string | null
           directions_clicks?: number | null
@@ -447,6 +463,7 @@ export type Database = {
           phone_visible?: boolean | null
           postal_code?: string | null
           province?: string | null
+          short_code?: string | null
           street_name?: string | null
           street_number?: string | null
           suburb?: string | null

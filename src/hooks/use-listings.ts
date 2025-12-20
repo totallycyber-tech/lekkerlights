@@ -31,6 +31,7 @@ export interface Listing {
   directions_clicks: number;
   favorites_count: number;
   tags: string[];
+  short_code: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -45,6 +46,7 @@ function toListingFromDb(row: any): Listing {
     directions_clicks: row.directions_clicks ?? 0,
     favorites_count: row.favorites_count ?? 0,
     tags: row.tags ?? [],
+    short_code: row.short_code ?? null,
   };
 }
 
