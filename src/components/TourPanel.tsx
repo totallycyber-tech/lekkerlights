@@ -22,6 +22,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Route,
   X,
   Trash2,
@@ -37,6 +44,8 @@ import {
   FolderOpen,
   Pencil,
   Check,
+  Map,
+  ExternalLink,
 } from "lucide-react";
 import { Listing } from "@/data/mockListings";
 import { toast } from "@/hooks/use-toast";
@@ -101,7 +110,42 @@ export function TourPanel({
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [editingTourId, setEditingTourId] = useState<string | null>(null);
   const [editingTourName, setEditingTourName] = useState("");
+  const [showMapChoice, setShowMapChoice] = useState(false);
+  const [pendingLocation, setPendingLocation] = useState<{ lat: number; lng: number } | null>(null);
 
+  // Detect if user is on iOS
+  const isIOS = useMemo(() => {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }, []);
+
+  // Generate Apple Maps URL for the tour
+  const generateAppleMapsUrl = useCallback((userLat?: number, userLng?: number) => {
+    const listingsWithCoords = tourListings.filter(
+      (l) => l.location.lat != null && l.location.lng != null
+    );
+
+    if (listingsWithCoords.length === 0) return null;
+
+    // Apple Maps uses a different URL format
+    // For directions with multiple stops, we need to chain them
+    if (listingsWithCoords.length === 1) {
+      const dest = listingsWithCoords[0];
+      let url = `maps://maps.apple.com/?daddr=${dest.location.lat},${dest.location.lng}`;
+      if (userLat != null && userLng != null) {
+        url += `&saddr=${userLat},${userLng}`;
+      }
+      return url;
+    }
+
+    // For multiple stops, Apple Maps supports "+" between addresses
+    const allPoints = listingsWithCoords.map(l => `${l.location.lat},${l.location.lng}`);
+    let url = `maps://maps.apple.com/?daddr=${allPoints.join('+to:')}`;
+    if (userLat != null && userLng != null) {
+      url += `&saddr=${userLat},${userLng}`;
+    }
+    return url;
+  }, [tourListings]);
   // Calculate total distance between all stops
   const tourStats = useMemo(() => {
     const listingsWithCoords = tourListings.filter(
@@ -168,10 +212,37 @@ export function TourPanel({
 
   const handleStartTour = async () => {
     const loc = await getUserLocation();
+    
+    // On iOS, show a choice dialog for maps
+    if (isIOS) {
+      setPendingLocation(loc);
+      setShowMapChoice(true);
+      return;
+    }
+    
+    // On other platforms, use Google Maps directly
     const url = generateGoogleMapsUrl(loc?.lat, loc?.lng);
     if (url) {
-      window.open(url, "_blank");
+      window.location.href = url;
     }
+  };
+
+  const openInGoogleMaps = () => {
+    const url = generateGoogleMapsUrl(pendingLocation?.lat, pendingLocation?.lng);
+    if (url) {
+      window.location.href = url;
+    }
+    setShowMapChoice(false);
+    setPendingLocation(null);
+  };
+
+  const openInAppleMaps = () => {
+    const url = generateAppleMapsUrl(pendingLocation?.lat, pendingLocation?.lng);
+    if (url) {
+      window.location.href = url;
+    }
+    setShowMapChoice(false);
+    setPendingLocation(null);
   };
 
   const handleOptimize = async () => {
@@ -567,7 +638,7 @@ export function TourPanel({
               ) : (
                 <Navigation className="h-4 w-4 mr-2" />
               )}
-              Start Tour in Google Maps
+              {isIOS ? "Start Tour in Maps" : "Start Tour in Google Maps"}
             </Button>
 
             <Button variant="outline" className="w-full" onClick={handleShare}>
@@ -604,19 +675,53 @@ export function TourPanel({
   );
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>{TriggerButton}</SheetTrigger>
-      <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <Route className="h-5 w-5 text-christmas" />
-            Plan Your Lights Tour
-          </SheetTitle>
-        </SheetHeader>
-        <div className="flex-1 overflow-hidden mt-4">
-          {showSavedTours ? <SavedToursView /> : <TourContent />}
-        </div>
-      </SheetContent>
-    </Sheet>
+    <>
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetTrigger asChild>{TriggerButton}</SheetTrigger>
+        <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <Route className="h-5 w-5 text-christmas" />
+              Plan Your Lights Tour
+            </SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-hidden mt-4">
+            {showSavedTours ? <SavedToursView /> : <TourContent />}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Map choice dialog for iOS */}
+      <Dialog open={showMapChoice} onOpenChange={setShowMapChoice}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Map className="h-5 w-5 text-christmas" />
+              Choose Your Maps App
+            </DialogTitle>
+            <DialogDescription>
+              Select which app you'd like to use for navigation.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-4">
+            <Button
+              className="w-full h-14 text-base"
+              variant="outline"
+              onClick={openInAppleMaps}
+            >
+              <Map className="h-5 w-5 mr-3" />
+              Open in Apple Maps
+            </Button>
+            <Button
+              className="w-full h-14 text-base bg-christmas hover:bg-christmas/90"
+              onClick={openInGoogleMaps}
+            >
+              <ExternalLink className="h-5 w-5 mr-3" />
+              Open in Google Maps
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
