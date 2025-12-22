@@ -691,7 +691,7 @@ export function TourPanel({
               ) : (
                 <Navigation className="h-4 w-4 mr-2" />
               )}
-              {isIOS ? "Start Tour in Maps" : "Start Tour in Google Maps"}
+              Start Tour
             </Button>
 
             {isIOS && savedMapApp && (

@@ -240,7 +240,7 @@ export default function TermsOfService() {
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>You may add up to 10 displays to a single tour and save up to 10 named tours locally on your device.</li>
                 <li>Tour data (including listing IDs and tour names) is stored in your browser's local storage and is not backed up by Lekker Lights – clearing your browser data will delete all saved tours.</li>
-                <li>When you use "Start Tour in Google Maps", your tour will open in Google Maps, which is subject to Google's own Terms of Service and Privacy Policy.</li>
+                <li>When you use "Start Tour", your tour will open in your preferred maps application (Google Maps, Apple Maps, or Waze), which is subject to that provider's Terms of Service and Privacy Policy.</li>
                 <li>The "Optimize Route" feature may request access to your device's location to calculate the optimal driving order; this is optional and requires your permission.</li>
                 <li>Tour links you share contain listing IDs and can be accessed by anyone with the link – do not share tour links if you wish to keep your planned route private.</li>
                 <li>Estimated driving times and distances are approximations based on average speeds and may not reflect actual road conditions, traffic, or routing.</li>

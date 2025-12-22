@@ -667,7 +667,7 @@ export default function HowToUse() {
                         <li>Click the <strong>"Plan Tour"</strong> button to open the tour panel</li>
                         <li>Use the <strong>up/down arrows</strong> to reorder stops, or click <strong>"Optimize Route"</strong> to automatically arrange stops for the shortest driving distance</li>
                         <li>See the <strong>estimated distance and time</strong> for your tour at the top of the panel</li>
-                        <li>Click <strong>"Start Tour in Google Maps"</strong> to open turn-by-turn navigation (optionally starting from your current location)</li>
+                        <li>Click <strong>"Start Tour"</strong> to open turn-by-turn navigation in your preferred maps app (optionally starting from your current location)</li>
                         <li>Use <strong>"Share Tour Link"</strong> to copy a link that others can use to see your planned route</li>
                       </ol>
                       <p className="mt-2">
