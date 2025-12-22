@@ -112,6 +112,16 @@ export function TourPanel({
   const [editingTourName, setEditingTourName] = useState("");
   const [showMapChoice, setShowMapChoice] = useState(false);
   const [pendingLocation, setPendingLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [rememberChoice, setRememberChoice] = useState(false);
+
+  // Load saved map preference from localStorage
+  const [savedMapApp, setSavedMapApp] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem("lekker-lights-preferred-map-app");
+    } catch {
+      return null;
+    }
+  });
 
   // Detect if user is on iOS
   const isIOS = useMemo(() => {
@@ -144,6 +154,21 @@ export function TourPanel({
     if (userLat != null && userLng != null) {
       url += `&saddr=${userLat},${userLng}`;
     }
+    return url;
+  }, [tourListings]);
+
+  // Generate Waze URL for the tour
+  const generateWazeUrl = useCallback((userLat?: number, userLng?: number) => {
+    const listingsWithCoords = tourListings.filter(
+      (l) => l.location.lat != null && l.location.lng != null
+    );
+
+    if (listingsWithCoords.length === 0) return null;
+
+    // Waze only supports single destination, so we use the first stop
+    // Users will need to navigate stop by stop
+    const dest = listingsWithCoords[0];
+    let url = `https://waze.com/ul?ll=${dest.location.lat},${dest.location.lng}&navigate=yes`;
     return url;
   }, [tourListings]);
   // Calculate total distance between all stops
@@ -213,8 +238,14 @@ export function TourPanel({
   const handleStartTour = async () => {
     const loc = await getUserLocation();
     
-    // On iOS, show a choice dialog for maps
+    // On iOS, check if user has a saved preference
     if (isIOS) {
+      if (savedMapApp) {
+        // Use saved preference
+        openMapApp(savedMapApp, loc);
+        return;
+      }
+      // Show choice dialog
       setPendingLocation(loc);
       setShowMapChoice(true);
       return;
@@ -227,22 +258,44 @@ export function TourPanel({
     }
   };
 
-  const openInGoogleMaps = () => {
-    const url = generateGoogleMapsUrl(pendingLocation?.lat, pendingLocation?.lng);
+  const openMapApp = (app: string, loc?: { lat: number; lng: number } | null) => {
+    let url: string | null = null;
+    
+    switch (app) {
+      case "apple":
+        url = generateAppleMapsUrl(loc?.lat, loc?.lng);
+        break;
+      case "google":
+        url = generateGoogleMapsUrl(loc?.lat, loc?.lng);
+        break;
+      case "waze":
+        url = generateWazeUrl(loc?.lat, loc?.lng);
+        break;
+    }
+    
     if (url) {
       window.location.href = url;
     }
-    setShowMapChoice(false);
-    setPendingLocation(null);
   };
 
-  const openInAppleMaps = () => {
-    const url = generateAppleMapsUrl(pendingLocation?.lat, pendingLocation?.lng);
-    if (url) {
-      window.location.href = url;
+  const handleMapChoice = (app: string) => {
+    if (rememberChoice) {
+      localStorage.setItem("lekker-lights-preferred-map-app", app);
+      setSavedMapApp(app);
     }
+    openMapApp(app, pendingLocation);
     setShowMapChoice(false);
     setPendingLocation(null);
+    setRememberChoice(false);
+  };
+
+  const clearMapPreference = () => {
+    localStorage.removeItem("lekker-lights-preferred-map-app");
+    setSavedMapApp(null);
+    toast({
+      title: "Preference cleared",
+      description: "You'll be asked to choose a maps app next time.",
+    });
   };
 
   const handleOptimize = async () => {
@@ -641,6 +694,16 @@ export function TourPanel({
               {isIOS ? "Start Tour in Maps" : "Start Tour in Google Maps"}
             </Button>
 
+            {isIOS && savedMapApp && (
+              <button
+                type="button"
+                onClick={clearMapPreference}
+                className="text-xs text-muted-foreground hover:text-foreground underline"
+              >
+                Change default maps app ({savedMapApp === "apple" ? "Apple Maps" : savedMapApp === "google" ? "Google Maps" : "Waze"})
+              </button>
+            )}
+
             <Button variant="outline" className="w-full" onClick={handleShare}>
               <Share2 className="h-4 w-4 mr-2" />
               Share Tour Link
@@ -701,24 +764,49 @@ export function TourPanel({
             </DialogTitle>
             <DialogDescription>
               Select which app you'd like to use for navigation.
+              {tourListings.length > 1 && (
+                <span className="block mt-1 text-xs">
+                  Note: Waze only supports one destination at a time.
+                </span>
+              )}
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 mt-4">
             <Button
               className="w-full h-14 text-base"
               variant="outline"
-              onClick={openInAppleMaps}
+              onClick={() => handleMapChoice("apple")}
             >
               <Map className="h-5 w-5 mr-3" />
               Open in Apple Maps
             </Button>
             <Button
               className="w-full h-14 text-base bg-christmas hover:bg-christmas/90"
-              onClick={openInGoogleMaps}
+              onClick={() => handleMapChoice("google")}
             >
               <ExternalLink className="h-5 w-5 mr-3" />
               Open in Google Maps
             </Button>
+            <Button
+              className="w-full h-14 text-base"
+              variant="outline"
+              onClick={() => handleMapChoice("waze")}
+            >
+              <Navigation className="h-5 w-5 mr-3" />
+              Open in Waze
+            </Button>
+          </div>
+          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
+            <input
+              type="checkbox"
+              id="remember-map-choice"
+              checked={rememberChoice}
+              onChange={(e) => setRememberChoice(e.target.checked)}
+              className="h-4 w-4 rounded border-border"
+            />
+            <label htmlFor="remember-map-choice" className="text-sm text-muted-foreground">
+              Remember my choice
+            </label>
           </div>
         </DialogContent>
       </Dialog>
