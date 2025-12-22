@@ -153,7 +153,7 @@ export default function PrivacyPolicy() {
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Your current tour (up to 10 stops) and saved tours (up to 10 named tours) are stored locally in your browser using localStorage</li>
                 <li>Tour data includes listing IDs, tour names, and creation dates – no personal information is collected</li>
-                <li>When you click "Start Tour in Google Maps" or share a tour link, this data may be processed by Google Maps</li>
+                <li>When you click "Start Tour" or share a tour link, this data may be processed by your chosen maps application (Google Maps, Apple Maps, or Waze)</li>
                 <li>If you use the "Optimize Route" feature, your device's location (with your permission) may be used to calculate the optimal order</li>
                 <li>Shareable tour links contain listing IDs in the URL – anyone with this link can load and view the same tour</li>
               </ul>
